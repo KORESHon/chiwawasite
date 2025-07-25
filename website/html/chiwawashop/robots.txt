@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /pgpanel/
+Disallow: /admin/
+Disallow: /config/
+Disallow: /logs/
+
+Allow: /
+
+# Указываем ссылку на главную страницу
+Sitemap: https://chiwawashop.ru/sitemap.xml

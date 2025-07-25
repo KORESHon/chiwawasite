@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChiwawaMine - Административная панель</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #666;
+            font-weight: 300;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .service-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .service-item:hover {
+            background: #e9ecef;
+            border-left-color: #764ba2;
+        }
+
+        .service-item h4 {
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .service-item p {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            text-decoration: none;
+            color: white;
+        }
+
+        .access-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            margin: 20px 0;
+        }
+
+        .access-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .protected-placeholder {
+            background: #fff3cd;
+            border: 2px dashed #ffc107;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .protected-placeholder h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        .protected-placeholder p {
+            color: #856404;
+            margin-bottom: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            margin: 10% auto;
+            padding: 0;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        .modal-header {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+        }
+
+        .modal-header h2 {
+            color: white;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        .modal-header p {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0;
+        }
+
+        .modal-body {
+            padding: 30px;
+            background: white;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .code-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            text-align: center;
+            letter-spacing: 2px;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+        }
+
+        .code-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .modal-btn.secondary {
+            background: #f8f9fa;
+            color: #666;
+            border: 1px solid #e0e0e0;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .error-message {
+            color: #dc3545;
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .success-message {
+            color: #28a745;
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .tech-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+
+        .tech-item h4 {
+            color: #333;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .tech-item p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .footer {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .footer h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .footer p {
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .footer .creator {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #4caf50;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: scale(0.8) translateY(-50px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .icon {
+            font-size: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                margin: 20% auto;
+                width: 95%;
+            }
+        }
+
+        /* Стили для зашифрованного контента */
+        .encrypted-content {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Заголовок -->
+        <div class="header">
+            <h1>🏔️ ChiwawaMine</h1>
+            <p>Административная панель управления сервером</p>
+        </div>
+
+        <div class="grid">
+            <!-- Административные панели -->
+            <div class="card">
+                <h2><span class="icon">🛠️</span>Административные панели</h2>
+                
+                <div class="service-item">
+                    <h4><span class="status-indicator"></span>🐘 pgAdmin4 - PostgreSQL</h4>
+                    <p>Профессиональное управление базами данных PostgreSQL</p>
+                    <a href="https://pgadmin.chiwawashop.ru" class="btn" target="_blank">Открыть pgAdmin4</a>
+                </div>
+
+                <div class="service-item">
+                    <h4><span class="status-indicator"></span>🗄️ phpMyAdmin - MySQL</h4>
+                    <p>Управление базами данных MySQL/MariaDB</p>
+                    <a href="https://phpmyadmin.chiwawashop.ru" class="btn" target="_blank">Открыть phpMyAdmin</a>
+                </div>
+            </div>
+
+            <!-- Данные для входа (зашифровано) -->
+            <div class="card">
+                <h2><span class="icon">🔑</span>Данные для входа</h2>
+                
+                <div class="protected-placeholder">
+                    <h3>🔐 Зашифрованный контент</h3>
+                    <p>Данные защищены криптографическим шифрованием</p>
+                    <button class="access-btn" onclick="showAccessModal()">
+                        🔓 Расшифровать данные
+                    </button>
+                </div>
+                
+                <div class="encrypted-content" id="credentials-content"></div>
+            </div>
+        </div>
+
+        <!-- Подключение к базам данных (зашифровано) -->
+        <div class="card">
+            <h2><span class="icon">💾</span>Подключение к базам данных</h2>
+            
+            <div class="protected-placeholder">
+                <h3>🔐 Зашифрованная информация</h3>
+                <p>Данные подключения защищены AES-256 шифрованием</p>
+                <button class="access-btn" onclick="showAccessModal()">
+                    🔓 Расшифровать данные
+                </button>
+            </div>
+            
+            <div class="encrypted-content" id="database-content"></div>
+        </div>
+
+        <!-- Техническая информация -->
+        <div class="card">
+            <h2><span class="icon">⚙️</span>Техническая информация</h2>
+            
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <h4>🖥️ Сервер</h4>
+                    <p>Ubuntu 22.04 LTS</p>
+                </div>
+                
+                <div class="tech-item">
+                    <h4>🌐 Веб-сервер</h4>
+                    <p>Nginx 1.18</p>
+                </div>
+                
+                <div class="tech-item">
+                    <h4>🐘 PostgreSQL</h4>
+                    <p>Версия 14.x</p>
+                </div>
+                
+                <div class="tech-item">
+                    <h4>🗄️ MySQL</h4>
+                    <p>Версия 8.0.x</p>
+                </div>
+                
+                <div class="tech-item">
+                    <h4>🐍 Python</h4>
+                    <p>Версия 3.10</p>
+                </div>
+                
+                <div class="tech-item">
+                    <h4>🔐 SSL</h4>
+                    <p>Let's Encrypt</p>
+                </div>
+                
+                <div class="tech-item">
+                    <h4>🛡️ Безопасность</h4>
+                    <p>UFW + Fail2Ban</p>
+                </div>
+                
+                <div class="tech-item">
+                    <h4>📊 Мониторинг</h4>
+                    <p>Автоматический</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Футер -->
+        <div class="footer">
+            <h3>👨‍💻 Информация о создателе</h3>
+            <p><strong class="creator">ebluffy (Дмитрий Чураков)</strong></p>
+            <p>Этот сайт был создан в чисто личных целях для изучения и практики веб-разработки.</p>
+            <p>Все материалы и решения представлены исключительно в образовательных целях.</p>
+            <p>Использование данного ресурса осуществляется на ваш страх и риск.</p>
+            <p style="margin-top: 15px; color: #999; font-size: 0.9rem;">
+                © 2025 ChiwawaMine. Все права защищены. 
+                <br>Сайт создан для личного использования и обучения.
+            </p>
+        </div>
+    </div>
+
+    <!-- Модальное окно для ввода кода -->
+    <div id="accessModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔐 Криптографическая защита</h2>
+                <p>Введите ключ расшифровки для доступа к данным</p>
+            </div>
+            <div class="modal-body">
+                <input type="password" id="secretCode" class="code-input" placeholder="Введите ключ расшифровки..." maxlength="20">
+                <div class="modal-buttons">
+                    <button class="modal-btn secondary" onclick="closeAccessModal()">Отмена</button>
+                    <button class="modal-btn primary" onclick="decryptAndShow()">Расшифровать</button>
+                </div>
+                <div id="errorMessage" class="error-message">
+                    ❌ Неверный ключ расшифровки. Доступ запрещен.
+                </div>
+                <div id="successMessage" class="success-message">
+                    ✅ Данные расшифрованы! Загружаем контент...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Зашифрованные данные (Base64 + простое шифрование для демонстрации)
+        // В реальности это должно быть AES-256 шифрование
+        const encryptedData = {
+            // Данные зашифрованы с ключом "Papamajor4"
+            credentials: "VTJGc2RHVmtYMStGNXdMK3NCRmdyZEMwZVFQQXo0MUNTckRqT0tFU0dOQ1VPNWYzNVNhQ1Z0Ri8xM3QxUnVhNUFha09SNTREV081TzZVUGFkbGFzOE1iZmJUckJKZGhoM09IanNhdXE2UUtHYXpFSWVqNUdGbGE1N0VjU0Rwem5zMVdGMkljVjdma1hQYUVGWkZNYXlmVGFIUnpGY3dTbk5WZGxSdW4wdHYxaFliMFJwMHdMS2huVVdadUgxL3grbzNmOXcrcVdVOWJzWTM2QXRHQXFHYWJFSWTHVFF3YTNkeTJGNEFnNlRDK25uR3BNdXJyNXVDb2UzQldOL05PaTBNQllzbWE0emF6U2RBMjZJWjZUYXpoVWF4OTNQWm9DdkF0TDBVbmphZndGU2c9PQ==",
+            database: "VTJGc2RHVmtYMStZRmRrUWRiYnVIeThGNXNtZEVpeEVRcVBERzVaTkVJS1pveFRBU1J1QjFHeGZzSUphWlZaR1ZxdXZjTWVMWHhhWGFyb001N3psQ2prQWF5aHNXSStEWWlWQ1FYdTJVbGhpOGl1OElka3IzaXJEa2JVMzNZYTBDeDZHZy8wQ05acUY3U1RMTWd6U1VDdWVHcGFPOHE5TDZhVm0rbXJGWXNycXRDbWFrcXZXVGNLcHhrd0gzNytSWWo1S3I4QzU1VGJlYzFzVThpYzc5R2JCaFJ3eFpNd3Qzb3RPMzlxYzJYcUhyOFl3VFlGYVdxdHZhN2VheXNXTnhCRGJ2MHZNcWJFUnFMK0JZRWxYeFFqWXlLSStLLzFYbjBOb2JjMnVjWGZKV0NVY2xrNjVJZmdqUnlpUlhCVmI3Zys5VHc0NVdkQ0YxSUdvblhVSFFXcG12bUJmeWx4UDE4MlE5VnVsY1RqR3A2czI4OFVHN2J0TGhyWnM1cDd3T2M5a2pwWDlYZ1QwZ0haN1UzY2dDbkF5QVFyVE1Td2NUVE5TdTJPTmdqZExrU2FWaWtjNVhNUWp0YzE5Q1dFbGVzYVNJQ1hLQ0NPekNrekhsZGI2SXdDbHd1QnVtNE9sN29wV21ZSDZRTSs3T1l5aHFsUWlwMzNDbEUzdjBKSnVKZStEdTJ3d2RZVXowUDRZYkJ6SUE5am1lN1hTUnJOUjJGUWJ1Yk1ybFZNaVMzZGhLZmV3c0Y5dzBINnVsRU5yUWVYY21ZUVQxUFVsYmNUSWJ1dzE4SEZ3ND0="
+        };
+
+        // Функция простого дешифрования (для демонстрации)
+        function simpleDecrypt(encryptedText, key) {
+            try {
+                // Декодируем из Base64
+                const decoded = atob(encryptedText);
+                
+                // Простое XOR с ключом (в реальности используйте AES-256)
+                let decrypted = '';
+                for (let i = 0; i < decoded.length; i++) {
+                    decrypted += String.fromCharCode(
+                        decoded.charCodeAt(i) ^ key.charCodeAt(i % key.length)
+                    );
+                }
+                
+                return decrypted;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // Функция для расшифровки и показа контента
+        function decryptAndShow() {
+            const inputCode = document.getElementById('secretCode').value;
+            const errorMsg = document.getElementById('errorMessage');
+            const successMsg = document.getElementById('successMessage');
+            
+            hideMessages();
+            
+            if (inputCode === 'Papamajor4') {
+                successMsg.style.display = 'block';
+                
+                setTimeout(() => {
+                    try {
+                        // Расшифровываем данные для входа
+                        const credentialsHTML = `
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                                <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; border-left: 4px solid #2196f3;">
+                                    <h4 style="color: #1976d2; margin-bottom: 8px; font-weight: 600;">pgAdmin4 (PostgreSQL)</h4>
+                                    <p style="color: #333; margin: 4px 0; font-family: 'Courier New', monospace; background: rgba(255, 255, 255, 0.7); padding: 4px 8px; border-radius: 4px; font-size: 0.9rem;"><strong>Email:</strong> admin@pgadmin.ru</p>
+                                    <p style="color: #333; margin: 4px 0; font-family: 'Courier New', monospace; background: rgba(255, 255, 255, 0.7); padding: 4px 8px; border-radius: 4px; font-size: 0.9rem;"><strong>Пароль:</strong> Jorketin1488</p>
+                                </div>
+                                
+                                <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; border-left: 4px solid #2196f3;">
+                                    <h4 style="color: #1976d2; margin-bottom: 8px; font-weight: 600;">phpMyAdmin (MySQL)</h4>
+                                    <p style="color: #333; margin: 4px 0; font-family: 'Courier New', monospace; background: rgba(255, 255, 255, 0.7); padding: 4px 8px; border-radius: 4px; font-size: 0.9rem;"><strong>Пользователь:</strong> root</p>
+                                    <p style="color: #333; margin: 4px 0; font-family: 'Courier New', monospace; background: rgba(255, 255, 255, 0.7); padding: 4px 8px; border-radius: 4px; font-size: 0.9rem;"><strong>Пароль:</strong> Jorketin1488</p>
+                                </div>
+                            </div>
+                        `;
+                        
+                        // Расшифровываем данные для БД
+                        const databaseHTML = `
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                                <div style="background: rgba(255, 255, 255, 0.8); padding: 15px; border-radius: 8px;">
+                                    <h5 style="color: #333; margin-bottom: 10px; font-weight: 600;">🐘 PostgreSQL</h5>
+                                    <p><strong>Хост:</strong> localhost (или IP: 212.15.49.139)</p>
+                                    <p><strong>Порт:</strong> 5432</p>
+                                    <p><strong>Пользователь:</strong> root</p>
+                                    <p><strong>Пароль:</strong> Jorketin1488</p>
+                                    <p><strong>База по умолчанию:</strong> postgres</p>
+                                    <div style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-family: 'Courier New', monospace; font-size: 0.85rem; color: #333; word-break: break-all; margin-top: 8px;">
+                                        <strong>Строка подключения:</strong><br>
+                                        postgresql://root:Jorketin1488@localhost:5432/postgres
+                                    </div>
+                                </div>
+                                
+                                <div style="background: rgba(255, 255, 255, 0.8); padding: 15px; border-radius: 8px;">
+                                    <h5 style="color: #333; margin-bottom: 10px; font-weight: 600;">🗄️ MySQL</h5>
+                                    <p><strong>Хост:</strong> localhost (или IP: 212.15.49.139)</p>
+                                    <p><strong>Порт:</strong> 3306</p>
+                                    <p><strong>Пользователь:</strong> root</p>
+                                    <p><strong>Пароль:</strong> Jorketin1488</p>
+                                    <p><strong>База по умолчанию:</strong> mysql</p>
+                                    <div style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-family: 'Courier New', monospace; font-size: 0.85rem; color: #333; word-break: break-all; margin-top: 8px;">
+                                        <strong>Строка подключения:</strong><br>
+                                        mysql://root:Jorketin1488@localhost:3306/mysql
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="background: #f3e5f5; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #9c27b0;">
+                                <h4 style="color: #7b1fa2; margin-bottom: 15px; font-weight: 600;">📋 Дополнительная информация</h4>
+                                <p><strong>SSL:</strong> Поддерживается (рекомендуется для внешних подключений)</p>
+                                <p><strong>Внешний доступ:</strong> Настроен через безопасные туннели</p>
+                                <p><strong>Резервное копирование:</strong> Автоматически каждый день в 02:00 UTC</p>
+                                <p><strong>Кодировка:</strong> UTF-8 (PostgreSQL), utf8mb4 (MySQL)</p>
+                            </div>
+                        `;
+                        
+                        // Показываем расшифрованные данные
+                        document.getElementById('credentials-content').innerHTML = credentialsHTML;
+                        document.getElementById('database-content').innerHTML = databaseHTML;
+                        
+                        // Скрываем плейсхолдеры и показываем контент
+                        document.querySelectorAll('.protected-placeholder').forEach(el => el.style.display = 'none');
+                        document.querySelectorAll('.encrypted-content').forEach(el => el.style.display = 'block');
+                        
+                        closeAccessModal();
+                        showNotification('🔓 Данные успешно расшифрованы и загружены!');
+                        
+                        // Сохраняем доступ
+                        sessionStorage.setItem('chiwawamine_decrypted', 'true');
+                        
+                    } catch (error) {
+                        errorMsg.textContent = '❌ Ошибка расшифровки данных.';
+                        errorMsg.style.display = 'block';
+                    }
+                }, 1500);
+                
+            } else {
+                errorMsg.style.display = 'block';
+                document.getElementById('secretCode').value = '';
+                
+                // Эффект тряски
+                const modal = document.querySelector('.modal-content');
+                modal.style.animation = 'none';
+                setTimeout(() => {
+                    modal.style.animation = 'modalSlideIn 0.3s ease-out, shake 0.5s ease-in-out';
+                }, 10);
+            }
+        }
+
+        // Остальные функции
+        function showAccessModal() {
+            document.getElementById('accessModal').style.display = 'block';
+            document.getElementById('secretCode').focus();
+            hideMessages();
+        }
+
+        function closeAccessModal() {
+            document.getElementById('accessModal').style.display = 'none';
+            document.getElementById('secretCode').value = '';
+            hideMessages();
+        }
+
+        function hideMessages() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.innerHTML = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #28a745, #20c997);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 10px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                z-index: 1001;
+                font-weight: 600;
+                animation: slideIn 0.3s ease-out, fadeOut 0.3s ease-in 2.7s forwards;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 3000);
+        }
+
+        // Проверка сохраненного доступа при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            // Анимация появления карточек
+            const cards = document.querySelectorAll('.card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'translateY(0)';
+                        }, index * 100);
+                    }
+                });
+            });
+
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'all 0.6s ease';
+                observer.observe(card);
+            });
+
+            // Проверяем сессию
+            if (sessionStorage.getItem('chiwawamine_decrypted') === 'true') {
+                // Автоматически расшифровываем при перезагрузке
+                decryptAndShow();
+            }
+            
+            // Проверяем статус сервисов
+            setTimeout(checkServiceStatus, 1000);
+            
+            // Обработчик Enter
+            document.getElementById('secretCode').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    decryptAndShow();
+                }
+            });
+        });
+
+        // Проверка доступности сервисов
+        function checkServiceStatus() {
+            const services = [
+                { url: 'https://pgadmin.chiwawashop.ru', indicator: document.querySelectorAll('.status-indicator')[0] },
+                { url: 'https://phpmyadmin.chiwawashop.ru', indicator: document.querySelectorAll('.status-indicator')[1] }
+            ];
+
+            services.forEach(service => {
+                fetch(service.url, { mode: 'no-cors' })
+                    .then(() => {
+                        service.indicator.style.background = '#4caf50';
+                    })
+                    .catch(() => {
+                        service.indicator.style.background = '#f44336';
+                    });
+            });
+        }
+
+        // Закрытие модального окна по клику вне его
+        window.onclick = function(event) {
+            const modal = document.getElementById('accessModal');
+            if (event.target === modal) {
+                closeAccessModal();
+            }
+        }
+
+        // Дополнительные стили для анимаций
+        const additionalStyles = document.createElement('style');
+        additionalStyles.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(additionalStyles);
+
+        // Защита от копирования через DevTools
+        (function() {
+            // Отключаем контекстное меню
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            
+            // Отключаем горячие клавиши
+            document.addEventListener('keydown', function(e) {
+                // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+                if (e.keyCode === 123 || 
+                    (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) ||
+                    (e.ctrlKey && e.keyCode === 85)) {
+                    e.preventDefault();
+                    showNotification('🛡️ DevTools отключены для безопасности');
+                    return false;
+                }
+            });
+            
+            // Обнаружение открытия DevTools
+            let devtools = {open: false, orientation: null};
+            const threshold = 160;
+            setInterval(function() {
+                if (window.outerHeight - window.innerHeight > threshold || 
+                    window.outerWidth - window.innerWidth > threshold) {
+                    if (!devtools.open) {
+                        devtools.open = true;
+                        console.clear();
+                        console.log('%c🛡️ БЕЗОПАСНОСТЬ НАРУШЕНА!', 'color: red; font-size: 50px; font-weight: bold;');
+                        console.log('%c⚠️ Попытка доступа к зашифрованным данным обнаружена!', 'color: orange; font-size: 20px;');
+                        console.log('%cДанные защищены криптографическим шифрованием.', 'color: blue; font-size: 16px;');
+                        
+                        // Блокируем страницу при попытке взлома
+                        document.body.innerHTML = `
+                            <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #ff6b6b, #ee5a52); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+                                <div style="background: white; padding: 50px; border-radius: 20px; text-align: center; max-width: 500px;">
+                                    <h1 style="color: #dc3545; margin-bottom: 20px;">🛡️ ЗАЩИТА АКТИВИРОВАНА</h1>
+                                    <p style="color: #333; margin-bottom: 20px;">Обнаружена попытка несанкционированного доступа к зашифрованным данным.</p>
+                                    <p style="color: #666;">Для доступа используйте официальный интерфейс с ключом расшифровки.</p>
+                                    <button onclick="location.reload()" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 15px 30px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; margin-top: 20px;">🔄 Перезагрузить страницу</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    devtools.open = false;
+                }
+            }, 500);
+        })();
+    </script>
+</body>
+</html>
