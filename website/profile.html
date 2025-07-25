@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет - Chiwawa Server</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 text-gray-900 font-main">
+    <!-- Навигация -->
+    <nav class="navbar" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <!-- Логотип -->
+                <div class="flex items-center space-x-3">
+                    <a href="/" class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-chiwawa-gradient rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-xl">🐕</span>
+                        </div>
+                        <div>
+                            <span class="text-xl font-title font-bold text-chiwawa-gradient">Chiwawa Server</span>
+                            <div class="text-xs text-gray-500">Личный кабинет</div>
+                        </div>
+                    </a>
+                </div>
+                
+                <!-- Навигация -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="/" class="text-gray-700 hover:text-chiwawa-primary transition-colors">Главная</a>
+                    <a href="/profile" class="text-chiwawa-primary font-semibold">Профиль</a>
+                    <button id="logoutBtn" class="btn-secondary">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Выйти</span>
+                    </button>
+                </div>
+                
+                <!-- Мобильное меню -->
+                <button class="mobile-menu md:hidden text-gray-700 hover:text-chiwawa-primary" id="mobileMenuBtn">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Основной контент -->
+    <main class="pt-20 pb-16">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Заголовок -->
+            <div class="text-center mb-8">
+                <h1 class="text-3xl md:text-4xl font-title font-bold text-chiwawa-gradient mb-4">
+                    Личный кабинет
+                </h1>
+                <p class="text-gray-600">Управляйте своим профилем и отслеживайте активность на сервере</p>
+            </div>
+
+            <!-- Профиль пользователя -->
+            <div id="profileContent" class="space-y-6">
+                <!-- Основная информация -->
+                <div class="card">
+                    <div class="flex items-center space-x-4 mb-6">
+                        <div class="w-20 h-20 bg-chiwawa-gradient rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white text-3xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h2 class="text-2xl font-bold text-gray-800" id="userName">Загрузка...</h2>
+                            <p class="text-gray-600" id="userNick">@loading...</p>
+                            <div class="flex items-center space-x-2 mt-2">
+                                <div class="w-3 h-3 rounded-full" id="trustLevelDot"></div>
+                                <span class="text-sm font-semibold" id="trustLevelText">Загрузка...</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm text-gray-500">Статус</div>
+                            <div class="font-semibold" id="userStatus">
+                                <i class="fas fa-circle text-green-500 mr-1"></i>
+                                Активен
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trust Level прогресс -->
+                <div class="card">
+                    <h3 class="text-xl font-bold mb-4">Система доверия (Trust Level)</h3>
+                    <div id="trustLevelProgress">
+                        <!-- Динамически загружается -->
+                    </div>
+                </div>
+
+                <!-- Статистика -->
+                <div class="card">
+                    <h3 class="text-xl font-bold mb-4">Статистика</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="userStats">
+                        <!-- Динамически загружается -->
+                    </div>
+                </div>
+
+                <!-- Последняя активность -->
+                <div class="card">
+                    <h3 class="text-xl font-bold mb-4">Последняя активность</h3>
+                    <div id="userActivity" class="space-y-3">
+                        <!-- Динамически загружается -->
+                    </div>
+                </div>
+
+                <!-- Настройки профиля -->
+                <div class="card">
+                    <h3 class="text-xl font-bold mb-4">Настройки профиля</h3>
+                    <form id="profileSettingsForm" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label for="profileEmail">Email</label>
+                                <input type="email" id="profileEmail" name="email" required>
+                                <small class="text-gray-500">Используется для уведомлений</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="profileDiscord">Discord</label>
+                                <input type="text" id="profileDiscord" name="discord" required>
+                                <small class="text-gray-500">Ваш Discord для связи</small>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="profileBio">О себе</label>
+                            <textarea id="profileBio" name="bio" rows="3" maxlength="500" placeholder="Расскажите немного о себе..."></textarea>
+                            <small class="text-gray-500">Максимум 500 символов</small>
+                        </div>
+                        <button type="submit" class="btn-chiwawa">
+                            <i class="fas fa-save"></i>
+                            <span>Сохранить изменения</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Состояние загрузки -->
+            <div id="loadingState" class="text-center py-12">
+                <i class="fas fa-spinner fa-spin text-3xl text-chiwawa-primary mb-4"></i>
+                <p class="text-gray-600">Загрузка профиля...</p>
+            </div>
+
+            <!-- Ошибка авторизации -->
+            <div id="authError" class="text-center py-12 hidden">
+                <i class="fas fa-lock text-3xl text-red-500 mb-4"></i>
+                <h2 class="text-xl font-bold text-gray-800 mb-2">Требуется авторизация</h2>
+                <p class="text-gray-600 mb-6">Для доступа к личному кабинету необходимо войти в систему</p>
+                <a href="/" class="btn-chiwawa">
+                    <i class="fas fa-home"></i>
+                    <span>На главную</span>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Уведомления -->
+    <div id="notifications" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/profile.js"></script>
+</body>
+</html>

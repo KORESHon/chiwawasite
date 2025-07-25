@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chiwawa Server - Премиум Minecraft сервер</title>
-    <meta name="description" content="Присоединяйтесь к лучшему приватному Minecraft серверу Chiwawa Server с уникальными режимами и дружным комьюнити">
+    <title>Chiwawa Server - Приватный Minecraft сервер</title>
+    <meta name="description" content="Присоединяйтесь к приватному Minecraft серверу Chiwawa Server. Вход только по заявке. Дружелюбное сообщество и качественный геймплей.">
+    <meta name="keywords" content="minecraft, сервер, приватный, chiwawa, геймплей, сообщество">
+    <meta name="author" content="ebluffy">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJhIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjZmJiZjI0Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZjU5ZTBiIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTIiIGZpbGw9InVybCgjYSkiLz48dGV4dCB4PSIzMiIgeT0iNDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIzMiIgZmlsbD0iIzFmMjkzNyIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+QlTwvdGV4dD48L3N2Zz4=">
     
     <!-- Создатель: ebluffy -->
     
@@ -15,28 +20,32 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#f59e0b',     // Оранжевый
-                        secondary: '#fbbf24',   // Жёлтый
-                        accent: '#fb923c',      // Светло-оранжевый
-                        dark: '#1f2937',        // Тёмно-серый
-                        darker: '#111827',      // Очень тёмный
                         chiwawa: {
-                            yellow: '#fbbf24',
-                            orange: '#f59e0b',
-                            amber: '#f97316',
-                            light: '#fef3c7',
-                            dark: '#92400e'
+                            primary: '#f59e0b',     // Основной оранжевый
+                            secondary: '#fbbf24',   // Жёлтый
+                            accent: '#fb923c',      // Светло-оранжевый
+                            light: '#fef3c7',       // Светлый
+                            dark: '#92400e',        // Тёмный оранжевый
+                            neutral: {
+                                100: '#f5f5f5',
+                                200: '#e5e5e5',
+                                300: '#d4d4d4',
+                                700: '#404040',
+                                800: '#262626',
+                                900: '#171717'
+                            }
                         }
                     },
                     fontFamily: {
                         'title': ['"Tektur"', 'sans-serif'],
-                        'main': ['"Exo 2"', 'sans-serif']
+                        'main': ['"Inter"', 'sans-serif']
                     },
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
                         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'bounce-slow': 'bounce 3s infinite',
-                        'glow': 'glow 2s ease-in-out infinite alternate'
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'slideInUp': 'slideInUp 0.5s ease-out',
+                        'fadeIn': 'fadeIn 0.3s ease-in'
                     },
                     keyframes: {
                         float: {
@@ -44,8 +53,16 @@
                             '50%': { transform: 'translateY(-20px)' }
                         },
                         glow: {
-                            '0%': { boxShadow: '0 0 5px #f59e0b, 0 0 10px #f59e0b, 0 0 15px #f59e0b' },
-                            '100%': { boxShadow: '0 0 10px #f59e0b, 0 0 20px #f59e0b, 0 0 30px #f59e0b' }
+                            '0%': { boxShadow: '0 0 5px var(--chiwawa-primary), 0 0 10px var(--chiwawa-primary)' },
+                            '100%': { boxShadow: '0 0 20px var(--chiwawa-primary), 0 0 30px var(--chiwawa-primary)' }
+                        },
+                        slideInUp: {
+                            '0%': { transform: 'translateY(100%)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
                         }
                     }
                 }
@@ -56,48 +73,356 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Tektur:wght@400;700&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tektur:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* Создатель: ebluffy */
+        /* Создатель: ebluffy - CSS переменные для Chiwawa Server */
         
-        /* Анимация задержки */
+        :root {
+            /* Основные цвета Chiwawa */
+            --chiwawa-primary: #f59e0b;
+            --chiwawa-secondary: #fbbf24;
+            --chiwawa-accent: #fb923c;
+            --chiwawa-light: #fef3c7;
+            --chiwawa-dark: #92400e;
+            
+            /* Нейтральные цвета */
+            --neutral-white: #ffffff;
+            --neutral-light: #f5f5f5;
+            --neutral-gray: #e5e5e5;
+            --neutral-dark: #404040;
+            --neutral-darker: #262626;
+            --neutral-black: #171717;
+            
+            /* Цвета статуса */
+            --status-online: #22c55e;
+            --status-offline: #ef4444;
+            --status-warning: #f59e0b;
+            
+            /* Эффекты */
+            --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --shadow-large: 0 8px 25px rgba(0, 0, 0, 0.2);
+            --shadow-chiwawa: 0 4px 15px rgba(245, 158, 11, 0.3);
+            
+            /* Переходы */
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.3s ease;
+            --transition-slow: 0.5s ease;
+            
+            /* Радиусы скругления */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+        }
+        
+        /* Глобальные стили */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--neutral-black);
+            scroll-behavior: smooth;
+        }
+        
+        /* Анимации задержки */
         .animation-delay-1000 { animation-delay: 1s; }
         .animation-delay-2000 { animation-delay: 2s; }
         .animation-delay-3000 { animation-delay: 3s; }
         
-        /* Сетчатый фон */
-        .grid-pattern {
-            background-image: 
-                linear-gradient(to right, rgba(251, 191, 36, 0.05) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(251, 191, 36, 0.05) 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-        
-        /* Волнообразный разделитель */
-        .wave-divider {
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-            line-height: 0;
-            transform: rotate(0deg);
-        }
-        
-        .wave-divider svg {
-            position: relative;
-            display: block;
-            width: calc(100% + 1.3px);
-            height: 100px;
-        }
-        
-        /* Градиентный текст Chiwawa */
-        .chiwawa-gradient {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b, #fb923c);
+        /* Утилиты */
+        .text-chiwawa-gradient {
+            background: linear-gradient(135deg, var(--chiwawa-secondary), var(--chiwawa-primary), var(--chiwawa-accent));
             -webkit-background-clip: text;
             background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .bg-chiwawa-gradient {
+            background: linear-gradient(135deg, var(--chiwawa-primary), var(--chiwawa-accent));
+        }
+        
+        .border-chiwawa {
+            border-color: var(--chiwawa-primary);
+        }
+        
+        /* Кнопки */
+        .btn-chiwawa {
+            background: linear-gradient(135deg, var(--chiwawa-primary), var(--chiwawa-accent));
+            color: var(--neutral-white);
+            padding: 12px 24px;
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all var(--transition-normal);
+            box-shadow: var(--shadow-chiwawa);
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-chiwawa:hover {
+            background: linear-gradient(135deg, #d97706, #ea580c);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: var(--neutral-white);
+            color: var(--chiwawa-primary);
+            border: 2px solid var(--chiwawa-primary);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--chiwawa-primary);
+            color: var(--neutral-white);
+        }
+        
+        /* Карточки */
+        .card {
+            background: var(--neutral-white);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-medium);
+            transition: all var(--transition-normal);
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-large);
+        }
+        
+        /* Статус сервера */
+        .status-indicator {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid var(--status-online);
+            border-radius: var(--radius-md);
+            padding: 12px 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--status-online);
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.offline {
+            background: var(--status-offline);
+        }
+        
+        .status-dot.warning {
+            background: var(--status-warning);
+        }
+        
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            animation: fadeIn var(--transition-normal);
+        }
+        
+        .modal-content {
+            background: var(--neutral-white);
+            margin: 5% auto;
+            padding: 40px;
+            border-radius: var(--radius-xl);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: var(--shadow-large);
+            animation: slideInUp var(--transition-slow);
+        }
+        
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: var(--neutral-dark);
+            transition: color var(--transition-fast);
+        }
+        
+        .close:hover {
+            color: var(--chiwawa-primary);
+        }
+        
+        /* Форма */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--neutral-darker);
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--neutral-gray);
+            border-radius: var(--radius-md);
+            background: var(--neutral-white);
+            color: var(--neutral-black);
+            font-size: 16px;
+            transition: all var(--transition-fast);
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--chiwawa-primary);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+        
+        .form-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: var(--radius-md);
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+        
+        .form-message.success {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--status-online);
+            border: 1px solid var(--status-online);
+        }
+        
+        .form-message.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--status-offline);
+            border: 1px solid var(--status-offline);
+        }
+        
+        /* Навигация */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--neutral-gray);
+            transition: all var(--transition-normal);
+        }
+        
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .modal-content {
+                margin: 10% auto;
+                padding: 25px;
+                width: 95%;
+            }
+            
+            .navbar .desktop-menu {
+                display: none;
+            }
+            
+            .mobile-menu {
+                display: block;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .mobile-menu {
+                display: none;
+            }
+        }
+        
+        /* Скрытые секции */
+        .hidden-section {
+            display: none;
+        }
+        
+        /* Админ панель */
+        .admin-panel {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: var(--neutral-white);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-large);
+            border: 2px solid var(--chiwawa-primary);
+            z-index: 999;
+            min-width: 300px;
+        }
+        
+        .color-picker {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .color-swatch {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid var(--neutral-gray);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .color-swatch:hover {
+            transform: scale(1.1);
+            border-color: var(--chiwawa-primary);
+        }
+        
+        /* Анимации */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        @keyframes slideInUp {
+            0% { transform: translateY(100%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
             -webkit-text-fill-color: transparent;
         }
         
@@ -307,176 +632,205 @@
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-darker via-dark to-gray-900 text-white font-main">
-    <!-- Создатель: ebluffy -->
+<<body class="bg-gray-50 text-gray-900 font-main">
+    <!-- Создатель: ebluffy - Современный сайт Chiwawa Server -->
     
     <!-- Навигация -->
-    <nav class="fixed w-full z-50 bg-dark/80 backdrop-blur-lg border-b border-chiwawa-yellow/20">
-        <div class="container mx-auto px-4">
+    <nav class="navbar" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center py-4">
-                <div class="flex items-center space-x-2">
-                    <div class="w-10 h-10 bg-gradient-to-r from-chiwawa-yellow to-chiwawa-orange rounded-lg flex items-center justify-center">
-                        <span class="text-dark font-bold text-xl">🐕</span>
+                <!-- Логотип -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-chiwawa-gradient rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-xl">🐕</span>
                     </div>
-                    <span class="text-xl font-title font-bold chiwawa-gradient">Chiwawa Server</span>
+                    <div>
+                        <span class="text-xl font-title font-bold text-chiwawa-gradient" id="serverName">Chiwawa Server</span>
+                        <div class="text-xs text-gray-500">Minecraft сервер</div>
+                    </div>
                 </div>
                 
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="#home" class="hover:text-chiwawa-yellow transition-colors">Главная</a>
-                    <a href="#features" class="hover:text-chiwawa-yellow transition-colors">Особенности</a>
-                    <a href="#rules" class="hover:text-chiwawa-yellow transition-colors">Правила</a>
-                    <a href="#contact" class="hover:text-chiwawa-yellow transition-colors">Контакты</a>
-                    <button id="loginBtn" class="bg-gradient-to-r from-chiwawa-orange to-chiwawa-yellow text-dark px-4 py-2 rounded-lg font-semibold hover:shadow-lg transition-all">
-                        Войти
+                <!-- Десктопное меню -->
+                <div class="desktop-menu hidden md:flex items-center space-x-8">
+                    <a href="#home" class="text-gray-700 hover:text-chiwawa-primary transition-colors">Главная</a>
+                    <a href="#features" class="text-gray-700 hover:text-chiwawa-primary transition-colors">О сервере</a>
+                    <a href="#rules" class="text-gray-700 hover:text-chiwawa-primary transition-colors">Правила</a>
+                    <a href="#contact" class="text-gray-700 hover:text-chiwawa-primary transition-colors">Контакты</a>
+                    <button id="profileBtn" class="btn-secondary">
+                        <i class="fas fa-user"></i>
+                        <span>Профиль</span>
+                    </button>
+                    <!-- Админ кнопка (скрыта по умолчанию) -->
+                    <button id="adminBtn" class="btn-chiwawa hidden">
+                        <i class="fas fa-cog"></i>
+                        <span>Админ</span>
                     </button>
                 </div>
                 
                 <!-- Мобильное меню -->
-                <button class="md:hidden text-chiwawa-yellow">
+                <button class="mobile-menu md:hidden text-gray-700 hover:text-chiwawa-primary" id="mobileMenuBtn">
                     <i class="fas fa-bars text-xl"></i>
                 </button>
+            </div>
+            
+            <!-- Мобильное выпадающее меню -->
+            <div class="mobile-dropdown hidden md:hidden py-4 border-t border-gray-200" id="mobileDropdown">
+                <div class="flex flex-col space-y-4">
+                    <a href="#home" class="text-gray-700 hover:text-chiwawa-primary transition-colors">Главная</a>
+                    <a href="#features" class="text-gray-700 hover:text-chiwawa-primary transition-colors">О сервере</a>
+                    <a href="#rules" class="text-gray-700 hover:text-chiwawa-primary transition-colors">Правила</a>
+                    <a href="#contact" class="text-gray-700 hover:text-chiwawa-primary transition-colors">Контакты</a>
+                    <button id="profileBtnMobile" class="btn-secondary w-full justify-center">
+                        <i class="fas fa-user"></i>
+                        <span>Профиль</span>
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
 
     <!-- Главная секция -->
-    <section id="home" class="relative overflow-hidden min-h-screen flex items-center">
-        <!-- Фоновые элементы -->
-        <div class="absolute inset-0 z-0">
-            <div class="absolute inset-0 bg-gradient-to-b from-chiwawa-orange/10 to-darker"></div>
-            <div class="absolute top-0 left-0 w-full h-full opacity-30">
-                <div class="grid-pattern"></div>
-            </div>
-            
-            <!-- Плавающие элементы -->
-            <div class="absolute top-1/4 left-1/4 w-16 h-16 rounded-full bg-chiwawa-yellow/20 blur-xl animate-float"></div>
-            <div class="absolute top-1/3 right-1/4 w-24 h-24 rounded-full bg-chiwawa-orange/20 blur-xl animate-float animation-delay-2000"></div>
-            <div class="absolute bottom-1/4 left-1/2 w-20 h-20 rounded-full bg-chiwawa-amber/20 blur-xl animate-float animation-delay-3000"></div>
-        </div>
-        
-        <div class="container mx-auto px-4 py-32 relative z-10">
-            <div class="max-w-4xl mx-auto text-center">
+    <section id="home" class="pt-20 pb-16 bg-gradient-to-br from-chiwawa-light via-white to-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center py-20">
+                <!-- Логотип сервера -->
                 <div class="mb-8">
-                    <div class="inline-block p-4 bg-gradient-to-r from-chiwawa-yellow/20 to-chiwawa-orange/20 rounded-full mb-6">
+                    <div class="inline-block p-6 bg-white rounded-full shadow-lg mb-6" style="animation: float 6s ease-in-out infinite;">
                         <span class="text-6xl">🐕</span>
                     </div>
                 </div>
                 
-                <h1 class="text-4xl md:text-7xl font-title font-bold mb-6">
-                    <span class="block text-white mb-2">Добро пожаловать в</span>
-                    <span class="chiwawa-gradient">Chiwawa Server</span>
+                <!-- Заголовок -->
+                <h1 class="text-4xl md:text-6xl font-title font-bold mb-6">
+                    <span class="block text-gray-800 mb-2">Добро пожаловать в</span>
+                    <span class="text-chiwawa-gradient" id="heroServerName">Chiwawa Server</span>
                 </h1>
                 
-                <p class="text-xl md:text-2xl mb-8 leading-relaxed text-gray-300">
-                    Приватный Minecraft сервер для своих<br>
-                    <span class="text-chiwawa-yellow">Вход только по заявке</span>
+                <!-- Описание -->
+                <p class="text-xl md:text-2xl mb-8 text-gray-600 max-w-3xl mx-auto" id="serverDescription">
+                    Приватный Minecraft сервер для своих.<br>
+                    <span class="text-chiwawa-primary font-semibold">Вход только по заявке.</span>
                 </p>
                 
                 <!-- Статус сервера -->
                 <div class="mb-8">
-                    <div class="status-indicator">
+                    <div class="status-indicator mx-auto">
                         <div class="status-dot" id="serverStatusDot"></div>
-                        <span id="serverStatusText" class="text-green-400 font-semibold">Сервер онлайн • 0 игроков</span>
+                        <span id="serverStatusText" class="text-green-600 font-semibold">Загрузка...</span>
                     </div>
                 </div>
                 
-                <div class="flex flex-col sm:flex-row justify-center gap-6">
-                    <button id="applyBtn" class="btn-chiwawa text-dark font-bold py-4 px-8 rounded-full transition-all transform hover:scale-105 flex items-center justify-center space-x-2 text-lg">
+                <!-- Кнопки действий -->
+                <div class="flex flex-col sm:flex-row justify-center gap-6 mb-16">
+                    <button id="applyBtn" class="btn-chiwawa text-lg px-8 py-4">
                         <i class="fas fa-paper-plane"></i>
                         <span>Подать заявку</span>
                     </button>
                     
-                    <a href="#" id="discordBtn" class="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-600/90 hover:to-indigo-700/90 text-white font-bold py-4 px-8 rounded-full transition-all transform hover:scale-105 flex items-center justify-center space-x-2 text-lg">
+                    <a href="#" id="discordBtn" class="btn-secondary text-lg px-8 py-4 inline-flex items-center justify-center">
                         <i class="fab fa-discord"></i>
-                        <span>Discord</span>
+                        <span>Discord сервер</span>
                     </a>
+                </div>
+                
+                <!-- Краткая статистика -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+                    <div class="card text-center">
+                        <div class="text-2xl font-bold text-chiwawa-primary" id="statsPlayers">0</div>
+                        <div class="text-sm text-gray-600">Игроков онлайн</div>
+                    </div>
+                    <div class="card text-center">
+                        <div class="text-2xl font-bold text-chiwawa-primary">2025</div>
+                        <div class="text-sm text-gray-600">Год основания</div>
+                    </div>
+                    <div class="card text-center">
+                        <div class="text-2xl font-bold text-chiwawa-primary">24/7</div>
+                        <div class="text-sm text-gray-600">Время работы</div>
+                    </div>
+                    <div class="card text-center">
+                        <div class="text-2xl font-bold text-chiwawa-primary">∞</div>
+                        <div class="text-sm text-gray-600">Возможностей</div>
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Волнообразный разделитель -->
-        <div class="wave-divider">
-            <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-                <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" class="fill-dark"></path>
-            </svg>
-        </div>
     </section>
 
-    <!-- Особенности -->
-    <section id="features" class="py-20 bg-dark">
-        <div class="container mx-auto px-4">
+    <!-- Секция "О сервере" -->
+    <section id="features" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-title font-bold mb-6">
-                    <span class="chiwawa-gradient">Почему Chiwawa?</span>
+                <h2 class="text-3xl md:text-4xl font-title font-bold mb-6 text-chiwawa-gradient">
+                    Почему выбирают Chiwawa?
                 </h2>
-                <p class="text-xl text-gray-300 max-w-2xl mx-auto">
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
                     Мы создали уникальное сообщество для настоящих ценителей качественного геймплея
                 </p>
             </div>
             
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Приватность -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-shield-alt"></i>
+                <div class="card hover:border-chiwawa-primary">
+                    <div class="w-16 h-16 bg-chiwawa-gradient rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-shield-alt text-white text-2xl"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-4 text-chiwawa-yellow">Приватный доступ</h3>
-                    <p class="text-gray-300 leading-relaxed">
+                    <h3 class="text-xl font-bold mb-4 text-gray-800">Приватный доступ</h3>
+                    <p class="text-gray-600">
                         Только проверенные игроки. Никаких гриферов и неадекватных игроков. Уютная атмосфера гарантирована.
                     </p>
                 </div>
                 
                 <!-- Сообщество -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-users"></i>
+                <div class="card hover:border-chiwawa-primary">
+                    <div class="w-16 h-16 bg-chiwawa-gradient rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-users text-white text-2xl"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-4 text-chiwawa-yellow">Дружное сообщество</h3>
-                    <p class="text-gray-300 leading-relaxed">
+                    <h3 class="text-xl font-bold mb-4 text-gray-800">Дружное сообщество</h3>
+                    <p class="text-gray-600">
                         Активные игроки, совместные проекты, помощь новичкам. Мы как одна большая семья геймеров.
                     </p>
                 </div>
                 
                 <!-- Стабильность -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-server"></i>
+                <div class="card hover:border-chiwawa-primary">
+                    <div class="w-16 h-16 bg-chiwawa-gradient rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-server text-white text-2xl"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-4 text-chiwawa-yellow">Стабильный сервер</h3>
-                    <p class="text-gray-300 leading-relaxed">
+                    <h3 class="text-xl font-bold mb-4 text-gray-800">Стабильный сервер</h3>
+                    <p class="text-gray-600">
                         Мощное железо, высокая производительность, минимальные лаги. Играйте без технических проблем.
                     </p>
                 </div>
                 
                 <!-- Уникальные режимы -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-gamepad"></i>
+                <div class="card hover:border-chiwawa-primary">
+                    <div class="w-16 h-16 bg-chiwawa-gradient rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-gamepad text-white text-2xl"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-4 text-chiwawa-yellow">Уникальные режимы</h3>
-                    <p class="text-gray-300 leading-relaxed">
+                    <h3 class="text-xl font-bold mb-4 text-gray-800">Уникальные режимы</h3>
+                    <p class="text-gray-600">
                         Выживание, творчество, мини-игры и собственные разработки. Всегда есть чем заняться.
                     </p>
                 </div>
                 
                 <!-- Поддержка -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-headset"></i>
+                <div class="card hover:border-chiwawa-primary">
+                    <div class="w-16 h-16 bg-chiwawa-gradient rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-headset text-white text-2xl"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-4 text-chiwawa-yellow">24/7 Поддержка</h3>
-                    <p class="text-gray-300 leading-relaxed">
+                    <h3 class="text-xl font-bold mb-4 text-gray-800">24/7 Поддержка</h3>
+                    <p class="text-gray-600">
                         Администрация всегда на связи. Быстрое решение проблем и помощь в любое время суток.
                     </p>
                 </div>
                 
                 <!-- События -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-calendar-alt"></i>
+                <div class="card hover:border-chiwawa-primary">
+                    <div class="w-16 h-16 bg-chiwawa-gradient rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-calendar-alt text-white text-2xl"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-4 text-chiwawa-yellow">Регулярные события</h3>
-                    <p class="text-gray-300 leading-relaxed">
+                    <h3 class="text-xl font-bold mb-4 text-gray-800">Регулярные события</h3>
+                    <p class="text-gray-600">
                         Турниры, конкурсы, совместные постройки. Скучать точно не придётся!
                     </p>
                 </div>
@@ -484,130 +838,862 @@
         </div>
     </section>
 
-    <!-- Контакты -->
-    <section id="contact" class="py-20 bg-gradient-to-b from-dark to-darker">
-        <div class="container mx-auto px-4 text-center">
-            <h2 class="text-4xl md:text-5xl font-title font-bold mb-8">
-                <span class="chiwawa-gradient">Связаться с нами</span>
-            </h2>
-            <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-                Есть вопросы? Нужна помощь? Мы всегда на связи!
-            </p>
+    <!-- Правила -->
+    <section id="rules" class="py-20 bg-gray-50">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-title font-bold mb-6 text-chiwawa-gradient">
+                    Основные правила
+                </h2>
+                <p class="text-xl text-gray-600">
+                    Простые правила для комфортной игры всех участников
+                </p>
+            </div>
             
-            <div class="flex flex-col sm:flex-row justify-center items-center gap-8">
-                <div class="flex items-center space-x-3">
-                    <i class="fas fa-envelope text-chiwawa-yellow text-2xl"></i>
-                    <a href="mailto:admin@chiwawa.site" class="text-lg hover:text-chiwawa-yellow transition-colors">
-                        admin@chiwawa.site
-                    </a>
+            <div class="space-y-6">
+                <div class="card">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-8 h-8 bg-chiwawa-gradient rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="text-white font-bold">1</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg mb-2 text-gray-800">Уважение к игрокам</h3>
+                            <p class="text-gray-600">Будьте вежливы и дружелюбны. Оскорбления и токсичность недопустимы.</p>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="flex items-center space-x-3">
-                    <i class="fab fa-discord text-chiwawa-yellow text-2xl"></i>
-                    <span class="text-lg">Discord сервер</span>
+                <div class="card">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-8 h-8 bg-chiwawa-gradient rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="text-white font-bold">2</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg mb-2 text-gray-800">Запрет на гриферство</h3>
+                            <p class="text-gray-600">Не разрушайте чужие постройки без разрешения. Уважайте труд других игроков.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-8 h-8 bg-chiwawa-gradient rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="text-white font-bold">3</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg mb-2 text-gray-800">Честная игра</h3>
+                            <p class="text-gray-600">Использование читов, дюпов и эксплойтов запрещено. Играйте честно.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-8 h-8 bg-chiwawa-gradient rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="text-white font-bold">4</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg mb-2 text-gray-800">Активность в сообществе</h3>
+                            <p class="text-gray-600">Участвуйте в жизни сервера, общайтесь в Discord, помогайте новичкам.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Модальное окно заявки -->
+    <!-- Контакты -->
+    <section id="contact" class="py-20 bg-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl md:text-4xl font-title font-bold mb-8 text-chiwawa-gradient">
+                Связаться с нами
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-8 mb-12">
+                <div class="card">
+                    <div class="w-16 h-16 bg-chiwawa-gradient rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-envelope text-white text-2xl"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Email поддержка</h3>
+                    <a href="mailto:chiwawa.helper@yandex.ru" class="text-chiwawa-primary hover:text-chiwawa-dark transition-colors">
+                        chiwawa.helper@yandex.ru
+                    </a>
+                </div>
+                
+                <div class="card">
+                    <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fab fa-discord text-white text-2xl"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Discord сервер</h3>
+                    <a href="#" id="discordLinkFooter" class="text-blue-600 hover:text-blue-800 transition-colors">
+                        Присоединиться
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Футер -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Логотип и описание -->
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-8 h-8 bg-chiwawa-gradient rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold">🐕</span>
+                        </div>
+                        <span class="text-lg font-title font-bold text-chiwawa-gradient">Chiwawa Server</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">
+                        Приватный Minecraft сервер для настоящих ценителей качественного геймплея.
+                    </p>
+                </div>
+                
+                <!-- Ссылки -->
+                <div>
+                    <h4 class="font-bold mb-4">Навигация</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#home" class="hover:text-chiwawa-secondary transition-colors">Главная</a></li>
+                        <li><a href="#features" class="hover:text-chiwawa-secondary transition-colors">О сервере</a></li>
+                        <li><a href="#rules" class="hover:text-chiwawa-secondary transition-colors">Правила</a></li>
+                        <li><a href="#contact" class="hover:text-chiwawa-secondary transition-colors">Контакты</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Контакты -->
+                <div>
+                    <h4 class="font-bold mb-4">Контакты</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li>
+                            <i class="fas fa-envelope mr-2"></i>
+                            <a href="mailto:chiwawa.helper@yandex.ru" class="hover:text-chiwawa-secondary transition-colors">
+                                chiwawa.helper@yandex.ru
+                            </a>
+                        </li>
+                        <li>
+                            <i class="fab fa-discord mr-2"></i>
+                            <a href="#" class="hover:text-chiwawa-secondary transition-colors">Discord</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 Chiwawa Server. Все права защищены. | Создатель: ebluffy</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Модальные окна -->
+    
+    <!-- Модальное окно заявки на Whitelist -->
     <div class="modal" id="applicationModal">
         <div class="modal-content">
-            <span class="close" id="closeModal">&times;</span>
-            <h2 class="text-2xl font-bold text-center mb-6 chiwawa-gradient">Подача заявки</h2>
+            <span class="close" id="closeApplicationModal">&times;</span>
+            <h2 class="text-2xl font-title font-bold text-center mb-4 text-chiwawa-gradient">Заявка на Whitelist</h2>
+            <p class="text-gray-600 text-center mb-6">Заполните все поля для рассмотрения вашей заявки на добавление в белый список сервера</p>
             
             <form id="applicationForm">
-                <div class="form-group">
-                    <label for="minecraft_nick">Ник в Minecraft:</label>
-                    <input type="text" id="minecraft_nick" name="minecraft_nick" required placeholder="Ваш игровой ник">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label for="minecraft_nick">Minecraft ник *</label>
+                        <input type="text" id="minecraft_nick" name="minecraft_nick" required 
+                               placeholder="Ваш игровой ник" maxlength="16">
+                        <small class="text-gray-500">От 3 до 16 символов</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="age">Возраст *</label>
+                        <select id="age" name="age" required>
+                            <option value="">Выберите возраст</option>
+                            <option value="under_16">Младше 16 лет</option>
+                            <option value="16_20">16-20 лет</option>
+                            <option value="21_25">21-25 лет</option>
+                            <option value="26_30">26-30 лет</option>
+                            <option value="over_30">Старше 30 лет</option>
+                        </select>
+                        <small class="text-gray-500">Выберите возрастную категорию</small>
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="discord">Discord:</label>
-                    <input type="text" id="discord" name="discord" required placeholder="username#1234 или @username">
+                    <label for="discord">Discord *</label>
+                    <input type="text" id="discord" name="discord" required 
+                           placeholder="username#1234 или @username">
+                    <small class="text-gray-500">Ваш Discord для связи и координации</small>
                 </div>
 
                 <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" required placeholder="ваш@email.com">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" name="email" required 
+                           placeholder="ваш@email.com">
+                    <small class="text-gray-500">Действующий email для подтверждения аккаунта</small>
                 </div>
 
                 <div class="form-group">
-                    <label for="reason">Почему хотите к нам?</label>
-                    <textarea id="reason" name="reason" rows="4" required placeholder="Расскажите немного о себе и почему хотите присоединиться к нашему серверу"></textarea>
+                    <label for="experience">Опыт игры в Minecraft *</label>
+                    <select id="experience" name="experience" required>
+                        <option value="">Выберите ваш опыт</option>
+                        <option value="beginner">Новичок (менее 1 года)</option>
+                        <option value="intermediate">Опытный (1-3 года)</option>
+                        <option value="advanced">Продвинутый (3-5 лет)</option>
+                        <option value="expert">Эксперт (более 5 лет)</option>
+                    </select>
+                    <small class="text-gray-500">Ваш опыт поможет нам лучше понять ваш уровень</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="motivation">Почему хотите играть на нашем сервере? *</label>
+                    <textarea id="motivation" name="motivation" rows="4" required 
+                              placeholder="Расскажите, что вас привлекает в нашем сервере, какой геймплей вы предпочитаете, и почему именно мы?" 
+                              maxlength="800"></textarea>
+                    <small class="text-gray-500">Минимум 50 символов, максимум 800 символов</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="plans">Ваши планы на сервере *</label>
+                    <textarea id="plans" name="plans" rows="3" required 
+                              placeholder="Что планируете строить? Какие проекты хотите реализовать? Готовы ли участвовать в жизни сообщества?" 
+                              maxlength="600"></textarea>
+                    <small class="text-gray-500">Опишите ваши планы и цели (минимум 30 символов)</small>
+                </div>
+
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-info-circle text-blue-600 mt-1"></i>
+                        <div>
+                            <h4 class="font-semibold text-blue-800 mb-2">Важная информация</h4>
+                            <ul class="text-blue-700 text-sm space-y-1">
+                                <li>• После одобрения заявки вы получите ранг <strong>Новичок</strong> с лимитом 10 часов игры</li>
+                                <li>• Для снятия лимита необходимо подтвердить email и привязать аккаунт в игре</li>
+                                <li>• Рассмотрение заявки может занять до 24 часов</li>
+                                <li>• Администрация оставляет за собой право отклонить заявку без объяснения причин</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="flex gap-4 mt-8">
-                    <button type="submit" class="flex-1 btn-chiwawa text-dark font-bold py-3 px-6 rounded-lg">
-                        Отправить заявку
+                    <button type="submit" class="flex-1 btn-chiwawa">
+                        <i class="fas fa-paper-plane"></i>
+                        <span>Отправить заявку</span>
                     </button>
-                    <button type="button" class="flex-1 bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-lg transition-colors" id="cancelBtn">
-                        Отмена
+                    <button type="button" class="flex-1 btn-secondary" id="cancelApplicationBtn">
+                        <span>Отмена</span>
                     </button>
                 </div>
             </form>
 
-            <div class="form-message" id="formMessage"></div>
+            <div class="form-message" id="applicationFormMessage"></div>
         </div>
     </div>
 
+    <!-- Модальное окно профиля/личного кабинета -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content" style="max-width: 700px;">
+            <span class="close" id="closeProfileModal">&times;</span>
+            <h2 class="text-2xl font-title font-bold text-center mb-6 text-chiwawa-gradient">Личный кабинет</h2>
+            
+            <!-- Демо профиль -->
+            <div id="profileContent">
+                <!-- Основная информация профиля -->
+                <div class="mb-6">
+                    <div class="flex items-center space-x-4 mb-6">
+                        <div class="w-16 h-16 bg-chiwawa-gradient rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">Демо Пользователь</h3>
+                            <p class="text-gray-600">demo_user</p>
+                            <div class="flex items-center space-x-2 mt-1">
+                                <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                                <span class="text-sm font-semibold text-yellow-600">Новичок (Trust Level 0)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Trust Level прогресс -->
+                <div class="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-semibold text-gray-800">Система доверия (Trust Level)</h4>
+                        <span class="text-sm text-gray-600">Уровень 0 из 5</span>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <!-- Текущий уровень -->
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
+                                <span class="text-white font-bold text-sm">0</span>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-semibold text-yellow-700">Новичок</span>
+                                    <span class="text-sm text-red-600">⏰ 2.5/10 часов (лимит активен)</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                                    <div class="bg-yellow-500 h-2 rounded-full" style="width: 25%"></div>
+                                </div>
+                                <p class="text-xs text-gray-600 mt-1">Подтвердите email для снятия лимита времени</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Следующие уровни -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                            <div class="flex items-center space-x-1 text-gray-400">
+                                <div class="w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center">
+                                    <span class="text-xs">1</span>
+                                </div>
+                                <span>Игрок</span>
+                            </div>
+                            <div class="flex items-center space-x-1 text-gray-400">
+                                <div class="w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center">
+                                    <span class="text-xs">2</span>
+                                </div>
+                                <span>Проверенный</span>
+                            </div>
+                            <div class="flex items-center space-x-1 text-gray-400">
+                                <div class="w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center">
+                                    <span class="text-xs">3</span>
+                                </div>
+                                <span>Ветеран</span>
+                            </div>
+                            <div class="flex items-center space-x-1 text-gray-400">
+                                <div class="w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center">
+                                    <span class="text-xs">4</span>
+                                </div>
+                                <span>Модератор</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Основная информация -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="text-sm text-gray-600">Minecraft ник</div>
+                        <div class="font-semibold">DemoPlayer</div>
+                        <div class="text-xs text-red-600 mt-1">
+                            <i class="fas fa-times-circle"></i> Не привязан
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="text-sm text-gray-600">Discord</div>
+                        <div class="font-semibold">demo#1234</div>
+                        <div class="text-xs text-green-600 mt-1">
+                            <i class="fas fa-check-circle"></i> Подтвержден
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="text-sm text-gray-600">Email</div>
+                        <div class="font-semibold">demo@example.com</div>
+                        <div class="text-xs text-red-600 mt-1">
+                            <i class="fas fa-times-circle"></i> Не подтвержден
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="text-sm text-gray-600">Статус заявки</div>
+                        <div class="font-semibold text-green-600">
+                            <i class="fas fa-check mr-1"></i>
+                            Одобрена
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Статистика игрока -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-chiwawa-primary">2.5</div>
+                        <div class="text-xs text-gray-600">Часов в игре</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-chiwawa-primary">3</div>
+                        <div class="text-xs text-gray-600">Дней на сервере</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-chiwawa-primary">0</div>
+                        <div class="text-xs text-gray-600">Репутация</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-chiwawa-primary">1</div>
+                        <div class="text-xs text-gray-600">Последний вход</div>
+                    </div>
+                </div>
+                
+                <!-- Требования для повышения -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <h4 class="font-semibold text-blue-800 mb-3">
+                        <i class="fas fa-arrow-up mr-2"></i>
+                        Для получения ранга "Игрок"
+                    </h4>
+                    <ul class="space-y-2 text-sm text-blue-700">
+                        <li class="flex items-center space-x-2">
+                            <i class="fas fa-times-circle text-red-500"></i>
+                            <span>Подтвердить email адрес</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            <span>Интеграция Discord (опционально)</span>
+                        </li>
+                    </ul>
+                    <button class="btn-chiwawa mt-3 text-sm" disabled>
+                        <i class="fas fa-envelope"></i>
+                        <span>Подтвердить Email</span>
+                    </button>
+                </div>
+                
+                <!-- Предстоящие функции -->
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
+                    <h4 class="font-semibold text-gray-800 mb-3">
+                        <i class="fas fa-rocket mr-2"></i>
+                        Скоро доступно
+                    </h4>
+                    <div class="grid grid-cols-2 gap-2 text-sm text-gray-600">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-comments text-gray-400"></i>
+                            <span>Мини-форум</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-calendar text-gray-400"></i>
+                            <span>Календарь ивентов</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-star text-gray-400"></i>
+                            <span>Система репутации</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-chart-line text-gray-400"></i>
+                            <span>Детальная статистика</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Демо предупреждение -->
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-info-circle text-amber-600 mr-2"></i>
+                        <span class="font-semibold text-amber-800">Демонстрационная версия</span>
+                    </div>
+                    <p class="text-amber-700 text-sm">
+                        Это демонстрация личного кабинета. В полной версии здесь будет отображаться 
+                        реальная информация о вашем аккаунте, статистика игры и доступ к функциям сообщества.
+                    </p>
+                </div>
+                
+                <!-- Кнопки действий -->
+                <div class="flex gap-3">
+                    <button class="btn-chiwawa flex-1" id="applyFromProfileBtn">
+                        <i class="fas fa-paper-plane"></i>
+                        <span>Подать заявку</span>
+                    </button>
+                    <button class="btn-secondary flex-1" disabled>
+                        <i class="fas fa-cog"></i>
+                        <span>Настройки</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Админ-панель -->
+    <div class="admin-panel hidden" id="adminPanel">
+        <h3 class="text-lg font-bold mb-4 text-chiwawa-gradient">Админ-панель</h3>
+        
+        <!-- Настройки сайта -->
+        <div class="mb-6">
+            <h4 class="font-semibold mb-3">Настройки сайта</h4>
+            
+            <div class="form-group">
+                <label for="adminServerName">Название сервера</label>
+                <input type="text" id="adminServerName" placeholder="Chiwawa Server" class="w-full">
+            </div>
+            
+            <div class="form-group">
+                <label for="adminServerDescription">Описание</label>
+                <textarea id="adminServerDescription" rows="3" placeholder="Приватный Minecraft сервер для своих. Вход только по заявке." class="w-full"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="adminDiscordLink">Discord ссылка</label>
+                <input type="url" id="adminDiscordLink" placeholder="https://discord.gg/your-invite" class="w-full">
+            </div>
+        </div>
+        
+        <!-- Цветовые схемы -->
+        <div class="mb-6">
+            <h4 class="font-semibold mb-3">Цветовая схема</h4>
+            <div class="color-picker">
+                <div class="color-swatch" style="background: linear-gradient(135deg, #f59e0b, #fb923c);" 
+                     data-colors='{"primary": "#f59e0b", "secondary": "#fbbf24", "accent": "#fb923c"}' 
+                     title="Оранжево-жёлтая (по умолчанию)"></div>
+                <div class="color-swatch" style="background: linear-gradient(135deg, #ef4444, #dc2626);" 
+                     data-colors='{"primary": "#ef4444", "secondary": "#f87171", "accent": "#dc2626"}' 
+                     title="Красная"></div>
+                <div class="color-swatch" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);" 
+                     data-colors='{"primary": "#3b82f6", "secondary": "#60a5fa", "accent": "#1d4ed8"}' 
+                     title="Синяя"></div>
+                <div class="color-swatch" style="background: linear-gradient(135deg, #10b981, #059669);" 
+                     data-colors='{"primary": "#10b981", "secondary": "#34d399", "accent": "#059669"}' 
+                     title="Зелёная"></div>
+                <div class="color-swatch" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);" 
+                     data-colors='{"primary": "#8b5cf6", "secondary": "#a78bfa", "accent": "#7c3aed"}' 
+                     title="Фиолетовая"></div>
+            </div>
+        </div>
+        
+        <!-- Кнопки управления -->
+        <div class="flex gap-2">
+            <button class="btn-chiwawa flex-1 text-sm" id="saveAdminSettings">
+                <i class="fas fa-save"></i>
+                <span>Сохранить</span>
+            </button>
+            <button class="btn-secondary flex-1 text-sm" id="resetAdminSettings">
+                <i class="fas fa-undo"></i>
+                <span>Сброс</span>
+            </button>
+        </div>
+        
+        <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="closeAdminPanel">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
     <script>
-        // Создатель: ebluffy
+        // Создатель: ebluffy - JavaScript для Chiwawa Server
         
         document.addEventListener('DOMContentLoaded', function() {
+            // Конфигурация
+            const CONFIG = {
+                API_BASE_URL: '/api',
+                DISCORD_INVITE: 'https://discord.gg/your-invite', // Настраивается в админ-панели
+                ADMIN_PASSWORD: 'chiwawa_admin_2025' // В реальном проекте использовать более безопасную аутентификацию
+            };
+            
             // Элементы DOM
-            const applyBtn = document.getElementById('applyBtn');
-            const discordBtn = document.getElementById('discordBtn');
-            const modal = document.getElementById('applicationModal');
-            const closeModal = document.getElementById('closeModal');
-            const cancelBtn = document.getElementById('cancelBtn');
-            const applicationForm = document.getElementById('applicationForm');
-            const formMessage = document.getElementById('formMessage');
-            const serverStatusDot = document.getElementById('serverStatusDot');
-            const serverStatusText = document.getElementById('serverStatusText');
-
-            // Настройки
-            const DISCORD_INVITE = 'https://discord.gg/your-invite'; // Замените на вашу ссылку
-            const API_BASE_URL = '/api'; // Базовый URL для API
-
+            const elements = {
+                // Навигация
+                navbar: document.getElementById('navbar'),
+                mobileMenuBtn: document.getElementById('mobileMenuBtn'),
+                mobileDropdown: document.getElementById('mobileDropdown'),
+                
+                // Основные кнопки
+                applyBtn: document.getElementById('applyBtn'),
+                profileBtn: document.getElementById('profileBtn'),
+                profileBtnMobile: document.getElementById('profileBtnMobile'),
+                adminBtn: document.getElementById('adminBtn'),
+                discordBtn: document.getElementById('discordBtn'),
+                discordLinkFooter: document.getElementById('discordLinkFooter'),
+                
+                // Статус сервера
+                serverStatusDot: document.getElementById('serverStatusDot'),
+                serverStatusText: document.getElementById('serverStatusText'),
+                statsPlayers: document.getElementById('statsPlayers'),
+                
+                // Модальные окна
+                applicationModal: document.getElementById('applicationModal'),
+                profileModal: document.getElementById('profileModal'),
+                adminPanel: document.getElementById('adminPanel'),
+                
+                // Формы
+                applicationForm: document.getElementById('applicationForm'),
+                applicationFormMessage: document.getElementById('applicationFormMessage'),
+                
+                // Настраиваемые элементы
+                serverName: document.getElementById('serverName'),
+                heroServerName: document.getElementById('heroServerName'),
+                serverDescription: document.getElementById('serverDescription'),
+                
+                // Админ панель
+                adminServerName: document.getElementById('adminServerName'),
+                adminServerDescription: document.getElementById('adminServerDescription'),
+                adminDiscordLink: document.getElementById('adminDiscordLink')
+            };
+            
             // Инициализация
             init();
-
+            
             function init() {
                 setupEventListeners();
                 checkServerStatus();
-                setupSmoothScrolling();
+                loadAdminSettings();
+                setupScrollEffects();
+                
+                // Периодическая проверка статуса каждые 30 секунд
+                setInterval(checkServerStatus, 30000);
             }
-
+            
             function setupEventListeners() {
-                // Модальное окно
-                applyBtn.addEventListener('click', openModal);
-                closeModal.addEventListener('click', closeModalWindow);
-                cancelBtn.addEventListener('click', closeModalWindow);
+                // Мобильное меню
+                elements.mobileMenuBtn?.addEventListener('click', toggleMobileMenu);
                 
-                // Discord ссылка
-                discordBtn.href = DISCORD_INVITE;
-                
-                // Закрытие модального окна
-                window.addEventListener('click', function(event) {
-                    if (event.target === modal) {
-                        closeModalWindow();
-                    }
+                // Модальные окна
+                elements.applyBtn?.addEventListener('click', () => openModal('application'));
+                elements.profileBtn?.addEventListener('click', () => openModal('profile'));
+                elements.profileBtnMobile?.addEventListener('click', () => openModal('profile'));
+                document.getElementById('applyFromProfileBtn')?.addEventListener('click', () => {
+                    closeModal('profile');
+                    openModal('application');
                 });
+                
+                // Админ панель
+                elements.adminBtn?.addEventListener('click', toggleAdminPanel);
+                document.getElementById('closeAdminPanel')?.addEventListener('click', () => {
+                    elements.adminPanel?.classList.add('hidden');
+                });
+                
+                // Закрытие модальных окон
+                document.getElementById('closeApplicationModal')?.addEventListener('click', () => closeModal('application'));
+                document.getElementById('closeProfileModal')?.addEventListener('click', () => closeModal('profile'));
+                document.getElementById('cancelApplicationBtn')?.addEventListener('click', () => closeModal('application'));
+                
+                // Закрытие по клику вне модального окна
+                window.addEventListener('click', handleOutsideClick);
                 
                 // ESC для закрытия
-                document.addEventListener('keydown', function(event) {
-                    if (event.key === 'Escape' && modal.style.display === 'block') {
-                        closeModalWindow();
-                    }
-                });
+                document.addEventListener('keydown', handleEscKey);
                 
                 // Форма заявки
-                applicationForm.addEventListener('submit', handleFormSubmit);
+                elements.applicationForm?.addEventListener('submit', handleApplicationSubmit);
+                
+                // Live-обновление счетчиков символов
+                document.getElementById('motivation')?.addEventListener('input', updateCharCounts);
+                document.getElementById('plans')?.addEventListener('input', updateCharCounts);
+                
+                // Плавная прокрутка
+                setupSmoothScrolling();
+                
+                // Админ панель
+                setupAdminPanel();
+                
+                // Проверка админ доступа (простая реализация)
+                checkAdminAccess();
             }
-
+            
+            function toggleMobileMenu() {
+                elements.mobileDropdown?.classList.toggle('hidden');
+            }
+            
+            function openModal(type) {
+                const modal = type === 'application' ? elements.applicationModal : elements.profileModal;
+                if (modal) {
+                    modal.style.display = 'block';
+                    document.body.style.overflow = 'hidden';
+                    
+                    if (type === 'application') {
+                        hideMessage();
+                        elements.applicationForm?.reset();
+                    }
+                }
+            }
+            
+            function closeModal(type) {
+                const modal = type === 'application' ? elements.applicationModal : elements.profileModal;
+                if (modal) {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                    
+                    if (type === 'application') {
+                        hideMessage();
+                    }
+                }
+            }
+            
+            function handleOutsideClick(event) {
+                if (event.target === elements.applicationModal) {
+                    closeModal('application');
+                }
+                if (event.target === elements.profileModal) {
+                    closeModal('profile');
+                }
+            }
+            
+            function handleEscKey(event) {
+                if (event.key === 'Escape') {
+                    closeModal('application');
+                    closeModal('profile');
+                    elements.adminPanel?.classList.add('hidden');
+                }
+            }
+            
+            function hideMessage() {
+                if (elements.applicationFormMessage) {
+                    elements.applicationFormMessage.style.display = 'none';
+                    elements.applicationFormMessage.className = 'form-message';
+                }
+            }
+            
+            function showMessage(text, type = 'success') {
+                if (elements.applicationFormMessage) {
+                    elements.applicationFormMessage.textContent = text;
+                    elements.applicationFormMessage.className = `form-message ${type}`;
+                    elements.applicationFormMessage.style.display = 'block';
+                }
+            }
+            
+            async function handleApplicationSubmit(event) {
+                event.preventDefault();
+                
+                const formData = new FormData(elements.applicationForm);
+                const data = {
+                    minecraft_nick: formData.get('minecraft_nick')?.trim(),
+                    age: formData.get('age'),
+                    discord: formData.get('discord')?.trim(),
+                    email: formData.get('email')?.trim(),
+                    experience: formData.get('experience'),
+                    motivation: formData.get('motivation')?.trim(),
+                    plans: formData.get('plans')?.trim()
+                };
+                
+                // Валидация
+                const validation = validateApplicationData(data);
+                if (!validation.valid) {
+                    showMessage(validation.error, 'error');
+                    return;
+                }
+                
+                // Отправка
+                const submitBtn = elements.applicationForm.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Отправляется...</span>';
+                
+                try {
+                    const response = await fetch(`${CONFIG.API_BASE_URL}/apply`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        showMessage('🎉 Заявка успешно отправлена! Мы рассмотрим её в ближайшее время и свяжемся с вами.', 'success');
+                        elements.applicationForm.reset();
+                        updateCharCounts(); // Сбрасываем счетчики символов
+                        
+                        setTimeout(() => {
+                            closeModal('application');
+                        }, 3000);
+                    } else {
+                        showMessage(result.error || 'Произошла ошибка при отправке заявки. Попробуйте позже.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Ошибка при отправке заявки:', error);
+                    showMessage('Не удалось отправить заявку. Проверьте подключение к интернету.', 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+            }
+            
+            function validateApplicationData(data) {
+                // Проверка обязательных полей
+                const requiredFields = ['minecraft_nick', 'age', 'discord', 'email', 'experience', 'motivation', 'plans'];
+                for (const field of requiredFields) {
+                    if (!data[field] || data[field].trim() === '') {
+                        return { valid: false, error: `Поле "${getFieldLabel(field)}" обязательно для заполнения` };
+                    }
+                }
+                
+                // Валидация Minecraft ника
+                if (data.minecraft_nick.length < 3 || data.minecraft_nick.length > 16) {
+                    return { valid: false, error: 'Minecraft ник должен быть от 3 до 16 символов' };
+                }
+                
+                // Проверка на корректные символы в нике
+                if (!/^[a-zA-Z0-9_]+$/.test(data.minecraft_nick)) {
+                    return { valid: false, error: 'Minecraft ник может содержать только латинские буквы, цифры и подчеркивания' };
+                }
+                
+                // Валидация email
+                if (!isValidEmail(data.email)) {
+                    return { valid: false, error: 'Пожалуйста, введите корректный email адрес' };
+                }
+                
+                // Валидация мотивации
+                if (data.motivation.length < 50) {
+                    return { valid: false, error: 'Описание мотивации должно содержать минимум 50 символов' };
+                }
+                
+                if (data.motivation.length > 800) {
+                    return { valid: false, error: 'Описание мотивации слишком длинное (максимум 800 символов)' };
+                }
+                
+                // Валидация планов
+                if (data.plans.length < 30) {
+                    return { valid: false, error: 'Опишите ваши планы более подробно (минимум 30 символов)' };
+                }
+                
+                if (data.plans.length > 600) {
+                    return { valid: false, error: 'Описание планов слишком длинное (максимум 600 символов)' };
+                }
+                
+                return { valid: true };
+            }
+            
+            function getFieldLabel(field) {
+                const labels = {
+                    'minecraft_nick': 'Minecraft ник',
+                    'age': 'Возраст',
+                    'discord': 'Discord',
+                    'email': 'Email',
+                    'experience': 'Опыт игры',
+                    'motivation': 'Мотивация',
+                    'plans': 'Планы на сервере'
+                };
+                return labels[field] || field;
+            }
+            
+            function isValidEmail(email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+            }
+            
+            async function checkServerStatus() {
+                try {
+                    const response = await fetch(`${CONFIG.API_BASE_URL}/status`);
+                    const data = await response.json();
+                    
+                    updateServerStatus(data);
+                } catch (error) {
+                    console.error('Ошибка при проверке статуса сервера:', error);
+                    updateServerStatus({ online: false, error: true });
+                }
+            }
+            
+            function updateServerStatus(data) {
+                const isOnline = data.online;
+                const players = data.players || 0;
+                
+                if (elements.serverStatusDot) {
+                    elements.serverStatusDot.className = `status-dot ${isOnline ? '' : 'offline'}`;
+                }
+                
+                if (elements.serverStatusText) {
+                    if (data.error) {
+                        elements.serverStatusText.textContent = 'Статус недоступен';
+                        elements.serverStatusText.className = 'text-yellow-600 font-semibold';
+                        if (elements.serverStatusDot) {
+                            elements.serverStatusDot.className = 'status-dot warning';
+                        }
+                    } else if (isOnline) {
+                        elements.serverStatusText.textContent = `Сервер онлайн • ${players} игроков`;
+                        elements.serverStatusText.className = 'text-green-600 font-semibold';
+                    } else {
+                        elements.serverStatusText.textContent = 'Сервер оффлайн';
+                        elements.serverStatusText.className = 'text-red-600 font-semibold';
+                    }
+                }
+                
+                if (elements.statsPlayers) {
+                    elements.statsPlayers.textContent = players;
+                }
+            }
+            
             function setupSmoothScrolling() {
-                // Плавная прокрутка для навигации
                 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                     anchor.addEventListener('click', function (e) {
                         e.preventDefault();
@@ -617,123 +1703,153 @@
                                 behavior: 'smooth',
                                 block: 'start'
                             });
+                            
+                            // Закрыть мобильное меню
+                            elements.mobileDropdown?.classList.add('hidden');
                         }
                     });
                 });
             }
-
-            function openModal() {
-                modal.style.display = 'block';
-                document.body.style.overflow = 'hidden';
-                hideMessage();
-                applicationForm.reset();
-            }
-
-            function closeModalWindow() {
-                modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-                hideMessage();
-            }
-
-            function hideMessage() {
-                formMessage.style.display = 'none';
-                formMessage.className = 'form-message';
-            }
-
-            function showMessage(text, type = 'success') {
-                formMessage.textContent = text;
-                formMessage.className = `form-message ${type}`;
-                formMessage.style.display = 'block';
-            }
-
-            async function handleFormSubmit(event) {
-                event.preventDefault();
+            
+            function setupScrollEffects() {
+                let lastScrollY = window.scrollY;
                 
-                const formData = new FormData(applicationForm);
-                const data = {
-                    minecraft_nick: formData.get('minecraft_nick').trim(),
-                    discord: formData.get('discord').trim(),
-                    email: formData.get('email').trim(),
-                    reason: formData.get('reason').trim()
-                };
-
-                // Валидация
-                if (!data.minecraft_nick || !data.discord || !data.email || !data.reason) {
-                    showMessage('Пожалуйста, заполните все поля', 'error');
-                    return;
+                window.addEventListener('scroll', () => {
+                    const currentScrollY = window.scrollY;
+                    
+                    // Эффект навигации при прокрутке
+                    if (elements.navbar) {
+                        if (currentScrollY > 100) {
+                            elements.navbar.classList.add('scrolled');
+                        } else {
+                            elements.navbar.classList.remove('scrolled');
+                        }
+                    }
+                    
+                    lastScrollY = currentScrollY;
+                });
+            }
+            
+            function checkAdminAccess() {
+                // Простая проверка админ доступа через localStorage
+                const isAdmin = localStorage.getItem('chiwawa_admin') === 'true';
+                if (isAdmin) {
+                    elements.adminBtn?.classList.remove('hidden');
                 }
-
-                if (!isValidEmail(data.email)) {
-                    showMessage('Пожалуйста, введите корректный email', 'error');
-                    return;
-                }
-
-                // Отправка
-                const submitBtn = applicationForm.querySelector('button[type="submit"]');
-                const originalText = submitBtn.textContent;
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Отправляется...';
-
-                try {
-                    const response = await fetch(`${API_BASE_URL}/apply`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(data)
+                
+                // Или проверка через prompt (для демонстрации)
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+                        const password = prompt('Введите админ-пароль:');
+                        if (password === CONFIG.ADMIN_PASSWORD) {
+                            localStorage.setItem('chiwawa_admin', 'true');
+                            elements.adminBtn?.classList.remove('hidden');
+                            alert('Админ режим активирован!');
+                        }
+                    }
+                });
+            }
+            
+            function toggleAdminPanel() {
+                elements.adminPanel?.classList.toggle('hidden');
+            }
+            
+            function setupAdminPanel() {
+                // Цветовые схемы
+                document.querySelectorAll('.color-swatch').forEach(swatch => {
+                    swatch.addEventListener('click', () => {
+                        const colors = JSON.parse(swatch.dataset.colors);
+                        applyColorScheme(colors);
                     });
-
-                    const result = await response.json();
-
-                    if (response.ok) {
-                        showMessage('🎉 Заявка успешно отправлена! Мы рассмотрим её в ближайшее время.', 'success');
-                        applicationForm.reset();
-                        
-                        setTimeout(() => {
-                            closeModalWindow();
-                        }, 3000);
-                    } else {
-                        showMessage(result.error || 'Произошла ошибка при отправке заявки', 'error');
-                    }
-                } catch (error) {
-                    console.error('Ошибка при отправке заявки:', error);
-                    showMessage('Не удалось отправить заявку. Проверьте подключение к интернету.', 'error');
-                } finally {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = originalText;
+                });
+                
+                // Сохранение настроек
+                document.getElementById('saveAdminSettings')?.addEventListener('click', saveAdminSettings);
+                document.getElementById('resetAdminSettings')?.addEventListener('click', resetAdminSettings);
+            }
+            
+            function applyColorScheme(colors) {
+                document.documentElement.style.setProperty('--chiwawa-primary', colors.primary);
+                document.documentElement.style.setProperty('--chiwawa-secondary', colors.secondary);
+                document.documentElement.style.setProperty('--chiwawa-accent', colors.accent);
+                
+                // Сохранить в localStorage
+                localStorage.setItem('chiwawa_colors', JSON.stringify(colors));
+            }
+            
+            function saveAdminSettings() {
+                const settings = {
+                    serverName: elements.adminServerName?.value || 'Chiwawa Server',
+                    serverDescription: elements.adminServerDescription?.value || 'Приватный Minecraft сервер для своих. Вход только по заявке.',
+                    discordLink: elements.adminDiscordLink?.value || CONFIG.DISCORD_INVITE
+                };
+                
+                // Применить настройки
+                if (elements.serverName) elements.serverName.textContent = settings.serverName;
+                if (elements.heroServerName) elements.heroServerName.textContent = settings.serverName;
+                if (elements.serverDescription) elements.serverDescription.innerHTML = settings.serverDescription;
+                if (elements.discordBtn) elements.discordBtn.href = settings.discordLink;
+                if (elements.discordLinkFooter) elements.discordLinkFooter.href = settings.discordLink;
+                
+                // Сохранить в localStorage
+                localStorage.setItem('chiwawa_settings', JSON.stringify(settings));
+                
+                alert('Настройки сохранены!');
+            }
+            
+            function loadAdminSettings() {
+                // Загрузить цветовую схему
+                const savedColors = localStorage.getItem('chiwawa_colors');
+                if (savedColors) {
+                    const colors = JSON.parse(savedColors);
+                    applyColorScheme(colors);
+                }
+                
+                // Загрузить настройки сайта
+                const savedSettings = localStorage.getItem('chiwawa_settings');
+                if (savedSettings) {
+                    const settings = JSON.parse(savedSettings);
+                    
+                    if (elements.serverName) elements.serverName.textContent = settings.serverName;
+                    if (elements.heroServerName) elements.heroServerName.textContent = settings.serverName;
+                    if (elements.serverDescription) elements.serverDescription.innerHTML = settings.serverDescription;
+                    if (elements.discordBtn) elements.discordBtn.href = settings.discordLink;
+                    if (elements.discordLinkFooter) elements.discordLinkFooter.href = settings.discordLink;
+                    
+                    // Заполнить админ форму
+                    if (elements.adminServerName) elements.adminServerName.value = settings.serverName;
+                    if (elements.adminServerDescription) elements.adminServerDescription.value = settings.serverDescription;
+                    if (elements.adminDiscordLink) elements.adminDiscordLink.value = settings.discordLink;
+                    
+                    CONFIG.DISCORD_INVITE = settings.discordLink;
                 }
             }
-
-            async function checkServerStatus() {
-                try {
-                    const response = await fetch(`${API_BASE_URL}/status`);
-                    const data = await response.json();
-
-                    if (data.online) {
-                        serverStatusDot.className = 'status-dot';
-                        serverStatusText.textContent = `Сервер онлайн • ${data.players || 0} игроков`;
-                        serverStatusText.className = 'text-green-400 font-semibold';
-                    } else {
-                        serverStatusDot.className = 'status-dot';
-                        serverStatusDot.style.background = '#ef4444';
-                        serverStatusText.textContent = 'Сервер оффлайн';
-                        serverStatusText.className = 'text-red-400 font-semibold';
-                    }
-                } catch (error) {
-                    console.error('Ошибка при проверке статуса сервера:', error);
-                    serverStatusDot.style.background = '#fbbf24';
-                    serverStatusText.textContent = 'Статус недоступен';
-                    serverStatusText.className = 'text-yellow-400 font-semibold';
+            
+            function resetAdminSettings() {
+                localStorage.removeItem('chiwawa_settings');
+                localStorage.removeItem('chiwawa_colors');
+                location.reload();
+            }
+            
+            function updateCharCounts() {
+                // Обновление счетчика для мотивации
+                const motivationTextarea = document.getElementById('motivation');
+                const motivationCounter = document.getElementById('motivation-counter');
+                if (motivationTextarea && motivationCounter) {
+                    const length = motivationTextarea.value.length;
+                    motivationCounter.textContent = `${length}/800`;
+                    motivationCounter.className = length > 800 ? 'text-red-500' : 'text-gray-500';
+                }
+                
+                // Обновление счетчика для планов
+                const plansTextarea = document.getElementById('plans');
+                const plansCounter = document.getElementById('plans-counter');
+                if (plansTextarea && plansCounter) {
+                    const length = plansTextarea.value.length;
+                    plansCounter.textContent = `${length}/600`;
+                    plansCounter.className = length > 600 ? 'text-red-500' : 'text-gray-500';
                 }
             }
-
-            function isValidEmail(email) {
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                return emailRegex.test(email);
-            }
-
-            // Периодическая проверка статуса (каждые 30 секунд)
-            setInterval(checkServerStatus, 30000);
         });
     </script>
 </body>

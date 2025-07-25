@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ панель - Chiwawa Server</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 text-gray-900 font-main">
+    <!-- Навигация -->
+    <nav class="navbar" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <!-- Логотип -->
+                <div class="flex items-center space-x-3">
+                    <a href="/" class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-chiwawa-gradient rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-xl">🐕</span>
+                        </div>
+                        <div>
+                            <span class="text-xl font-title font-bold text-chiwawa-gradient">Chiwawa Server</span>
+                            <div class="text-xs text-gray-500">Администрирование</div>
+                        </div>
+                    </a>
+                </div>
+                
+                <!-- Навигация -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="/" class="text-gray-700 hover:text-chiwawa-primary transition-colors">Главная</a>
+                    <a href="/profile" class="text-gray-700 hover:text-chiwawa-primary transition-colors">Профиль</a>
+                    <a href="/admin" class="text-chiwawa-primary font-semibold">Админ панель</a>
+                    <button id="logoutBtn" class="btn-secondary">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Выйти</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Основной контент -->
+    <main class="pt-20 pb-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Заголовок -->
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-title font-bold text-chiwawa-gradient mb-2">
+                        Панель администратора
+                    </h1>
+                    <p class="text-gray-600">Управление сервером и сообществом</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-gray-500">Последний вход</div>
+                    <div class="font-semibold" id="lastLogin">Загрузка...</div>
+                </div>
+            </div>
+
+            <!-- Быстрая статистика -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="card text-center">
+                    <div class="text-3xl font-bold text-chiwawa-primary" id="pendingApplications">0</div>
+                    <div class="text-sm text-gray-600">Заявок на рассмотрении</div>
+                </div>
+                <div class="card text-center">
+                    <div class="text-3xl font-bold text-green-600" id="onlineUsers">0</div>
+                    <div class="text-sm text-gray-600">Пользователей онлайн</div>
+                </div>
+                <div class="card text-center">
+                    <div class="text-3xl font-bold text-blue-600" id="totalUsers">0</div>
+                    <div class="text-sm text-gray-600">Всего пользователей</div>
+                </div>
+                <div class="card text-center">
+                    <div class="text-3xl font-bold text-purple-600" id="serverUptime">0</div>
+                    <div class="text-sm text-gray-600">Время работы (дни)</div>
+                </div>
+            </div>
+
+            <!-- Навигация по разделам -->
+            <div class="mb-8">
+                <nav class="flex space-x-1 bg-white rounded-lg p-1 shadow-sm border">
+                    <button class="admin-tab active" data-tab="applications">
+                        <i class="fas fa-file-alt mr-2"></i>
+                        Заявки
+                    </button>
+                    <button class="admin-tab" data-tab="users">
+                        <i class="fas fa-users mr-2"></i>
+                        Пользователи
+                    </button>
+                    <button class="admin-tab" data-tab="server">
+                        <i class="fas fa-server mr-2"></i>
+                        Сервер
+                    </button>
+                    <button class="admin-tab" data-tab="settings">
+                        <i class="fas fa-cog mr-2"></i>
+                        Настройки
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Секция заявок -->
+            <div id="applicationsTab" class="admin-section">
+                <div class="card">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold">Заявки на whitelist</h2>
+                        <div class="flex space-x-2">
+                            <select id="applicationFilter" class="form-input">
+                                <option value="all">Все заявки</option>
+                                <option value="pending">Ожидают</option>
+                                <option value="approved">Одобрены</option>
+                                <option value="rejected">Отклонены</option>
+                            </select>
+                            <button id="refreshApplications" class="btn-secondary">
+                                <i class="fas fa-refresh"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="applicationsTable" class="overflow-x-auto">
+                        <!-- Таблица заявок загружается динамически -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Секция пользователей -->
+            <div id="usersTab" class="admin-section hidden">
+                <div class="card">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold">Управление пользователями</h2>
+                        <div class="flex space-x-2">
+                            <input type="text" id="userSearch" placeholder="Поиск пользователей..." class="form-input">
+                            <button id="refreshUsers" class="btn-secondary">
+                                <i class="fas fa-refresh"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="usersTable" class="overflow-x-auto">
+                        <!-- Таблица пользователей загружается динамически -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Секция сервера -->
+            <div id="serverTab" class="admin-section hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Статус сервера -->
+                    <div class="card">
+                        <h3 class="text-lg font-bold mb-4">Статус сервера</h3>
+                        <div id="serverStatus" class="space-y-3">
+                            <!-- Динамически загружается -->
+                        </div>
+                    </div>
+                    
+                    <!-- Управление сервером -->
+                    <div class="card">
+                        <h3 class="text-lg font-bold mb-4">Управление</h3>
+                        <div class="space-y-3">
+                            <button class="btn-chiwawa w-full" id="restartServer">
+                                <i class="fas fa-redo mr-2"></i>
+                                Перезапустить сервер
+                            </button>
+                            <button class="btn-secondary w-full" id="backupWorld">
+                                <i class="fas fa-save mr-2"></i>
+                                Создать бекап мира
+                            </button>
+                            <button class="btn-secondary w-full" id="viewLogs">
+                                <i class="fas fa-file-text mr-2"></i>
+                                Просмотр логов
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Секция настроек -->
+            <div id="settingsTab" class="admin-section hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Настройки сайта -->
+                    <div class="card">
+                        <h3 class="text-lg font-bold mb-4">Настройки сайта</h3>
+                        <form id="siteSettingsForm" class="space-y-4">
+                            <div class="form-group">
+                                <label for="serverName">Название сервера</label>
+                                <input type="text" id="serverName" name="serverName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="serverDescription">Описание</label>
+                                <textarea id="serverDescription" name="serverDescription" rows="3" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="discordInvite">Discord приглашение</label>
+                                <input type="url" id="discordInvite" name="discordInvite" required>
+                            </div>
+                            <button type="submit" class="btn-chiwawa">
+                                <i class="fas fa-save mr-2"></i>
+                                Сохранить
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Цветовая схема -->
+                    <div class="card">
+                        <h3 class="text-lg font-bold mb-4">Цветовая схема</h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="color-scheme-option" data-scheme="orange">
+                                <div class="w-full h-12 rounded-lg bg-gradient-to-r from-orange-400 to-yellow-500"></div>
+                                <div class="text-sm text-center mt-2">Оранжевая</div>
+                            </div>
+                            <div class="color-scheme-option" data-scheme="blue">
+                                <div class="w-full h-12 rounded-lg bg-gradient-to-r from-blue-400 to-indigo-500"></div>
+                                <div class="text-sm text-center mt-2">Синяя</div>
+                            </div>
+                            <div class="color-scheme-option" data-scheme="green">
+                                <div class="w-full h-12 rounded-lg bg-gradient-to-r from-green-400 to-emerald-500"></div>
+                                <div class="text-sm text-center mt-2">Зелёная</div>
+                            </div>
+                            <div class="color-scheme-option" data-scheme="purple">
+                                <div class="w-full h-12 rounded-lg bg-gradient-to-r from-purple-400 to-pink-500"></div>
+                                <div class="text-sm text-center mt-2">Фиолетовая</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Модальные окна -->
+    <!-- Модальное окно просмотра заявки -->
+    <div id="applicationModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <span class="close" id="closeApplicationModal">&times;</span>
+            <h2 class="text-2xl font-title font-bold text-center mb-6 text-chiwawa-gradient">Просмотр заявки</h2>
+            <div id="applicationDetails">
+                <!-- Динамически загружается -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомления -->
+    <div id="notifications" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
