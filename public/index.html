@@ -23,11 +23,13 @@
             theme: {
                 extend: {
                     colors: {
+                        'minecraft-dark': '#0a0a0a',
+                        'minecraft-darker': '#050505',
                         'minecraft-gold': '#FFAA00',
-                        'minecraft-dark': '#2B2B2B',
-                        'minecraft-light': '#555555',
                         'minecraft-yellow': '#FFFF55',
-                        'minecraft-orange': '#FF6600'
+                        'minecraft-gray': '#2a2a2a',
+                        'minecraft-light-gray': '#404040',
+                        'minecraft-lighter-gray': '#555555'
                     },
                     fontFamily: {
                         'minecraft': ['Courier New', 'monospace']
@@ -46,6 +48,9 @@
                             '0%': { boxShadow: '0 0 5px #FFAA00' },
                             '100%': { boxShadow: '0 0 20px #FFAA00, 0 0 30px #FFAA00' }
                         }
+                    },
+                    backdropBlur: {
+                        'xs': '2px',
                     }
                 }
             }
@@ -56,27 +61,61 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #FFAA00 #1a1a1a;
+        }
+        
+        *::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        *::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        
+        *::-webkit-scrollbar-thumb {
+            background: #FFAA00;
+            border-radius: 4px;
+        }
+        
         body {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
             color: #ffffff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         .minecraft-bg {
             background-image: 
-                radial-gradient(circle at 25% 25%, #333 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, #444 0%, transparent 50%),
-                linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+                radial-gradient(circle at 25% 25%, #2a2a2a 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, #404040 0%, transparent 50%),
+                linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
         }
         
         .glass-effect {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(42, 42, 42, 0.2);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 170, 0, 0.3);
+            border: 1px solid rgba(255, 170, 0, 0.1);
         }
         
         .text-shadow {
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+        
+        .btn-minecraft {
+            background: linear-gradient(135deg, #FFAA00 0%, #FF8800 100%);
+            border: 2px solid #FFAA00;
+            color: #000;
+            font-weight: bold;
+            text-shadow: none;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-minecraft:hover {
+            background: linear-gradient(135deg, #FFFF55 0%, #FFAA00 100%);
+            border-color: #FFFF55;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 170, 0, 0.4);
         }
         
         .gold-glow {
@@ -145,15 +184,17 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
-                    <i class="fas fa-cubes text-minecraft-gold text-2xl mr-3 animate-pulse-slow"></i>
-                    <span class="text-2xl font-bold text-minecraft-yellow text-shadow">Chiwawa Server</span>
+                    <a href="/" class="flex items-center hover:scale-105 transition-transform duration-200">
+                        <i class="fas fa-cubes text-minecraft-gold text-2xl mr-3 animate-pulse-slow"></i>
+                        <span class="text-2xl font-bold text-minecraft-yellow text-shadow">Chiwawa Server</span>
+                    </a>
                 </div>
                 <div class="flex items-center space-x-6">
                     <a href="/" class="nav-item text-minecraft-gold font-medium text-shadow">Главная</a>
-                    <a href="/login" id="login-btn" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">
+                    <a href="/login" id="login-btn" class="nav-item bg-gradient-to-r from-minecraft-gray to-minecraft-light-gray text-minecraft-gold px-4 py-2 rounded-lg border border-minecraft-gold/30 hover:bg-gradient-to-r hover:from-minecraft-gold hover:to-minecraft-yellow hover:text-minecraft-dark transition-all duration-300 font-medium">
                         <i class="fas fa-sign-in-alt mr-1"></i>Вход
                     </a>
-                    <a href="/register" id="register-btn" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">
+                    <a href="/register" id="register-btn" class="nav-item btn-minecraft px-4 py-2 rounded-lg font-medium">
                         <i class="fas fa-user-plus mr-1"></i>Регистрация
                     </a>
                     <!-- Кнопка личного кабинета для авторизованных пользователей -->
@@ -568,31 +609,30 @@
             }, 3000);
         }
 
-        // Инициализация
+        // Обработчик кнопки выхода
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            const token = localStorage.getItem('auth_token');
+            
+            if (token) {
+                try {
+                    await fetch('/api/auth/logout', {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                } catch (error) {
+                    console.error('Ошибка выхода:', error);
+                }
+            }
+            
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('remember_me');
+            localStorage.removeItem('token_expires');
+            
+            // Обновляем интерфейс
+            checkAuth();
+            
+            showMessage('Вы успешно вышли из системы', 'success');
         });
-
-        // Функция показа сообщений
-        function showMessage(text, type) {
-            // Создаем элемент сообщения
-            const message = document.createElement('div');
-            message.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 ${
-                type === 'success' ? 
-                'bg-green-900/90 text-green-300 border border-green-500/50' : 
-                'bg-red-900/90 text-red-300 border border-red-500/50'
-            }`;
-            message.textContent = text;
-            
-            document.body.appendChild(message);
-            
-            // Убираем сообщение через 3 секунды
-            setTimeout(() => {
-                message.style.opacity = '0';
-                message.style.transform = 'translateX(100%)';
-                setTimeout(() => {
-                    document.body.removeChild(message);
-                }, 300);
-            }, 3000);
-        }
 
         // Инициализация
         document.addEventListener('DOMContentLoaded', () => {

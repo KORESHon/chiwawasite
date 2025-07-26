@@ -560,4 +560,201 @@ router.post('/clear-cache', authenticateToken, requireRole(['admin']), async (re
     }
 });
 
+// GET /api/admin/users/:id/details - Получить детальную информацию о пользователе
+router.get('/users/:id/details', authenticateToken, requireRole(['admin', 'moderator']), async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const userResult = await db.query(`
+            SELECT 
+                u.id, u.nickname, u.email, u.discord_tag, u.trust_level,
+                u.is_banned, u.ban_reason, u.banned_at, u.banned_until,
+                u.registered_at, u.last_login, u.is_email_verified, 
+                u.first_name, u.last_name, u.role, u.status,
+                ps.total_minutes, ps.daily_limit_minutes, ps.is_time_limited,
+                ps.reputation, ps.warnings_count, ps.total_logins, ps.last_played,
+                ps.first_played, ps.total_sessions
+            FROM users u
+            LEFT JOIN player_stats ps ON u.id = ps.user_id
+            WHERE u.id = $1
+        `, [id]);
+
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Пользователь не найден' });
+        }
+
+        // Получить последние сессии
+        const sessionsResult = await db.query(`
+            SELECT started_at, ended_at, duration_minutes, is_active, user_agent, ip_address
+            FROM user_sessions 
+            WHERE user_id = $1 
+            ORDER BY started_at DESC 
+            LIMIT 10
+        `, [id]);
+
+        // Получить историю действий
+        const actionsResult = await db.query(`
+            SELECT action, details, created_at, admin_id
+            FROM admin_logs 
+            WHERE target_user_id = $1 
+            ORDER BY created_at DESC 
+            LIMIT 20
+        `, [id]);
+
+        const user = userResult.rows[0];
+        user.recent_sessions = sessionsResult.rows;
+        user.action_history = actionsResult.rows;
+
+        res.json(user);
+
+    } catch (error) {
+        console.error('Ошибка получения деталей пользователя:', error);
+        res.status(500).json({
+            error: 'Внутренняя ошибка сервера'
+        });
+    }
+});
+
+// PUT /api/admin/users/:id/role - Изменить роль пользователя
+router.put('/users/:id/role', [
+    authenticateToken,
+    requireRole(['admin']),
+    body('role').isIn(['user', 'moderator', 'admin', 'helper'])
+], async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                error: 'Ошибка валидации',
+                details: errors.array()
+            });
+        }
+
+        const { id } = req.params;
+        const { role } = req.body;
+
+        // Проверяем, что пользователь существует
+        const userResult = await db.query('SELECT nickname, role FROM users WHERE id = $1', [id]);
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Пользователь не найден' });
+        }
+
+        const user = userResult.rows[0];
+        const oldRole = user.role;
+
+        // Обновляем роль
+        await db.query('UPDATE users SET role = $1 WHERE id = $2', [role, id]);
+
+        // Логируем действие
+        await db.query(`
+            INSERT INTO admin_logs (admin_id, action, details, target_user_id)
+            VALUES ($1, $2, $3, $4)
+        `, [
+            req.user.id,
+            'role_changed',
+            `Роль пользователя ${user.nickname} изменена с ${oldRole} на ${role}`,
+            id
+        ]);
+
+        res.json({
+            success: true,
+            message: `Роль пользователя ${user.nickname} изменена на ${role}`
+        });
+
+    } catch (error) {
+        console.error('Ошибка изменения роли:', error);
+        res.status(500).json({
+            error: 'Внутренняя ошибка сервера'
+        });
+    }
+});
+
+// POST /api/admin/settings - Сохранить настройки сервера
+router.post('/settings', [
+    authenticateToken,
+    requireRole(['admin']),
+    body('serverName').optional().isLength({ min: 1, max: 100 }),
+    body('serverDescription').optional().isLength({ max: 500 }),
+    body('maxPlayers').optional().isInt({ min: 1, max: 1000 }),
+    body('maintenanceMode').optional().isBoolean(),
+    body('registrationEnabled').optional().isBoolean(),
+    body('autoBackupEnabled').optional().isBoolean(),
+    body('backupInterval').optional().isInt({ min: 1, max: 168 })
+], async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                error: 'Ошибка валидации',
+                details: errors.array()
+            });
+        }
+
+        const {
+            serverName,
+            serverDescription,
+            maxPlayers,
+            maintenanceMode,
+            registrationEnabled,
+            autoBackupEnabled,
+            backupInterval
+        } = req.body;
+
+        // Сохраняем настройки в базу данных
+        // Если таблица настроек не существует, создаем ее
+        await db.query(`
+            CREATE TABLE IF NOT EXISTS server_settings (
+                id SERIAL PRIMARY KEY,
+                setting_key VARCHAR(50) UNIQUE NOT NULL,
+                setting_value TEXT,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_by INTEGER REFERENCES users(id)
+            )
+        `);
+
+        const settings = {
+            server_name: serverName,
+            server_description: serverDescription,
+            max_players: maxPlayers,
+            maintenance_mode: maintenanceMode,
+            registration_enabled: registrationEnabled,
+            auto_backup_enabled: autoBackupEnabled,
+            backup_interval: backupInterval
+        };
+
+        // Обновляем каждую настройку
+        for (const [key, value] of Object.entries(settings)) {
+            if (value !== undefined) {
+                await db.query(`
+                    INSERT INTO server_settings (setting_key, setting_value, updated_by)
+                    VALUES ($1, $2, $3)
+                    ON CONFLICT (setting_key) 
+                    DO UPDATE SET setting_value = $2, updated_at = CURRENT_TIMESTAMP, updated_by = $3
+                `, [key, JSON.stringify(value), req.user.id]);
+            }
+        }
+
+        // Логируем действие
+        await db.query(`
+            INSERT INTO admin_logs (admin_id, action, details)
+            VALUES ($1, $2, $3)
+        `, [
+            req.user.id,
+            'settings_updated',
+            `Настройки сервера обновлены: ${Object.keys(settings).filter(k => settings[k] !== undefined).join(', ')}`
+        ]);
+
+        res.json({
+            success: true,
+            message: 'Настройки успешно сохранены'
+        });
+
+    } catch (error) {
+        console.error('Ошибка сохранения настроек:', error);
+        res.status(500).json({
+            error: 'Внутренняя ошибка сервера'
+        });
+    }
+});
+
 module.exports = router;

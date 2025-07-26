@@ -12,12 +12,16 @@
             theme: {
                 extend: {
                     colors: {
-                        chiwawa: {
-                            primary: '#f59e0b',
-                            secondary: '#fbbf24', 
-                            dark: '#92400e',
-                            light: '#fef3c7'
-                        }
+                        'minecraft-dark': '#0a0a0a',
+                        'minecraft-darker': '#050505',
+                        'minecraft-gold': '#FFAA00',
+                        'minecraft-yellow': '#FFFF55',
+                        'minecraft-gray': '#2a2a2a',
+                        'minecraft-light-gray': '#404040',
+                        'minecraft-lighter-gray': '#555555'
+                    },
+                    backdropBlur: {
+                        'xs': '2px',
                     }
                 }
             }
@@ -26,21 +30,69 @@
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #FFAA00 #1a1a1a;
+        }
+        
+        *::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        *::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        
+        *::-webkit-scrollbar-thumb {
+            background: #FFAA00;
+            border-radius: 4px;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+        }
+        
+        .glass-effect {
+            background: rgba(42, 42, 42, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 170, 0, 0.1);
+        }
+        
+        .btn-minecraft {
+            background: linear-gradient(135deg, #FFAA00 0%, #FF8800 100%);
+            border: 2px solid #FFAA00;
+            color: #000;
+            font-weight: bold;
+            text-shadow: none;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-minecraft:hover {
+            background: linear-gradient(135deg, #FFFF55 0%, #FFAA00 100%);
+            border-color: #FFFF55;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 170, 0, 0.4);
+        }
+    </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-minecraft-dark min-h-screen">
     <!-- Навигация -->
-    <nav class="bg-white shadow-lg sticky top-0 z-50">
+    <nav class="bg-minecraft-gray shadow-lg sticky top-0 z-50 border-b border-minecraft-gold/20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
-                    <i class="fas fa-cubes text-chiwawa-primary text-2xl mr-2"></i>
-                    <span class="text-xl font-bold text-gray-800">Chiwawa Server</span>
-                    <span class="ml-2 px-2 py-1 bg-red-100 text-red-600 text-xs font-medium rounded">ADMIN</span>
+                    <a href="/" class="flex items-center hover:scale-105 transition-transform duration-200">
+                        <i class="fas fa-cubes text-minecraft-gold text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-white">Chiwawa Server</span>
+                    </a>
+                    <span class="ml-2 px-2 py-1 bg-red-500/20 text-red-400 text-xs font-medium rounded border border-red-500/40">ADMIN</span>
                 </div>
                 <div class="flex space-x-4">
-                    <a href="/" class="text-gray-600 hover:text-chiwawa-primary transition-colors">Главная</a>
-                    <a href="/profile" class="text-gray-600 hover:text-chiwawa-primary transition-colors">Профиль</a>
-                    <a href="/admin" class="text-chiwawa-primary font-medium">Админ</a>
+                    <a href="/" class="text-gray-300 hover:text-minecraft-gold transition-colors">Главная</a>
+                    <a href="/profile" class="text-gray-300 hover:text-minecraft-gold transition-colors">Профиль</a>
+                    <a href="/admin" class="text-minecraft-gold font-medium">Админ</a>
                     <button id="logout-btn" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors">
                         Выйти
                     </button>
@@ -52,11 +104,11 @@
     <!-- Проверка доступа -->
     <div id="access-denied" class="hidden">
         <div class="max-w-md mx-auto mt-20">
-            <div class="bg-white rounded-xl shadow-lg p-8 text-center">
-                <i class="fas fa-lock text-red-500 text-4xl mb-4"></i>
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">Доступ запрещен</h2>
-                <p class="text-gray-600 mb-6">У вас нет прав администратора</p>
-                <a href="/profile" class="bg-chiwawa-primary text-white px-6 py-3 rounded-lg hover:bg-chiwawa-dark transition-colors">
+            <div class="glass-effect rounded-xl shadow-lg p-8 text-center">
+                <i class="fas fa-lock text-red-400 text-4xl mb-4"></i>
+                <h2 class="text-2xl font-bold text-white mb-4">Доступ запрещен</h2>
+                <p class="text-gray-300 mb-6">У вас нет прав администратора</p>
+                <a href="/profile" class="btn-minecraft px-6 py-3 rounded-lg inline-block">
                     Вернуться в профиль
                 </a>
             </div>
@@ -68,75 +120,75 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- Заголовок -->
             <div class="mb-8">
-                <h1 class="text-3xl font-bold text-gray-800">Панель администратора</h1>
-                <p class="text-gray-600 mt-2">Управление сервером и пользователями</p>
+                <h1 class="text-3xl font-bold text-white">Панель администратора</h1>
+                <p class="text-gray-300 mt-2">Управление сервером и пользователями</p>
             </div>
 
             <!-- Статистика -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="glass-effect rounded-xl shadow-lg p-6">
                     <div class="flex items-center">
-                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-                            <i class="fas fa-users text-blue-600 text-xl"></i>
+                        <div class="w-12 h-12 bg-minecraft-gold/20 rounded-lg flex items-center justify-center mr-4">
+                            <i class="fas fa-users text-minecraft-gold text-xl"></i>
                         </div>
                         <div>
-                            <div class="text-2xl font-bold text-gray-800" id="total-users">0</div>
-                            <div class="text-sm text-gray-600">Всего пользователей</div>
+                            <div class="text-2xl font-bold text-white" id="total-users">0</div>
+                            <div class="text-sm text-gray-300">Всего пользователей</div>
                         </div>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="glass-effect rounded-xl shadow-lg p-6">
                     <div class="flex items-center">
-                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
-                            <i class="fas fa-file-alt text-green-600 text-xl"></i>
+                        <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center mr-4">
+                            <i class="fas fa-file-alt text-green-400 text-xl"></i>
                         </div>
                         <div>
-                            <div class="text-2xl font-bold text-gray-800" id="pending-apps">0</div>
-                            <div class="text-sm text-gray-600">Заявки на рассмотрении</div>
+                            <div class="text-2xl font-bold text-white" id="pending-apps">0</div>
+                            <div class="text-sm text-gray-300">Заявки на рассмотрении</div>
                         </div>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="glass-effect rounded-xl shadow-lg p-6">
                     <div class="flex items-center">
-                        <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mr-4">
-                            <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                        <div class="w-12 h-12 bg-yellow-500/20 rounded-lg flex items-center justify-center mr-4">
+                            <i class="fas fa-clock text-yellow-400 text-xl"></i>
                         </div>
                         <div>
-                            <div class="text-2xl font-bold text-gray-800" id="active-sessions">0</div>
-                            <div class="text-sm text-gray-600">Активных сессий</div>
+                            <div class="text-2xl font-bold text-white" id="active-sessions">0</div>
+                            <div class="text-sm text-gray-300">Активных сессий</div>
                         </div>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="glass-effect rounded-xl shadow-lg p-6">
                     <div class="flex items-center">
-                        <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mr-4">
-                            <i class="fas fa-ban text-red-600 text-xl"></i>
+                        <div class="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center mr-4">
+                            <i class="fas fa-ban text-red-400 text-xl"></i>
                         </div>
                         <div>
-                            <div class="text-2xl font-bold text-gray-800" id="banned-users">0</div>
-                            <div class="text-sm text-gray-600">Заблокированных</div>
+                            <div class="text-2xl font-bold text-white" id="banned-users">0</div>
+                            <div class="text-sm text-gray-300">Заблокированных</div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Навигация по разделам -->
-            <div class="bg-white rounded-xl shadow-lg mb-8">
-                <div class="border-b border-gray-200">
+            <div class="glass-effect rounded-xl shadow-lg mb-8">
+                <div class="border-b border-minecraft-gold/20">
                     <nav class="flex space-x-8 px-6">
-                        <button class="admin-tab py-4 px-2 border-b-2 border-chiwawa-primary text-chiwawa-primary font-medium" data-tab="applications">
+                        <button class="admin-tab py-4 px-2 border-b-2 border-minecraft-gold text-minecraft-gold font-medium" data-tab="applications">
                             <i class="fas fa-file-alt mr-2"></i>Заявки
                         </button>
-                        <button class="admin-tab py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="users">
+                        <button class="admin-tab py-4 px-2 border-b-2 border-transparent text-gray-300 hover:text-minecraft-gold" data-tab="users">
                             <i class="fas fa-users mr-2"></i>Пользователи
                         </button>
-                        <button class="admin-tab py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="settings">
+                        <button class="admin-tab py-4 px-2 border-b-2 border-transparent text-gray-300 hover:text-minecraft-gold" data-tab="settings">
                             <i class="fas fa-cog mr-2"></i>Настройки сайта
                         </button>
-                        <button class="admin-tab py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="technical">
+                        <button class="admin-tab py-4 px-2 border-b-2 border-transparent text-gray-300 hover:text-minecraft-gold" data-tab="technical">
                             <i class="fas fa-server mr-2"></i>Техническое
                         </button>
-                        <button class="admin-tab py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="logs">
+                        <button class="admin-tab py-4 px-2 border-b-2 border-transparent text-gray-300 hover:text-minecraft-gold" data-tab="logs">
                             <i class="fas fa-list mr-2"></i>Логи
                         </button>
                     </nav>
@@ -146,8 +198,8 @@
                     <!-- Заявки -->
                     <div id="tab-applications" class="admin-tab-content">
                         <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-lg font-semibold text-gray-800">Заявки на whitelist</h3>
-                            <select id="app-status-filter" class="px-4 py-2 border border-gray-300 rounded-lg">
+                            <h3 class="text-lg font-semibold text-white">Заявки на whitelist</h3>
+                            <select id="app-status-filter" class="px-4 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
                                 <option value="all">Все заявки</option>
                                 <option value="pending">На рассмотрении</option>
                                 <option value="approved">Одобренные</option>
@@ -156,8 +208,8 @@
                         </div>
                         <div id="applications-list" class="space-y-4">
                             <div class="text-center py-8">
-                                <i class="fas fa-spinner fa-spin text-2xl text-gray-400 mb-2"></i>
-                                <p class="text-gray-500">Загрузка заявок...</p>
+                                <i class="fas fa-spinner fa-spin text-2xl text-minecraft-gold mb-2"></i>
+                                <p class="text-gray-300">Загрузка заявок...</p>
                             </div>
                         </div>
                     </div>
@@ -165,11 +217,11 @@
                     <!-- Пользователи -->
                     <div id="tab-users" class="admin-tab-content hidden">
                         <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-lg font-semibold text-gray-800">Управление пользователями</h3>
+                            <h3 class="text-lg font-semibold text-white">Управление пользователями</h3>
                             <div class="flex space-x-3">
                                 <input type="text" id="user-search" placeholder="Поиск пользователей..."
-                                    class="px-4 py-2 border border-gray-300 rounded-lg">
-                                <select id="user-status-filter" class="px-4 py-2 border border-gray-300 rounded-lg">
+                                    class="px-4 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white placeholder-gray-400">
+                                <select id="user-status-filter" class="px-4 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
                                     <option value="all">Все пользователи</option>
                                     <option value="active">Активные</option>
                                     <option value="banned">Заблокированные</option>
@@ -178,132 +230,132 @@
                         </div>
                         <div id="users-list" class="space-y-4">
                             <div class="text-center py-8">
-                                <i class="fas fa-spinner fa-spin text-2xl text-gray-400 mb-2"></i>
-                                <p class="text-gray-500">Загрузка пользователей...</p>
+                                <i class="fas fa-spinner fa-spin text-2xl text-minecraft-gold mb-2"></i>
+                                <p class="text-gray-300">Загрузка пользователей...</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Настройки сайта -->
                     <div id="tab-settings" class="admin-tab-content hidden">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-6">Настройки сайта</h3>
+                        <h3 class="text-lg font-semibold text-white mb-6">Настройки сайта</h3>
                         
                         <div class="grid md:grid-cols-2 gap-8">
                             <!-- Основные настройки -->
-                            <div class="bg-gray-50 rounded-lg p-6">
-                                <h4 class="font-medium text-gray-800 mb-4">
-                                    <i class="fas fa-globe mr-2"></i>Основные настройки
+                            <div class="glass-effect rounded-lg p-6">
+                                <h4 class="font-medium text-white mb-4">
+                                    <i class="fas fa-globe mr-2 text-minecraft-gold"></i>Основные настройки
                                 </h4>
                                 <div class="space-y-4">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Название сервера</label>
-                                        <input type="text" value="Chiwawa Server" 
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Название сервера</label>
+                                        <input type="text" id="server-name" value="Chiwawa Server" 
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Описание</label>
-                                        <textarea rows="3" 
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg">Приватный Minecraft сервер с дружелюбным сообществом</textarea>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Описание</label>
+                                        <textarea rows="3" id="server-description"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">Приватный Minecraft сервер с дружелюбным сообществом</textarea>
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">IP сервера</label>
-                                        <input type="text" value="212.15.49.139" 
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">IP сервера</label>
+                                        <input type="text" id="server-ip" value="212.15.49.139" 
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Порт</label>
-                                        <input type="number" value="25565" 
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Порт</label>
+                                        <input type="number" id="server-port" value="25565" 
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Настройки заявок -->
-                            <div class="bg-gray-50 rounded-lg p-6">
-                                <h4 class="font-medium text-gray-800 mb-4">
-                                    <i class="fas fa-file-alt mr-2"></i>Настройки заявок
+                            <div class="glass-effect rounded-lg p-6">
+                                <h4 class="font-medium text-white mb-4">
+                                    <i class="fas fa-file-alt mr-2 text-minecraft-gold"></i>Настройки заявок
                                 </h4>
                                 <div class="space-y-4">
                                     <div class="flex items-center justify-between">
-                                        <span class="text-sm text-gray-700">Прием заявок</span>
+                                        <span class="text-sm text-gray-300">Прием заявок</span>
                                         <label class="relative inline-flex items-center cursor-pointer">
                                             <input type="checkbox" checked class="sr-only peer">
-                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-chiwawa-primary"></div>
+                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:glass-effect after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-chiwawa-primary"></div>
                                         </label>
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Мин. символов в мотивации</label>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Мин. символов в мотивации</label>
                                         <input type="number" value="50" 
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Мин. символов в планах</label>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Мин. символов в планах</label>
                                         <input type="number" value="30" 
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Лимит заявок с IP в день</label>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Лимит заявок с IP в день</label>
                                         <input type="number" value="10" 
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Настройки Trust Level -->
-                            <div class="bg-gray-50 rounded-lg p-6">
-                                <h4 class="font-medium text-gray-800 mb-4">
+                            <div class="glass-effect rounded-lg p-6">
+                                <h4 class="font-medium text-white mb-4">
                                     <i class="fas fa-medal mr-2"></i>Trust Level система
                                 </h4>
                                 <div class="space-y-4">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Очки за подтверждение email</label>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Очки за подтверждение email</label>
                                         <input type="number" value="10" 
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Очки за Discord связку</label>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Очки за Discord связку</label>
                                         <input type="number" value="15" 
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Очки за час игры</label>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Очки за час игры</label>
                                         <input type="number" value="1" 
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Очки для уровня 1</label>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Очки для уровня 1</label>
                                         <input type="number" value="25" 
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Настройки безопасности -->
-                            <div class="bg-gray-50 rounded-lg p-6">
-                                <h4 class="font-medium text-gray-800 mb-4">
+                            <div class="glass-effect rounded-lg p-6">
+                                <h4 class="font-medium text-white mb-4">
                                     <i class="fas fa-shield-alt mr-2"></i>Безопасность
                                 </h4>
                                 <div class="space-y-4">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Максимум попыток входа</label>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Максимум попыток входа</label>
                                         <input type="number" value="5" 
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Время блокировки (минуты)</label>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Время блокировки (минуты)</label>
                                         <input type="number" value="15" 
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Время жизни JWT (дни)</label>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Время жизни JWT (дни)</label>
                                         <input type="number" value="7" 
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
                                     </div>
                                     <div class="flex items-center justify-between">
-                                        <span class="text-sm text-gray-700">Двухфакторная аутентификация</span>
+                                        <span class="text-sm text-gray-300">Двухфакторная аутентификация</span>
                                         <label class="relative inline-flex items-center cursor-pointer">
                                             <input type="checkbox" class="sr-only peer">
-                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-chiwawa-primary"></div>
+                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:glass-effect after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-chiwawa-primary"></div>
                                         </label>
                                     </div>
                                 </div>
@@ -311,7 +363,7 @@
                         </div>
 
                         <div class="mt-8 text-center">
-                            <button class="bg-chiwawa-primary text-white px-8 py-3 rounded-lg font-medium hover:bg-chiwawa-dark transition-colors">
+                            <button id="save-settings-btn" class="btn-minecraft px-8 py-3 rounded-lg font-medium">
                                 <i class="fas fa-save mr-2"></i>
                                 Сохранить все настройки
                             </button>
@@ -320,108 +372,108 @@
 
                     <!-- Техническое -->
                     <div id="tab-technical" class="admin-tab-content hidden">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-6">Техническая информация</h3>
+                        <h3 class="text-lg font-semibold text-white mb-6">Техническая информация</h3>
                         
                         <div class="grid md:grid-cols-2 gap-8">
                             <!-- База данных -->
-                            <div class="bg-gray-50 rounded-lg p-6">
-                                <h4 class="font-medium text-gray-800 mb-4">
+                            <div class="glass-effect rounded-lg p-6">
+                                <h4 class="font-medium text-white mb-4">
                                     <i class="fas fa-database mr-2"></i>База данных
                                 </h4>
                                 <div class="space-y-3 text-sm">
                                     <div class="flex justify-between">
-                                        <span class="text-gray-600">Хост:</span>
+                                        <span class="text-gray-300">Хост:</span>
                                         <span class="font-mono">localhost/212.15.49.139</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-600">Пользователь:</span>
+                                        <span class="text-gray-300">Пользователь:</span>
                                         <span class="font-mono">chiwawa</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-600">База данных:</span>
+                                        <span class="text-gray-300">База данных:</span>
                                         <span class="font-mono">chiwawa</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-600">Статус:</span>
+                                        <span class="text-gray-300">Статус:</span>
                                         <span class="text-green-600 font-medium">Подключена</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-600">Таблиц:</span>
+                                        <span class="text-gray-300">Таблиц:</span>
                                         <span class="font-medium">15</span>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Сервер -->
-                            <div class="bg-gray-50 rounded-lg p-6">
-                                <h4 class="font-medium text-gray-800 mb-4">
+                            <div class="glass-effect rounded-lg p-6">
+                                <h4 class="font-medium text-white mb-4">
                                     <i class="fas fa-server mr-2"></i>Сервер
                                 </h4>
                                 <div class="space-y-3 text-sm">
                                     <div class="flex justify-between">
-                                        <span class="text-gray-600">Node.js версия:</span>
+                                        <span class="text-gray-300">Node.js версия:</span>
                                         <span class="font-mono" id="node-version">Loading...</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-600">Время работы:</span>
+                                        <span class="text-gray-300">Время работы:</span>
                                         <span class="font-mono" id="uptime">Loading...</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-600">Память (RSS):</span>
+                                        <span class="text-gray-300">Память (RSS):</span>
                                         <span class="font-mono" id="memory-rss">Loading...</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-600">Память (Heap):</span>
+                                        <span class="text-gray-300">Память (Heap):</span>
                                         <span class="font-mono" id="memory-heap">Loading...</span>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- API статистика -->
-                            <div class="bg-gray-50 rounded-lg p-6">
-                                <h4 class="font-medium text-gray-800 mb-4">
+                            <div class="glass-effect rounded-lg p-6">
+                                <h4 class="font-medium text-white mb-4">
                                     <i class="fas fa-chart-line mr-2"></i>API статистика
                                 </h4>
                                 <div class="space-y-3 text-sm">
                                     <div class="flex justify-between">
-                                        <span class="text-gray-600">Всего запросов:</span>
+                                        <span class="text-gray-300">Всего запросов:</span>
                                         <span class="font-medium">1,234</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-600">Сегодня:</span>
+                                        <span class="text-gray-300">Сегодня:</span>
                                         <span class="font-medium">156</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-600">Ошибки 5xx:</span>
+                                        <span class="text-gray-300">Ошибки 5xx:</span>
                                         <span class="font-medium text-red-600">3</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-600">Ошибки 4xx:</span>
+                                        <span class="text-gray-300">Ошибки 4xx:</span>
                                         <span class="font-medium text-yellow-600">27</span>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Конфигурация -->
-                            <div class="bg-gray-50 rounded-lg p-6">
-                                <h4 class="font-medium text-gray-800 mb-4">
+                            <div class="glass-effect rounded-lg p-6">
+                                <h4 class="font-medium text-white mb-4">
                                     <i class="fas fa-cogs mr-2"></i>Конфигурация
                                 </h4>
                                 <div class="space-y-3 text-sm">
                                     <div class="flex justify-between">
-                                        <span class="text-gray-600">Порт:</span>
+                                        <span class="text-gray-300">Порт:</span>
                                         <span class="font-mono">3001</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-600">Режим:</span>
+                                        <span class="text-gray-300">Режим:</span>
                                         <span class="font-mono">production</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-600">CORS:</span>
+                                        <span class="text-gray-300">CORS:</span>
                                         <span class="text-green-600">Включен</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-600">Rate Limiting:</span>
+                                        <span class="text-gray-300">Rate Limiting:</span>
                                         <span class="text-green-600">Активен</span>
                                     </div>
                                 </div>
@@ -430,7 +482,7 @@
 
                         <!-- Системные утилиты -->
                         <div class="mt-8">
-                            <h4 class="font-medium text-gray-800 mb-4">
+                            <h4 class="font-medium text-white mb-4">
                                 <i class="fas fa-tools mr-2"></i>Системные утилиты
                             </h4>
                             <div class="grid md:grid-cols-3 gap-4">
@@ -454,9 +506,9 @@
 
                         <!-- Результаты тестов -->
                         <div id="test-results" class="mt-6 hidden">
-                            <div class="bg-gray-50 rounded-lg p-4">
-                                <h5 class="font-medium text-gray-800 mb-2">Результат теста:</h5>
-                                <div id="test-output" class="text-sm text-gray-600 font-mono whitespace-pre-wrap"></div>
+                            <div class="glass-effect rounded-lg p-4">
+                                <h5 class="font-medium text-white mb-2">Результат теста:</h5>
+                                <div id="test-output" class="text-sm text-gray-300 font-mono whitespace-pre-wrap"></div>
                             </div>
                         </div>
                     </div>
@@ -464,9 +516,9 @@
                     <!-- Логи -->
                     <div id="tab-logs" class="admin-tab-content hidden">
                         <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-lg font-semibold text-gray-800">Системные логи</h3>
+                            <h3 class="text-lg font-semibold text-white">Системные логи</h3>
                             <div class="flex space-x-3">
-                                <select id="log-action-filter" class="px-4 py-2 border border-gray-300 rounded-lg">
+                                <select id="log-action-filter" class="px-4 py-2 border border-minecraft-gold/20 rounded-lg">
                                     <option value="all">Все действия</option>
                                     <option value="login">Входы</option>
                                     <option value="application_submitted">Заявки</option>
@@ -637,11 +689,11 @@
                     
                     if (data.applications && data.applications.length > 0) {
                         appsList.innerHTML = data.applications.map(app => `
-                            <div class="bg-white border border-gray-200 rounded-lg p-6">
+                            <div class="glass-effect border border-gray-200 rounded-lg p-6">
                                 <div class="flex justify-between items-start mb-4">
                                     <div>
-                                        <h4 class="font-semibold text-gray-800">${app.minecraft_nick}</h4>
-                                        <p class="text-sm text-gray-600">${app.email} • ${app.discord}</p>
+                                        <h4 class="font-semibold text-white">${app.minecraft_nick}</h4>
+                                        <p class="text-sm text-gray-300">${app.email} • ${app.discord}</p>
                                         <p class="text-xs text-gray-500">${new Date(app.submitted_at).toLocaleString('ru-RU')}</p>
                                     </div>
                                     <div class="flex items-center space-x-2">
@@ -669,7 +721,7 @@
                                 <div class="mt-4">
                                     <details class="text-sm">
                                         <summary class="cursor-pointer text-chiwawa-primary font-medium">Подробности заявки</summary>
-                                        <div class="mt-2 space-y-2 text-gray-600">
+                                        <div class="mt-2 space-y-2 text-gray-300">
                                             <div><strong>Мотивация:</strong> ${app.motivation}</div>
                                             <div><strong>Планы:</strong> ${app.plans}</div>
                                             ${app.review_comment ? `<div><strong>Комментарий:</strong> ${app.review_comment}</div>` : ''}
@@ -709,15 +761,15 @@
                     
                     if (data.users && data.users.length > 0) {
                         usersList.innerHTML = data.users.map(user => `
-                            <div class="bg-white border border-gray-200 rounded-lg p-6">
+                            <div class="glass-effect border border-gray-200 rounded-lg p-6">
                                 <div class="flex justify-between items-center">
                                     <div class="flex items-center">
                                         <div class="w-10 h-10 bg-chiwawa-light rounded-full flex items-center justify-center mr-4">
                                             <i class="fas fa-user text-chiwawa-primary"></i>
                                         </div>
                                         <div>
-                                            <h4 class="font-semibold text-gray-800">${user.nickname}</h4>
-                                            <p class="text-sm text-gray-600">${user.email}</p>
+                                            <h4 class="font-semibold text-white">${user.nickname}</h4>
+                                            <p class="text-sm text-gray-300">${user.email}</p>
                                             <p class="text-xs text-gray-500">Trust Level ${user.trust_level} • ${Math.floor((user.total_minutes || 0) / 60)} часов</p>
                                         </div>
                                     </div>
@@ -725,17 +777,26 @@
                                         <span class="px-2 py-1 text-xs font-medium rounded ${user.is_banned ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}">
                                             ${user.is_banned ? 'Заблокирован' : 'Активен'}
                                         </span>
+                                        <span class="px-2 py-1 text-xs font-medium rounded bg-minecraft-gold/20 text-minecraft-gold">
+                                            ${user.role === 'admin' ? 'Админ' : user.role === 'moderator' ? 'Модератор' : 'Пользователь'}
+                                        </span>
                                         <div class="flex space-x-1">
+                                            <button onclick="showUserDetails(${user.id})" class="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600" title="Подробная информация">
+                                                <i class="fas fa-info-circle"></i>
+                                            </button>
+                                            <button onclick="changeUserRole(${user.id}, '${user.nickname}')" class="px-2 py-1 bg-purple-500 text-white text-xs rounded hover:bg-purple-600" title="Изменить роль">
+                                                <i class="fas fa-user-shield"></i>
+                                            </button>
                                             ${!user.is_banned ? `
-                                                <button onclick="banUser(${user.id}, '${user.nickname}')" class="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600">
-                                                    Заблокировать
+                                                <button onclick="banUser(${user.id}, '${user.nickname}')" class="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600" title="Заблокировать">
+                                                    <i class="fas fa-ban"></i>
                                                 </button>
                                             ` : `
-                                                <button onclick="unbanUser(${user.id}, '${user.nickname}')" class="px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600">
-                                                    Разблокировать
+                                                <button onclick="unbanUser(${user.id}, '${user.nickname}')" class="px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600" title="Разблокировать">
+                                                    <i class="fas fa-check"></i>
                                                 </button>
                                             `}
-                                            <select onchange="changeTrustLevel(${user.id}, this.value)" class="px-2 py-1 text-xs border border-gray-300 rounded">
+                                            <select onchange="changeTrustLevel(${user.id}, this.value)" class="px-2 py-1 text-xs bg-minecraft-gray border border-minecraft-gold/20 rounded text-white" title="Изменить Trust Level">
                                                 ${[0,1,2,3,4,5].map(level => `<option value="${level}" ${user.trust_level == level ? 'selected' : ''}>TL${level}</option>`).join('')}
                                             </select>
                                         </div>
@@ -796,14 +857,14 @@
                     
                     if (data.logs && data.logs.length > 0) {
                         logsList.innerHTML = data.logs.map(log => `
-                            <div class="bg-white border-l-4 ${getLogBorderColor(log.action)} p-4">
+                            <div class="glass-effect border-l-4 ${getLogBorderColor(log.action)} p-4">
                                 <div class="flex justify-between items-start">
                                     <div class="flex-1">
                                         <div class="flex items-center space-x-2">
-                                            <span class="font-medium text-gray-800">${log.action}</span>
-                                            ${log.admin_nickname ? `<span class="text-sm text-gray-600">от ${log.admin_nickname}</span>` : ''}
+                                            <span class="font-medium text-white">${log.action}</span>
+                                            ${log.admin_nickname ? `<span class="text-sm text-gray-300">от ${log.admin_nickname}</span>` : ''}
                                         </div>
-                                        <p class="text-sm text-gray-600 mt-1">${log.details}</p>
+                                        <p class="text-sm text-gray-300 mt-1">${log.details}</p>
                                         ${log.target_user_nickname ? `<p class="text-xs text-gray-500">Цель: ${log.target_user_nickname}</p>` : ''}
                                     </div>
                                     <div class="text-xs text-gray-500">
@@ -930,15 +991,161 @@
             }
         }
 
+        // Функция просмотра подробной информации о пользователе
+        async function showUserDetails(userId) {
+            const token = localStorage.getItem('auth_token');
+            
+            try {
+                const response = await fetch(`/api/admin/users/${userId}/details`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const user = await response.json();
+                    
+                    const modal = document.createElement('div');
+                    modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+                    modal.innerHTML = `
+                        <div class="glass-effect rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xl font-bold text-white">Подробная информация о пользователе</h3>
+                                <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <span class="text-gray-300 font-medium">Никнейм:</span>
+                                        <p class="text-white">${user.nickname}</p>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-300 font-medium">Email:</span>
+                                        <p class="text-white">${user.email}</p>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-300 font-medium">Роль:</span>
+                                        <p class="text-minecraft-gold">${user.role === 'admin' ? 'Администратор' : user.role === 'moderator' ? 'Модератор' : 'Пользователь'}</p>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-300 font-medium">Trust Level:</span>
+                                        <p class="text-minecraft-yellow">${user.trust_level}</p>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-300 font-medium">Время в игре:</span>
+                                        <p class="text-white">${Math.floor((user.total_minutes || 0) / 60)} ч ${(user.total_minutes || 0) % 60} мин</p>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-300 font-medium">Дата регистрации:</span>
+                                        <p class="text-white">${new Date(user.created_at).toLocaleDateString('ru-RU')}</p>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-300 font-medium">Статус:</span>
+                                        <p class="${user.is_banned ? 'text-red-400' : 'text-green-400'}">${user.is_banned ? 'Заблокирован' : 'Активен'}</p>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-300 font-medium">Последний вход:</span>
+                                        <p class="text-white">${user.last_login ? new Date(user.last_login).toLocaleString('ru-RU') : 'Никогда'}</p>
+                                    </div>
+                                </div>
+                                ${user.is_banned && user.ban_reason ? `
+                                    <div>
+                                        <span class="text-gray-300 font-medium">Причина блокировки:</span>
+                                        <p class="text-red-400">${user.ban_reason}</p>
+                                    </div>
+                                ` : ''}
+                                ${user.discord_id ? `
+                                    <div>
+                                        <span class="text-gray-300 font-medium">Discord ID:</span>
+                                        <p class="text-purple-400">${user.discord_id}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(modal);
+                } else {
+                    alert('Ошибка загрузки данных пользователя');
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки пользователя:', error);
+                alert('Ошибка соединения с сервером');
+            }
+        }
+
+        // Функция изменения роли пользователя
+        async function changeUserRole(userId, nickname) {
+            const roles = [
+                { value: 'user', label: 'Пользователь' },
+                { value: 'moderator', label: 'Модератор' },
+                { value: 'admin', label: 'Администратор' }
+            ];
+            
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="glass-effect rounded-xl p-6 max-w-md w-full mx-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-white">Изменить роль</h3>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                    </div>
+                    <p class="text-gray-300 mb-4">Изменить роль пользователя <strong class="text-minecraft-gold">${nickname}</strong>?</p>
+                    <div class="space-y-3">
+                        <label class="text-gray-300 font-medium">Выберите новую роль:</label>
+                        <select id="role-select" class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
+                            ${roles.map(role => `<option value="${role.value}">${role.label}</option>`).join('')}
+                        </select>
+                        <div class="flex space-x-3 mt-4">
+                            <button onclick="updateUserRole(${userId})" class="btn-minecraft flex-1 py-2 rounded-lg">
+                                Изменить роль
+                            </button>
+                            <button onclick="this.closest('.fixed').remove()" class="bg-gray-600 text-white flex-1 py-2 rounded-lg hover:bg-gray-700">
+                                Отмена
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Функция обновления роли пользователя
+        async function updateUserRole(userId) {
+            const roleSelect = document.getElementById('role-select');
+            const newRole = roleSelect.value;
+            const token = localStorage.getItem('auth_token');
+            
+            try {
+                const response = await fetch(`/api/admin/users/${userId}/role`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ role: newRole })
+                });
+                
+                if (response.ok) {
+                    showMessage('Роль пользователя успешно изменена!', 'success');
+                    loadUsers();
+                    document.querySelector('.fixed').remove();
+                } else {
+                    const error = await response.json();
+                    alert('Ошибка: ' + error.error);
+                }
+            } catch (error) {
+                console.error('Ошибка изменения роли:', error);
+                alert('Ошибка соединения с сервером');
+            }
+        }
+
         // Утилиты
         function getStatusBadge(status) {
             const badges = {
                 'pending': 'bg-yellow-100 text-yellow-600',
                 'approved': 'bg-green-100 text-green-600',
                 'rejected': 'bg-red-100 text-red-600',
-                'banned': 'bg-gray-100 text-gray-600'
+                'banned': 'bg-gray-100 text-gray-300'
             };
-            return badges[status] || 'bg-gray-100 text-gray-600';
+            return badges[status] || 'bg-gray-100 text-gray-300';
         }
 
         function getStatusText(status) {
@@ -1006,7 +1213,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        testEmail: 'admin@example.com' // Можно сделать поле ввода для этого
+                        testEmail: 'dima2_05@mail.ru' // Можно сделать поле ввода для этого
                     })
                 });
                 
@@ -1080,6 +1287,71 @@
             
             // Прокручиваем к результату
             resultsDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Обработчик сохранения настроек
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('save-settings-btn')?.addEventListener('click', async () => {
+                const btn = document.getElementById('save-settings-btn');
+                const originalText = btn.innerHTML;
+                
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Сохраняю...';
+                btn.disabled = true;
+                
+                try {
+                    // Собираем все настройки из формы
+                    const settings = {
+                        serverName: document.getElementById('server-name')?.value,
+                        description: document.getElementById('server-description')?.value,
+                        serverIp: document.getElementById('server-ip')?.value,
+                        serverPort: document.getElementById('server-port')?.value,
+                    };
+                    
+                    const token = localStorage.getItem('auth_token');
+                    const response = await fetch('/api/admin/settings', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(settings)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        showMessage('Настройки успешно сохранены!', 'success');
+                    } else {
+                        showMessage('Ошибка сохранения: ' + (result.error || 'Неизвестная ошибка'), 'error');
+                    }
+                } catch (error) {
+                    showMessage('Ошибка соединения: ' + error.message, 'error');
+                } finally {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            });
+        });
+
+        // Функция показа сообщений
+        function showMessage(text, type) {
+            const message = document.createElement('div');
+            message.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 ${
+                type === 'success' ? 
+                'bg-green-900/90 text-green-300 border border-green-500/50' : 
+                'bg-red-900/90 text-red-300 border border-red-500/50'
+            }`;
+            message.textContent = text;
+            
+            document.body.appendChild(message);
+            
+            setTimeout(() => {
+                message.style.opacity = '0';
+                message.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    document.body.removeChild(message);
+                }, 300);
+            }, 3000);
         }
     </script>
 </body>
