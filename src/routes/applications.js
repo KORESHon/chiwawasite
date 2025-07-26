@@ -3,7 +3,7 @@
 
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const db = require('../database/connection');
+const db = require('../../database/connection');
 const { authenticateToken, requireRole } = require('./auth');
 const bcrypt = require('bcryptjs');
 

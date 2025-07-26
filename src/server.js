@@ -11,15 +11,13 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 require('dotenv').config();
 
-const db = require('./database/connection');
+const db = require('../database/connection');
 
 // Импорт маршрутов
 const authRoutes = require('./routes/auth');
-const userRoutes = require('./routes/users');
 const applicationRoutes = require('./routes/applications');
 const profileRoutes = require('./routes/profile');
 const adminRoutes = require('./routes/admin');
-const serverRoutes = require('./routes/server');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -29,10 +27,11 @@ app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
-            styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
-            scriptSrc: ["'self'", "'unsafe-inline'"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "https://cdnjs.cloudflare.com"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.tailwindcss.com"],
             imgSrc: ["'self'", "data:", "https:"],
             fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
+            connectSrc: ["'self'"]
         },
     },
 }));
@@ -75,29 +74,78 @@ app.use('/api/auth/login', strictLimiter);
 app.use('/api/applications', strictLimiter);
 
 // Статические файлы
-app.use(express.static(path.join(__dirname, '../website'), {
+app.use(express.static(path.join(__dirname, '../public'), {
     maxAge: process.env.NODE_ENV === 'production' ? '1d' : '0'
 }));
 
 // API маршруты
 app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/server', serverRoutes);
+
+// Информация о сервере Minecraft
+app.get('/api/server-info', async (req, res) => {
+    try {
+        // В режиме без БД возвращаем заглушку
+        if (process.env.NO_DATABASE === 'true') {
+            return res.json({
+                status: 'online',
+                players: {
+                    online: 12,
+                    max: 100
+                },
+                motd: 'Chiwawa Server - Творческий мир без границ!',
+                version: '1.20.1',
+                ping: 45
+            });
+        }
+        
+        // Здесь должен быть код для проверки реального статуса сервера
+        // Например, пинг сервера Minecraft или запрос к базе данных
+        
+        res.json({
+            status: 'online',
+            players: {
+                online: 8,
+                max: 100
+            },
+            motd: 'Chiwawa Server - Творческий мир без границ!',
+            version: '1.20.1',
+            ping: 32
+        });
+    } catch (error) {
+        console.error('Error getting server info:', error);
+        res.status(500).json({
+            error: 'Failed to get server information',
+            status: 'offline'
+        });
+    }
+});
 
 // Маршруты для страниц
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../website/index.html'));
+    res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/login.html'));
+});
+
+app.get('/register', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/register.html'));
+});
+
+app.get('/forgot-password', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/forgot-password.html'));
 });
 
 app.get('/profile', (req, res) => {
-    res.sendFile(path.join(__dirname, '../website/profile.html'));
+    res.sendFile(path.join(__dirname, '../public/profile.html'));
 });
 
 app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, '../website/admin.html'));
+    res.sendFile(path.join(__dirname, '../public/admin.html'));
 });
 
 // Проверка здоровья системы
@@ -134,11 +182,9 @@ app.get('/api', (req, res) => {
         author: 'ebluffy',
         endpoints: {
             auth: '/api/auth',
-            users: '/api/users',
             applications: '/api/applications',
             profile: '/api/profile',
-            admin: '/api/admin',
-            server: '/api/server'
+            admin: '/api/admin'
         },
         documentation: '/api/docs'
     });
@@ -155,7 +201,7 @@ app.use('/api/*', (req, res) => {
 
 // SPA fallback - все остальные маршруты отправляем на главную
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../website/index.html'));
+    res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
 // Глобальная обработка ошибок
@@ -208,15 +254,20 @@ app.listen(PORT, async () => {
     console.log(`📋 API документация: http://localhost:${PORT}/api`);
     console.log(`🔍 Health check: http://localhost:${PORT}/health`);
     console.log(`👨‍💻 Создатель: ebluffy`);
+    console.log(''); // Пустая строка для разделения
     
     // Проверяем подключение к базе данных
-    try {
-        await db.query('SELECT NOW() as server_time');
-        console.log('✅ Подключение к PostgreSQL установлено');
-    } catch (error) {
-        console.error('❌ Ошибка подключения к PostgreSQL:', error.message);
-        console.log('📝 Убедитесь, что PostgreSQL запущен и настройки в .env корректны');
+    const isDbConnected = await db.testConnection();
+    
+    if (!isDbConnected) {
+        console.log('');
+        console.log('⚠️  ВНИМАНИЕ: Сервер запущен без подключения к базе данных');
+        console.log('   Некоторые функции могут не работать');
+        console.log('   Проверьте настройки PostgreSQL');
     }
+    
+    console.log('');
+    console.log('🎯 Сервер готов к работе!');
 });
 
 module.exports = app;

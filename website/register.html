@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация - Chiwawa Server</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'minecraft-dark': '#0a0a0a',
+                        'minecraft-darker': '#050505',
+                        'minecraft-gold': '#FFAA00',
+                        'minecraft-yellow': '#FFFF55',
+                        'minecraft-gray': '#2a2a2a',
+                        'minecraft-light-gray': '#404040'
+                    },
+                    backdropBlur: {
+                        'xs': '2px',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #FFAA00 #1a1a1a;
+        }
+        
+        *::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        *::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        
+        *::-webkit-scrollbar-thumb {
+            background: #FFAA00;
+            border-radius: 4px;
+        }
+        
+        .glass-effect {
+            background: rgba(42, 42, 42, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 170, 0, 0.1);
+        }
+        
+        .text-shadow {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+        
+        .btn-minecraft {
+            background: linear-gradient(135deg, #FFAA00 0%, #FF8800 100%);
+            border: 2px solid #FFAA00;
+            color: #000;
+            font-weight: bold;
+            text-shadow: none;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-minecraft:hover {
+            background: linear-gradient(135deg, #FFFF55 0%, #FFAA00 100%);
+            border-color: #FFFF55;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 170, 0, 0.4);
+        }
+        
+        .btn-minecraft:active {
+            transform: translateY(0);
+        }
+        
+        .gold-glow {
+            box-shadow: 0 0 30px rgba(255, 170, 0, 0.3);
+        }
+        
+        .animate-glow {
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 0 20px rgba(255, 170, 0, 0.3); }
+            to { box-shadow: 0 0 40px rgba(255, 170, 0, 0.6); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #FFAA00;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particle-float 4s linear infinite;
+        }
+        
+        @keyframes particle-float {
+            0% {
+                opacity: 0;
+                transform: translateY(100vh) scale(0);
+            }
+            10% {
+                opacity: 1;
+                transform: translateY(90vh) scale(1);
+            }
+            90% {
+                opacity: 1;
+                transform: translateY(10vh) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(0vh) scale(0);
+            }
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .input-minecraft {
+            background: rgba(42, 42, 42, 0.3);
+            border: 2px solid rgba(255, 170, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .input-minecraft:focus {
+            border-color: #FFAA00;
+            box-shadow: 0 0 20px rgba(255, 170, 0, 0.2);
+            background: rgba(42, 42, 42, 0.5);
+        }
+        
+        .password-strength {
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .password-strength-bar {
+            height: 100%;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+        
+        .strength-weak { background: #ef4444; width: 25%; }
+        .strength-fair { background: #f59e0b; width: 50%; }
+        .strength-good { background: #eab308; width: 75%; }
+        .strength-strong { background: #22c55e; width: 100%; }
+    </style>
+</head>
+<body>
+    <!-- Фон с частицами -->
+    <div id="particles" class="fixed inset-0 pointer-events-none z-0"></div>
+    
+    <!-- Навигация -->
+    <nav class="glass-effect fixed w-full top-0 z-50 border-b border-minecraft-gold/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-minecraft-gold text-shadow">
+                        <i class="fas fa-cubes mr-2"></i>Chiwawa Server
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="/" class="text-gray-300 hover:text-minecraft-yellow px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            <i class="fas fa-home mr-1"></i>Главная
+                        </a>
+                        <a href="/login" class="text-gray-300 hover:text-minecraft-yellow px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            <i class="fas fa-sign-in-alt mr-1"></i>Вход
+                        </a>
+                        <a href="/register" class="text-minecraft-yellow px-3 py-2 rounded-md text-sm font-bold transition-colors">
+                            <i class="fas fa-user-plus mr-1"></i>Регистрация
+                        </a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-300 hover:text-minecraft-yellow">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Мобильное меню -->
+        <div id="mobile-menu" class="md:hidden hidden border-t border-minecraft-gold/30">
+            <div class="px-2 pt-2 pb-3 space-y-1 glass-effect">
+                <a href="/" class="text-gray-300 hover:text-minecraft-yellow block px-3 py-2 rounded-md text-base font-medium">
+                    <i class="fas fa-home mr-2"></i>Главная
+                </a>
+                <a href="/login" class="text-gray-300 hover:text-minecraft-yellow block px-3 py-2 rounded-md text-base font-medium">
+                    <i class="fas fa-sign-in-alt mr-2"></i>Вход
+                </a>
+                <a href="/register" class="text-minecraft-yellow block px-3 py-2 rounded-md text-base font-bold">
+                    <i class="fas fa-user-plus mr-2"></i>Регистрация
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Основной контент -->
+    <main class="relative z-10 pt-16">
+        <!-- Форма регистрации -->
+        <section class="min-h-screen flex items-center justify-center py-20">
+            <div class="max-w-lg w-full mx-4">
+                <div class="glass-effect rounded-2xl p-8 border border-minecraft-gold/30 gold-glow">
+                    <div class="text-center mb-8">
+                        <div class="animate-float inline-block">
+                            <i class="fas fa-user-plus text-6xl text-minecraft-gold mb-4"></i>
+                        </div>
+                        <h1 class="text-4xl font-bold text-shadow mb-2">
+                            <span class="text-minecraft-gold">Регистрация</span>
+                        </h1>
+                        <p class="text-gray-300">Создайте аккаунт для игры на сервере</p>
+                        <p class="text-gray-400 text-sm mt-2">Дополнительные настройки можно изменить в профиле</p>
+                    </div>
+                    
+                    <!-- Сообщения -->
+                    <div id="message" class="hidden mb-6 p-4 rounded-xl"></div>
+                    
+                    <form id="registerForm" class="space-y-6">
+                        <div>
+                            <label class="block text-minecraft-yellow font-bold text-lg mb-3">
+                                <i class="fas fa-user mr-2"></i>Имя <span class="text-gray-400 text-sm font-normal">(необязательно)</span>
+                            </label>
+                            <input type="text" name="first_name"
+                                class="input-minecraft w-full px-4 py-3 rounded-xl text-white placeholder-gray-400"
+                                placeholder="Ваше имя">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-minecraft-yellow font-bold text-lg mb-3">
+                                <i class="fas fa-gamepad mr-2"></i>Minecraft ник *
+                            </label>
+                            <input type="text" name="minecraft_nick" required
+                                class="input-minecraft w-full px-4 py-3 rounded-xl text-white placeholder-gray-400"
+                                placeholder="YourNickname">
+                            <div class="text-xs text-gray-400 mt-1">
+                                Этот ник будет использоваться на сервере
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-minecraft-yellow font-bold text-lg mb-3">
+                                <i class="fas fa-envelope mr-2"></i>Email *
+                            </label>
+                            <input type="email" name="email" required
+                                class="input-minecraft w-full px-4 py-3 rounded-xl text-white placeholder-gray-400"
+                                placeholder="your@email.com">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-minecraft-yellow font-bold text-lg mb-3">
+                                <i class="fas fa-lock mr-2"></i>Пароль *
+                            </label>
+                            <div class="relative">
+                                <input type="password" name="password" id="password" required
+                                    class="input-minecraft w-full px-4 py-3 pr-12 rounded-xl text-white placeholder-gray-400"
+                                    placeholder="••••••••" minlength="8">
+                                <button type="button" id="togglePassword" 
+                                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-minecraft-yellow transition-colors">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="password-strength">
+                                <div id="passwordStrengthBar" class="password-strength-bar"></div>
+                            </div>
+                            <div id="passwordStrengthText" class="text-xs text-gray-400 mt-1">
+                                Минимум 8 символов
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-minecraft-yellow font-bold text-lg mb-3">
+                                <i class="fas fa-lock mr-2"></i>Подтверждение пароля *
+                            </label>
+                            <input type="password" name="confirm_password" id="confirmPassword" required
+                                class="input-minecraft w-full px-4 py-3 rounded-xl text-white placeholder-gray-400"
+                                placeholder="••••••••">
+                            <div id="passwordMatch" class="text-xs mt-1 hidden"></div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <input type="checkbox" name="terms" id="terms" required
+                                class="mt-1 rounded border-minecraft-gold/30 text-minecraft-gold focus:ring-minecraft-gold focus:ring-offset-0">
+                            <label for="terms" class="ml-3 text-gray-300 text-sm leading-relaxed">
+                                Я согласен с <a href="/terms" class="text-minecraft-gold hover:text-minecraft-yellow">правилами сервера</a> 
+                                и <a href="/privacy" class="text-minecraft-gold hover:text-minecraft-yellow">политикой конфиденциальности</a>
+                            </label>
+                        </div>
+                        
+                        <button type="submit" 
+                            class="btn-minecraft w-full py-3 rounded-xl text-xl font-bold hover:scale-105 transition-all duration-300 animate-glow">
+                            <i class="fas fa-user-plus mr-2"></i>
+                            Зарегистрироваться
+                        </button>
+                    </form>
+                    
+                    <div class="mt-8 text-center">
+                        <p class="text-gray-300">
+                            Уже есть аккаунт? 
+                            <a href="/login" class="text-minecraft-gold hover:text-minecraft-yellow font-bold transition-colors">
+                                Войти
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Футер -->
+    <footer class="glass-effect border-t border-minecraft-gold/30 py-8 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <p class="text-gray-400">
+                    © 2025 Chiwawa Server. Все права защищены.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Создание частиц
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            
+            function createParticle() {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.animationDelay = Math.random() * 4 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                
+                particlesContainer.appendChild(particle);
+                
+                setTimeout(() => {
+                    particle.remove();
+                }, 5000);
+            }
+            
+            setInterval(createParticle, 300);
+        }
+
+        // Переключение видимости пароля
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordField = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        // Проверка силы пароля
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strengthBar = document.getElementById('passwordStrengthBar');
+            const strengthText = document.getElementById('passwordStrengthText');
+            
+            let strength = 0;
+            let feedback = [];
+            
+            // Проверки
+            if (password.length >= 8) strength++;
+            else feedback.push('минимум 8 символов');
+            
+            if (/[a-z]/.test(password)) strength++;
+            else feedback.push('строчные буквы');
+            
+            if (/[A-Z]/.test(password)) strength++;
+            else feedback.push('заглавные буквы');
+            
+            if (/[0-9]/.test(password)) strength++;
+            else feedback.push('цифры');
+            
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            else feedback.push('спецсимволы');
+            
+            // Обновляем индикатор
+            strengthBar.className = 'password-strength-bar';
+            if (strength === 0) {
+                strengthBar.classList.add('strength-weak');
+                strengthText.textContent = 'Слабый пароль';
+                strengthText.className = 'text-xs text-red-400 mt-1';
+            } else if (strength <= 2) {
+                strengthBar.classList.add('strength-weak');
+                strengthText.textContent = 'Слабый: ' + feedback.slice(0, 2).join(', ');
+                strengthText.className = 'text-xs text-red-400 mt-1';
+            } else if (strength <= 3) {
+                strengthBar.classList.add('strength-fair');
+                strengthText.textContent = 'Средний: ' + feedback.join(', ');
+                strengthText.className = 'text-xs text-yellow-400 mt-1';
+            } else if (strength <= 4) {
+                strengthBar.classList.add('strength-good');
+                strengthText.textContent = 'Хороший: ' + feedback.join(', ');
+                strengthText.className = 'text-xs text-yellow-300 mt-1';
+            } else {
+                strengthBar.classList.add('strength-strong');
+                strengthText.textContent = 'Сильный пароль!';
+                strengthText.className = 'text-xs text-green-400 mt-1';
+            }
+        });
+
+        // Проверка совпадения паролей
+        function checkPasswordMatch() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const matchDiv = document.getElementById('passwordMatch');
+            
+            if (confirmPassword) {
+                matchDiv.classList.remove('hidden');
+                if (password === confirmPassword) {
+                    matchDiv.textContent = '✓ Пароли совпадают';
+                    matchDiv.className = 'text-xs text-green-400 mt-1';
+                } else {
+                    matchDiv.textContent = '✗ Пароли не совпадают';
+                    matchDiv.className = 'text-xs text-red-400 mt-1';
+                }
+            } else {
+                matchDiv.classList.add('hidden');
+            }
+        }
+
+        document.getElementById('password').addEventListener('input', checkPasswordMatch);
+        document.getElementById('confirmPassword').addEventListener('input', checkPasswordMatch);
+
+        // Мобильное меню
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Обработка формы регистрации
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Проверяем совпадение паролей
+            if (data.password !== data.confirm_password) {
+                showMessage('Пароли не совпадают', 'error');
+                return;
+            }
+            
+            // Убираем confirm_password из данных
+            delete data.confirm_password;
+            
+            const submitButton = e.target.querySelector('button[type="submit"]');
+            
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Регистрация...';
+            
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showMessage('Регистрация успешна! Перенаправляем на вход...', 'success');
+                    
+                    // Перенаправляем на страницу входа через 2 секунды
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 2000);
+                } else {
+                    showMessage(result.error || 'Ошибка регистрации', 'error');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                showMessage('Ошибка соединения с сервером', 'error');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = '<i class="fas fa-user-plus mr-2"></i>Зарегистрироваться';
+            }
+        });
+
+        function showMessage(text, type) {
+            const messageElement = document.getElementById('message');
+            messageElement.textContent = text;
+            messageElement.className = `mb-6 p-4 rounded-xl ${
+                type === 'success' ? 'bg-green-900/50 text-green-300 border border-green-500/50' : 
+                'bg-red-900/50 text-red-300 border border-red-500/50'
+            }`;
+            messageElement.classList.remove('hidden');
+            
+            setTimeout(() => {
+                if (type !== 'success') { // Не скрываем успешные сообщения
+                    messageElement.classList.add('hidden');
+                }
+            }, 5000);
+        }
+
+        // Проверка авторизации при загрузке страницы
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                // Если пользователь уже авторизован, перенаправляем в профиль
+                window.location.href = '/profile';
+            }
+        });
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+        });
+    </script>
+</body>
+</html>

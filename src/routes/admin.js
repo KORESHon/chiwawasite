@@ -3,7 +3,7 @@
 
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const db = require('../database/connection');
+const db = require('../../database/connection');
 const { authenticateToken, requireRole } = require('./auth');
 const bcrypt = require('bcryptjs');
 
@@ -256,8 +256,8 @@ router.get('/stats', authenticateToken, requireRole(['admin', 'moderator']), asy
         const userStats = await db.query(`
             SELECT 
                 COUNT(*) as total_users,
-                COUNT(CASE WHEN created_at > NOW() - INTERVAL '24 hours' THEN 1 END) as new_today,
-                COUNT(CASE WHEN created_at > NOW() - INTERVAL '7 days' THEN 1 END) as new_week,
+                COUNT(CASE WHEN registered_at > NOW() - INTERVAL '24 hours' THEN 1 END) as new_today,
+                COUNT(CASE WHEN registered_at > NOW() - INTERVAL '7 days' THEN 1 END) as new_week,
                 COUNT(CASE WHEN is_banned = true THEN 1 END) as banned_users,
                 COUNT(CASE WHEN last_login > NOW() - INTERVAL '24 hours' THEN 1 END) as active_today
             FROM users
@@ -280,7 +280,7 @@ router.get('/stats', authenticateToken, requireRole(['admin', 'moderator']), asy
                 COUNT(*) as total_sessions,
                 COUNT(CASE WHEN is_active = true THEN 1 END) as active_sessions,
                 COUNT(CASE WHEN created_at > NOW() - INTERVAL '24 hours' THEN 1 END) as sessions_today,
-                AVG(EXTRACT(EPOCH FROM (COALESCE(ended_at, NOW()) - created_at))/60) as avg_session_minutes
+                AVG(EXTRACT(EPOCH FROM (expires_at - created_at))/60) as avg_session_minutes
             FROM user_sessions
         `);
 

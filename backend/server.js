@@ -1,59 +1,143 @@
+// Chiwawa Server Backend v2.0
 // Создатель: ebluffy
+// Полная система с PostgreSQL, авторизацией и многостраничной архитектурой
 
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const morgan = require('morgan');
+const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
+require('dotenv').config();
+
+const db = require('./database/connection');
+
+// Импорт маршрутов
+const authRoutes = require('./routes/auth');
+const applicationRoutes = require('./routes/applications');
+const profileRoutes = require('./routes/profile');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Импорт маршрутов
-const authRoutes = require('./routes/auth');
-const profileRoutes = require('./routes/profile');
-const applicationRoutes = require('./routes/applications');
-const adminRoutes = require('./routes/admin');
+// Middleware безопасности
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "https://cdnjs.cloudflare.com"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.tailwindcss.com"],
+            imgSrc: ["'self'", "data:", "https:"],
+            fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
+            connectSrc: ["'self'"]
+        },
+    },
+}));
 
-// Безопасность
-app.use(helmet());
-
-// Общий лимит запросов
-const generalLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 минут
-    max: 100, // максимум 100 запросов на IP
-    message: 'Слишком много запросов с вашего IP, попробуйте позже'
-});
-
-app.use(generalLimiter);
-
-// Middleware
+// CORS настройки
 app.use(cors({
-    origin: process.env.FRONTEND_URL || '*',
+    origin: process.env.NODE_ENV === 'production' 
+        ? ['https://chiwawa.site', 'https://www.chiwawa.site']
+        : ['http://localhost:3000', 'http://127.0.0.1:3000'],
     credentials: true
 }));
+
+// Общие middleware
+app.use(compression());
+app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Middleware для получения IP адреса
-app.use((req, res, next) => {
-    req.ip = req.headers['x-forwarded-for'] || 
-             req.headers['x-real-ip'] || 
-             req.connection.remoteAddress || 
-             req.socket.remoteAddress ||
-             (req.connection.socket ? req.connection.socket.remoteAddress : null);
-    next();
+// Rate limiting
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 минут
+    max: 100, // Максимум 100 запросов с одного IP
+    message: {
+        error: 'Слишком много запросов с вашего IP. Попробуйте позже.'
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
 });
+
+const strictLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5, // Для чувствительных операций
+    message: {
+        error: 'Слишком много попыток. Попробуйте позже.'
+    }
+});
+
+app.use('/api/', limiter);
+app.use('/api/auth/login', strictLimiter);
+app.use('/api/applications', strictLimiter);
+
+// Статические файлы
+app.use(express.static(path.join(__dirname, '../website'), {
+    maxAge: process.env.NODE_ENV === 'production' ? '1d' : '0'
+}));
 
 // API маршруты
 app.use('/api/auth', authRoutes);
-app.use('/api/profile', profileRoutes);
 app.use('/api/applications', applicationRoutes);
+app.use('/api/profile', profileRoutes);
 app.use('/api/admin', adminRoutes);
+
+// Информация о сервере Minecraft
+app.get('/api/server-info', async (req, res) => {
+    try {
+        // В режиме без БД возвращаем заглушку
+        if (process.env.NO_DATABASE === 'true') {
+            return res.json({
+                status: 'online',
+                players: {
+                    online: 12,
+                    max: 100
+                },
+                motd: 'Chiwawa Server - Творческий мир без границ!',
+                version: '1.20.1',
+                ping: 45
+            });
+        }
+        
+        // Здесь должен быть код для проверки реального статуса сервера
+        // Например, пинг сервера Minecraft или запрос к базе данных
+        
+        res.json({
+            status: 'online',
+            players: {
+                online: 8,
+                max: 100
+            },
+            motd: 'Chiwawa Server - Творческий мир без границ!',
+            version: '1.20.1',
+            ping: 32
+        });
+    } catch (error) {
+        console.error('Error getting server info:', error);
+        res.status(500).json({
+            error: 'Failed to get server information',
+            status: 'offline'
+        });
+    }
+});
 
 // Маршруты для страниц
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../website/index.html'));
+});
+
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, '../website/login.html'));
+});
+
+app.get('/register', (req, res) => {
+    res.sendFile(path.join(__dirname, '../website/register.html'));
+});
+
+app.get('/forgot-password', (req, res) => {
+    res.sendFile(path.join(__dirname, '../website/forgot-password.html'));
 });
 
 app.get('/profile', (req, res) => {
@@ -64,178 +148,126 @@ app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, '../website/admin.html'));
 });
 
-// API для получения информации о сервере (совместимость)
-app.get('/api/server-info', async (req, res) => {
+// Проверка здоровья системы
+app.get('/health', async (req, res) => {
     try {
-        res.json({
-            name: "Chiwawa Server",
-            version: "1.20.1",
-            online: true,
-            players: {
-                online: 5,
-                max: 50
-            },
-            description: "Выживание с модификациями и отличным сообществом!",
-            ip: "212.15.49.139",
-            port: 25565,
-            last_updated: new Date().toISOString()
-        });
-    } catch (error) {
-        console.error('Ошибка получения информации о сервере:', error);
-        res.status(500).json({ error: 'Ошибка сервера' });
-    }
-});
-
-// 404 для API маршрутов
-app.use('/api/*', (req, res) => {
-    res.status(404).json({ error: 'API endpoint не найден' });
-});
-
-// Утилиты для валидации
-function validateEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}
-
-function validateApplicationData(data) {
-    const { minecraft_nick, age, discord, email, experience, motivation, plans } = data;
-    
-    // Проверка обязательных полей
-    if (!minecraft_nick || !age || !discord || !email || !experience || !motivation || !plans) {
-        return { valid: false, error: 'Все поля обязательны для заполнения' };
-    }
-    
-    // Валидация Minecraft ника
-    if (minecraft_nick.trim().length < 3 || minecraft_nick.trim().length > 16) {
-        return { valid: false, error: 'Minecraft ник должен быть от 3 до 16 символов' };
-    }
-    
-    if (!/^[a-zA-Z0-9_]+$/.test(minecraft_nick.trim())) {
-        return { valid: false, error: 'Minecraft ник может содержать только латинские буквы, цифры и подчеркивания' };
-    }
-    
-    // Валидация email
-    if (!validateEmail(email.trim())) {
-        return { valid: false, error: 'Введите корректный email адрес' };
-    }
-    
-    // Валидация возраста
-    const ageNum = parseInt(age);
-    if (isNaN(ageNum) || ageNum < 10 || ageNum > 99) {
-        return { valid: false, error: 'Возраст должен быть от 10 до 99 лет' };
-    }
-    
-    // Валидация мотивации
-    if (motivation.trim().length < 50) {
-        return { valid: false, error: 'Описание мотивации должно содержать минимум 50 символов' };
-    }
-    
-    if (motivation.trim().length > 800) {
-        return { valid: false, error: 'Описание мотивации слишком длинное (максимум 800 символов)' };
-    }
-    
-    // Валидация планов
-    if (plans.trim().length < 30) {
-        return { valid: false, error: 'Опишите ваши планы более подробно (минимум 30 символов)' };
-    }
-    
-    if (plans.trim().length > 600) {
-        return { valid: false, error: 'Описание планов слишком длинное (максимум 600 символов)' };
-    }
-    
-    return { valid: true };
-}
-
-// Функция для логирования заявок
-function logApplication(applicationData) {
-    const timestamp = new Date().toISOString();
-    const logEntry = {
-        timestamp,
-        ...applicationData
-    };
-    
-    const logLine = `${timestamp} | ${applicationData.minecraft_nick} | ${applicationData.age} | ${applicationData.discord} | ${applicationData.email} | ${applicationData.experience} | ${applicationData.motivation} | ${applicationData.plans}\n`;
-    
-    try {
-        fs.appendFileSync(APPLICATIONS_LOG, logLine, 'utf8');
-        console.log('✅ Новая заявка:', {
-            timestamp,
-            minecraft_nick: applicationData.minecraft_nick,
-            age: applicationData.age,
-            discord: applicationData.discord,
-            email: applicationData.email,
-            experience: applicationData.experience
-        });
-    } catch (error) {
-        console.error('❌ Ошибка записи в лог:', error);
-    }
-}
-
-// API Routes
-
-// POST /api/apply - Подача заявки
-app.post('/api/apply', (req, res) => {
-    console.log('📝 Получена заявка:', req.body);
-    
-    try {
-        const validation = validateApplicationData(req.body);
-        
-        if (!validation.valid) {
-            return res.status(400).json({
-                success: false,
-                error: validation.error
-            });
-        }
-        
-        // Очищаем данные
-        const applicationData = {
-            minecraft_nick: req.body.minecraft_nick.trim(),
-            age: parseInt(req.body.age),
-            discord: req.body.discord.trim(),
-            email: req.body.email.trim().toLowerCase(),
-            experience: req.body.experience,
-            motivation: req.body.motivation.trim(),
-            plans: req.body.plans.trim()
-        };
-        
-        // Логируем заявку
-        logApplication(applicationData);
+        // Проверяем подключение к базе данных
+        await db.query('SELECT 1');
         
         res.json({
-            success: true,
-            message: 'Заявка успешно отправлена! Мы рассмотрим её в ближайшее время.',
-            timestamp: new Date().toISOString()
+            status: 'healthy',
+            timestamp: new Date().toISOString(),
+            version: '2.0.0',
+            services: {
+                database: 'connected',
+                server: 'running'
+            }
         });
-        
     } catch (error) {
-        console.error('❌ Ошибка обработки заявки:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Ошибка сервера. Попробуйте позже.'
+        console.error('Health check failed:', error);
+        res.status(503).json({
+            status: 'unhealthy',
+            timestamp: new Date().toISOString(),
+            error: 'Database connection failed'
         });
     }
 });
 
-// Статические файлы (для обслуживания frontend)
-app.use(express.static(path.join(__dirname, '../website')));
-
-// Обработка ошибок
-app.use((err, req, res, next) => {
-    console.error('Ошибка сервера:', err);
-    res.status(500).json({
-        error: 'Внутренняя ошибка сервера'
+// API информация
+app.get('/api', (req, res) => {
+    res.json({
+        name: 'Chiwawa Server API',
+        version: '2.0.0',
+        description: 'API для управления Minecraft сервером и сообществом',
+        author: 'ebluffy',
+        endpoints: {
+            auth: '/api/auth',
+            applications: '/api/applications',
+            profile: '/api/profile',
+            admin: '/api/admin'
+        },
+        documentation: '/api/docs'
     });
 });
 
-// Запуск сервера
-app.listen(PORT, () => {
-    console.log(`🚀 Сервер запущен на порту ${PORT}`);
-    console.log(`🌐 Веб-интерфейс: http://localhost:${PORT}`);
-    console.log(`� Профиль: http://localhost:${PORT}/profile`);
-    console.log(`⚙️ Админ-панель: http://localhost:${PORT}/admin`);
-    console.log(`📋 API документация:`);
-    console.log(`   Auth: /api/auth/*`);
-    console.log(`   Profile: /api/profile/*`);
-    console.log(`   Applications: /api/applications/*`);
-    console.log(`   Admin: /api/admin/*`);
+// 404 для API
+app.use('/api/*', (req, res) => {
+    res.status(404).json({
+        error: 'API endpoint не найден',
+        path: req.path,
+        method: req.method
+    });
 });
+
+// SPA fallback - все остальные маршруты отправляем на главную
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../website/index.html'));
+});
+
+// Глобальная обработка ошибок
+app.use((error, req, res, next) => {
+    console.error('Серверная ошибка:', error);
+    
+    // Не показываем детали ошибок в продакшене
+    const isDevelopment = process.env.NODE_ENV !== 'production';
+    
+    res.status(error.status || 500).json({
+        error: isDevelopment ? error.message : 'Внутренняя ошибка сервера',
+        ...(isDevelopment && { stack: error.stack })
+    });
+});
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+    console.log('\n🛑 Получен сигнал остановки сервера...');
+    
+    try {
+        await db.end();
+        console.log('✅ Соединения с базой данных закрыты');
+    } catch (error) {
+        console.error('❌ Ошибка при закрытии соединений:', error);
+    }
+    
+    process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+    console.log('🛑 Получен SIGTERM...');
+    await db.end();
+    process.exit(0);
+});
+
+// Обработка необработанных исключений
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+    process.exit(1);
+});
+
+// Запуск сервера
+app.listen(PORT, async () => {
+    console.log(`🚀 Chiwawa Server Backend v2.0 запущен на порту ${PORT}`);
+    console.log(`🌐 Frontend доступен по адресу: http://localhost:${PORT}`);
+    console.log(`📋 API документация: http://localhost:${PORT}/api`);
+    console.log(`🔍 Health check: http://localhost:${PORT}/health`);
+    console.log(`👨‍💻 Создатель: ebluffy`);
+    console.log(''); // Пустая строка для разделения
+    
+    // Проверяем подключение к базе данных
+    const isDbConnected = await db.testConnection();
+    
+    if (!isDbConnected) {
+        console.log('');
+        console.log('⚠️  ВНИМАНИЕ: Сервер запущен без подключения к базе данных');
+        console.log('   Некоторые функции могут не работать');
+        console.log('   Проверьте настройки PostgreSQL');
+    }
+    
+    console.log('');
+    console.log('🎯 Сервер готов к работе!');
+});
+
+module.exports = app;
