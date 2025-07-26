@@ -1,6 +1,6 @@
-// Chiwawa Server Backend v2.0
+// Chiwawa Site v2.1
 // Создатель: ebluffy
-// Полная система с PostgreSQL, авторизацией и многостраничной архитектурой
+// Веб-сайт для Minecraft сервера с системой пользователей
 
 const express = require('express');
 const cors = require('cors');
@@ -157,7 +157,7 @@ app.get('/health', async (req, res) => {
         res.json({
             status: 'healthy',
             timestamp: new Date().toISOString(),
-            version: '2.0.0',
+            version: '2.1.0',
             services: {
                 database: 'connected',
                 server: 'running'
@@ -176,9 +176,9 @@ app.get('/health', async (req, res) => {
 // API информация
 app.get('/api', (req, res) => {
     res.json({
-        name: 'Chiwawa Server API',
-        version: '2.0.0',
-        description: 'API для управления Minecraft сервером и сообществом',
+        name: 'Chiwawa Site API',
+        version: '2.1.0',
+        description: 'API для веб-сайта Minecraft сервера',
         author: 'ebluffy',
         endpoints: {
             auth: '/api/auth',
@@ -249,7 +249,7 @@ process.on('uncaughtException', (error) => {
 
 // Запуск сервера
 app.listen(PORT, async () => {
-    console.log(`🚀 Chiwawa Server Backend v2.0 запущен на порту ${PORT}`);
+    console.log(`🚀 Chiwawa Site v2.1 запущен на порту ${PORT}`);
     console.log(`🌐 Frontend доступен по адресу: http://localhost:${PORT}`);
     console.log(`📋 API документация: http://localhost:${PORT}/api`);
     console.log(`🔍 Health check: http://localhost:${PORT}/health`);

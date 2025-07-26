@@ -1,7 +1,7 @@
 {
-  "name": "chiwawa-server",
+  "name": "chiwawasite",
   "version": "2.1.0",
-  "description": "Приватный Minecraft сервер с веб-интерфейсом",
+  "description": "Веб-сайт Chiwawa Minecraft сервера с системой пользователей",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
