@@ -19,23 +19,33 @@ router.get('/users', authenticateToken, requireRole(['admin']), async (req, res)
         const offset = (page - 1) * limit;
 
         let whereClause = '';
-        let queryParams = [limit, offset];
-        let paramCount = 2;
+        let queryParams = [];
+        let paramCount = 0;
 
-        if (search) {
+        // Добавляем условие поиска
+        if (search && search.trim()) {
             paramCount++;
-            whereClause += ` ${whereClause ? 'AND' : 'WHERE'} (u.nickname ILIKE $${paramCount} OR u.email ILIKE $${paramCount})`;
-            queryParams.push(`%${search}%`);
+            whereClause += ` WHERE (u.nickname ILIKE $${paramCount} OR u.email ILIKE $${paramCount})`;
+            queryParams.push(`%${search.trim()}%`);
         }
 
+        // Добавляем условие статуса
         if (status !== 'all') {
-            paramCount++;
             if (status === 'active') {
                 whereClause += ` ${whereClause ? 'AND' : 'WHERE'} u.is_banned = false`;
             } else if (status === 'banned') {
                 whereClause += ` ${whereClause ? 'AND' : 'WHERE'} u.is_banned = true`;
             }
         }
+
+        // Добавляем LIMIT и OFFSET в конец
+        paramCount++;
+        const limitParam = paramCount;
+        queryParams.push(limit);
+        
+        paramCount++;
+        const offsetParam = paramCount;
+        queryParams.push(offset);
 
         const result = await db.query(`
             SELECT 
@@ -51,11 +61,11 @@ router.get('/users', authenticateToken, requireRole(['admin']), async (req, res)
             ${whereClause}
             GROUP BY u.id, ps.total_minutes, ps.daily_limit_minutes, ps.is_time_limited, ps.reputation, ps.warnings_count, ps.total_logins
             ORDER BY u.registered_at DESC
-            LIMIT $1 OFFSET $2
+            LIMIT $${limitParam} OFFSET $${offsetParam}
         `, queryParams);
 
-        // Получаем общее количество
-        const countParams = queryParams.slice(2); // убираем limit и offset
+        // Получаем общее количество (убираем LIMIT и OFFSET параметры)
+        const countParams = queryParams.slice(0, -2);
         const countResult = await db.query(`
             SELECT COUNT(DISTINCT u.id) as total 
             FROM users u 
@@ -86,9 +96,10 @@ router.get('/users', authenticateToken, requireRole(['admin']), async (req, res)
 router.put('/users/:id/ban', [
     authenticateToken,
     requireRole(['admin', 'moderator']),
-    body('reason').isLength({ min: 5, max: 500 }),
-    body('duration').optional().isIn(['temporary', 'permanent']),
-    body('until').optional().isISO8601()
+    body('reason').isLength({ min: 1, max: 500 }),
+    body('type').optional().isIn(['temporary', 'permanent', 'delete']),
+    body('duration').optional().isInt({ min: 1 }),
+    body('unit').optional().isIn(['hours', 'days', 'weeks', 'months'])
 ], async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -100,9 +111,64 @@ router.put('/users/:id/ban', [
         }
 
         const { id } = req.params;
-        const { reason, duration, until } = req.body;
+        const { reason, type, duration, unit } = req.body;
 
-        // Проверяем, что пользователь существует
+        // Если это удаление аккаунта, перенаправляем на соответствующий эндпоинт
+        if (type === 'delete') {
+            // Вызываем логику удаления
+            try {
+                // Проверяем, что пользователь существует
+                const userResult = await db.query('SELECT nickname, role FROM users WHERE id = $1', [id]);
+                if (userResult.rows.length === 0) {
+                    return res.status(404).json({ error: 'Пользователь не найден' });
+                }
+
+                const user = userResult.rows[0];
+
+                // Запрещаем удаление админов
+                if (user.role === 'admin') {
+                    return res.status(403).json({ error: 'Нельзя удалить администратора' });
+                }
+
+                await db.query('BEGIN');
+
+                // Логируем удаление
+                await db.query(`
+                    INSERT INTO admin_logs (admin_id, action, details, target_user_id)
+                    VALUES ($1, $2, $3, $4)
+                `, [
+                    req.user.id,
+                    'user_deleted',
+                    `Аккаунт пользователя ${user.nickname} полностью удален: ${reason}`,
+                    id
+                ]);
+
+                // Удаляем все связанные данные
+                await db.query('DELETE FROM user_sessions WHERE user_id = $1', [id]);
+                await db.query('DELETE FROM login_logs WHERE user_id = $1', [id]);
+                await db.query('DELETE FROM applications WHERE user_id = $1', [id]);
+                await db.query('DELETE FROM trust_level_applications WHERE user_id = $1', [id]);
+                await db.query('DELETE FROM user_reputation WHERE user_id = $1', [id]);
+                await db.query('DELETE FROM player_stats WHERE user_id = $1', [id]);
+                await db.query('DELETE FROM users WHERE id = $1', [id]);
+
+                await db.query('COMMIT');
+
+                return res.json({
+                    success: true,
+                    message: `Аккаунт пользователя ${user.nickname} полностью удален`
+                });
+
+            } catch (deleteError) {
+                await db.query('ROLLBACK');
+                console.error('Ошибка удаления пользователя:', deleteError);
+                return res.status(500).json({
+                    error: 'Ошибка при удалении пользователя'
+                });
+            }
+        }
+
+        // Обычная логика бана для temporary и permanent
         const userResult = await db.query('SELECT nickname FROM users WHERE id = $1', [id]);
         if (userResult.rows.length === 0) {
             return res.status(404).json({ error: 'Пользователь не найден' });
@@ -110,34 +176,62 @@ router.put('/users/:id/ban', [
 
         const user = userResult.rows[0];
 
+        // Вычисляем дату окончания бана для временной блокировки
+        let bannedUntil = null;
+        if (type === 'temporary' && duration && unit) {
+            const now = new Date();
+            switch (unit) {
+                case 'hours':
+                    bannedUntil = new Date(now.getTime() + duration * 60 * 60 * 1000);
+                    break;
+                case 'days':
+                    bannedUntil = new Date(now.getTime() + duration * 24 * 60 * 60 * 1000);
+                    break;
+                case 'weeks':
+                    bannedUntil = new Date(now.getTime() + duration * 7 * 24 * 60 * 60 * 1000);
+                    break;
+                case 'months':
+                    bannedUntil = new Date(now.getTime() + duration * 30 * 24 * 60 * 60 * 1000);
+                    break;
+                default:
+                    bannedUntil = null;
+            }
+        }
+
         // Обновляем статус бана
         await db.query(`
             UPDATE users 
-            SET is_banned = true, ban_reason = $1, banned_at = NOW(), banned_until = $2
-            WHERE id = $3
-        `, [reason, until || null, id]);
+            SET is_banned = true, ban_reason = $1
+            WHERE id = $2
+        `, [reason, id]);
 
         // Деактивируем все активные сессии пользователя
         await db.query(`
             UPDATE user_sessions 
-            SET is_active = false, ended_at = NOW() 
+            SET is_active = false 
             WHERE user_id = $1 AND is_active = true
         `, [id]);
 
         // Логируем действие
+        const logDetails = type === 'temporary' 
+            ? `Пользователь ${user.nickname} заблокирован на ${duration} ${unit}: ${reason}`
+            : `Пользователь ${user.nickname} заблокирован навсегда: ${reason}`;
+
         await db.query(`
             INSERT INTO admin_logs (admin_id, action, details, target_user_id)
             VALUES ($1, $2, $3, $4)
         `, [
             req.user.id,
             'user_banned',
-            `Пользователь ${user.nickname} заблокирован: ${reason}`,
+            logDetails,
             id
         ]);
 
         res.json({
             success: true,
-            message: `Пользователь ${user.nickname} заблокирован`
+            message: type === 'temporary' 
+                ? `Пользователь ${user.nickname} заблокирован на ${duration} ${unit}`
+                : `Пользователь ${user.nickname} заблокирован навсегда`
         });
 
     } catch (error) {
@@ -162,7 +256,7 @@ router.put('/users/:id/unban', authenticateToken, requireRole(['admin']), async 
 
         await db.query(`
             UPDATE users 
-            SET is_banned = false, ban_reason = NULL, banned_at = NULL, banned_until = NULL
+            SET is_banned = false, ban_reason = NULL
             WHERE id = $1
         `, [id]);
 
@@ -184,6 +278,96 @@ router.put('/users/:id/unban', authenticateToken, requireRole(['admin']), async 
 
     } catch (error) {
         console.error('Ошибка разблокировки пользователя:', error);
+        res.status(500).json({
+            error: 'Внутренняя ошибка сервера'
+        });
+    }
+});
+
+// DELETE /api/admin/users/:id/delete - Полное удаление аккаунта пользователя
+router.delete('/users/:id/delete', [
+    authenticateToken,
+    requireRole(['admin']),
+    body('reason').isLength({ min: 5, max: 500 })
+], async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                error: 'Ошибка валидации',
+                details: errors.array()
+            });
+        }
+
+        const { id } = req.params;
+        const { reason } = req.body;
+
+        // Проверяем, что пользователь существует и не является админом
+        const userResult = await db.query('SELECT nickname, role FROM users WHERE id = $1', [id]);
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Пользователь не найден' });
+        }
+
+        const user = userResult.rows[0];
+
+        // Запрещаем удаление админов
+        if (user.role === 'admin') {
+            return res.status(403).json({ error: 'Нельзя удалить аккаунт администратора' });
+        }
+
+        // Запрещаем самоудаление
+        if (parseInt(id) === req.user.id) {
+            return res.status(403).json({ error: 'Нельзя удалить собственный аккаунт' });
+        }
+
+        // Логируем действие ПЕРЕД удалением
+        await db.query(`
+            INSERT INTO admin_logs (admin_id, action, details, target_user_id)
+            VALUES ($1, $2, $3, $4)
+        `, [
+            req.user.id,
+            'user_deleted',
+            `Аккаунт пользователя ${user.nickname} полностью удален: ${reason}`,
+            id
+        ]);
+
+        // Начинаем транзакцию для полного удаления
+        await db.query('BEGIN');
+
+        try {
+            // Удаляем связанные данные в правильном порядке
+            await db.query('DELETE FROM user_sessions WHERE user_id = $1', [id]);
+            await db.query('DELETE FROM password_resets WHERE user_id = $1', [id]);
+            await db.query('DELETE FROM trust_level_applications WHERE user_id = $1', [id]);
+            await db.query('DELETE FROM applications WHERE user_id = $1', [id]);
+            await db.query('DELETE FROM player_stats WHERE user_id = $1', [id]);
+            await db.query('DELETE FROM user_notifications WHERE user_id = $1', [id]);
+            
+            // Обновляем логи админа (заменяем target_user_id на NULL, но сохраняем информацию в details)
+            await db.query(`
+                UPDATE admin_logs 
+                SET target_user_id = NULL, 
+                    details = details || ' [ПОЛЬЗОВАТЕЛЬ УДАЛЕН]'
+                WHERE target_user_id = $1
+            `, [id]);
+
+            // Удаляем самого пользователя
+            await db.query('DELETE FROM users WHERE id = $1', [id]);
+
+            await db.query('COMMIT');
+
+            res.json({
+                success: true,
+                message: `Аккаунт пользователя ${user.nickname} полностью удален`
+            });
+
+        } catch (deleteError) {
+            await db.query('ROLLBACK');
+            throw deleteError;
+        }
+
+    } catch (error) {
+        console.error('Ошибка удаления пользователя:', error);
         res.status(500).json({
             error: 'Внутренняя ошибка сервера'
         });
@@ -219,11 +403,6 @@ router.put('/users/:id/trust-level', [
 
         // Обновляем уровень доверия
         await db.query('UPDATE users SET trust_level = $1 WHERE id = $2', [level, id]);
-        await db.query(`
-            UPDATE player_stats 
-            SET current_level = $1, updated_at = NOW() 
-            WHERE user_id = $2
-        `, [level, id]);
 
         // Логируем действие
         await db.query(`
@@ -243,6 +422,103 @@ router.put('/users/:id/trust-level', [
 
     } catch (error) {
         console.error('Ошибка изменения уровня доверия:', error);
+        res.status(500).json({
+            error: 'Внутренняя ошибка сервера'
+        });
+    }
+});
+
+// GET /api/admin/users/:id/details - Получение подробной информации о пользователе
+router.get('/users/:id/details', authenticateToken, requireRole(['admin', 'moderator']), async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const userResult = await db.query(`
+            SELECT 
+                id,
+                nickname,
+                email,
+                first_name,
+                last_name,
+                age,
+                display_name,
+                bio,
+                avatar_url,
+                discord_id,
+                discord_tag,
+                role,
+                trust_level,
+                status,
+                is_active,
+                is_email_verified,
+                is_banned,
+                ban_reason,
+                registered_at,
+                last_login
+            FROM users 
+            WHERE id = $1
+        `, [id]);
+
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Пользователь не найден' });
+        }
+
+        const user = userResult.rows[0];
+        res.json(user);
+
+    } catch (error) {
+        console.error('Ошибка получения данных пользователя:', error);
+        res.status(500).json({
+            error: 'Внутренняя ошибка сервера'
+        });
+    }
+});
+
+// GET /api/admin/users/:id/activity - Получение активности пользователя
+router.get('/users/:id/activity', authenticateToken, requireRole(['admin', 'moderator']), async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Проверяем, существует ли пользователь
+        const userExists = await db.query('SELECT id FROM users WHERE id = $1', [id]);
+        if (userExists.rows.length === 0) {
+            return res.status(404).json({ error: 'Пользователь не найден' });
+        }
+
+        // Получаем последние сессии пользователя (ограничиваем 10 записями)
+        const sessions = await db.query(`
+            SELECT 
+                created_at,
+                ip_address,
+                user_agent,
+                is_active,
+                expires_at
+            FROM user_sessions 
+            WHERE user_id = $1 
+            ORDER BY created_at DESC 
+            LIMIT 10
+        `, [id]);
+
+        // Получаем последние входы в систему (ограничиваем 10 записями)
+        const loginLogs = await db.query(`
+            SELECT 
+                login_time,
+                ip_address,
+                user_agent,
+                success
+            FROM login_logs 
+            WHERE user_id = $1 
+            ORDER BY login_time DESC 
+            LIMIT 10
+        `, [id]);
+
+        res.json({
+            sessions: sessions.rows,
+            loginLogs: loginLogs.rows
+        });
+
+    } catch (error) {
+        console.error('Ошибка получения активности пользователя:', error);
         res.status(500).json({
             error: 'Внутренняя ошибка сервера'
         });
@@ -293,11 +569,44 @@ router.get('/stats', authenticateToken, requireRole(['admin', 'moderator']), asy
             FROM player_stats
         `);
 
+        // Статистика траст левелов
+        const trustLevelStats = await db.query(`
+            SELECT 
+                trust_level,
+                COUNT(*) as user_count
+            FROM users 
+            GROUP BY trust_level 
+            ORDER BY trust_level
+        `);
+
+        // Статистика репутации
+        const reputationStats = await db.query(`
+            SELECT 
+                COUNT(*) as users_with_reputation,
+                AVG(reputation_score) as avg_reputation,
+                COUNT(CASE WHEN reputation_score >= 10 THEN 1 END) as reputation_10_plus,
+                COUNT(CASE WHEN reputation_score >= 20 THEN 1 END) as reputation_20_plus
+            FROM user_reputation
+        `);
+
+        // Статистика заявок на траст левел
+        const trustApplicationStats = await db.query(`
+            SELECT 
+                COUNT(*) as total_applications,
+                COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending,
+                COUNT(CASE WHEN status = 'approved' THEN 1 END) as approved,
+                COUNT(CASE WHEN status = 'rejected' THEN 1 END) as rejected
+            FROM trust_level_applications
+        `);
+
         res.json({
             users: userStats.rows[0],
             applications: applicationStats.rows[0],
             sessions: sessionStats.rows[0],
             playtime: playtimeStats.rows[0],
+            trust_levels: trustLevelStats.rows,
+            reputation: reputationStats.rows[0],
+            trust_applications: trustApplicationStats.rows[0],
             server_info: {
                 uptime: process.uptime(),
                 memory_usage: process.memoryUsage(),
@@ -568,12 +877,12 @@ router.get('/users/:id/details', authenticateToken, requireRole(['admin', 'moder
         const userResult = await db.query(`
             SELECT 
                 u.id, u.nickname, u.email, u.discord_tag, u.trust_level,
-                u.is_banned, u.ban_reason, u.banned_at, u.banned_until,
-                u.registered_at, u.last_login, u.is_email_verified, 
-                u.first_name, u.last_name, u.role, u.status,
+                u.is_banned, u.ban_reason, u.registered_at, u.last_login, 
+                u.is_email_verified, u.first_name, u.last_name, u.role, u.status,
                 ps.total_minutes, ps.daily_limit_minutes, ps.is_time_limited,
-                ps.reputation, ps.warnings_count, ps.total_logins, ps.last_played,
-                ps.first_played, ps.total_sessions
+                ps.reputation, ps.warnings_count, ps.total_logins, 
+                ps.current_level, ps.time_played_minutes, ps.achievements_count,
+                ps.updated_at as stats_updated
             FROM users u
             LEFT JOIN player_stats ps ON u.id = ps.user_id
             WHERE u.id = $1
@@ -583,32 +892,113 @@ router.get('/users/:id/details', authenticateToken, requireRole(['admin', 'moder
             return res.status(404).json({ error: 'Пользователь не найден' });
         }
 
-        // Получить последние сессии
-        const sessionsResult = await db.query(`
-            SELECT started_at, ended_at, duration_minutes, is_active, user_agent, ip_address
-            FROM user_sessions 
-            WHERE user_id = $1 
-            ORDER BY started_at DESC 
-            LIMIT 10
-        `, [id]);
+        // Получить последние сессии (если таблица существует)
+        let recentSessions = [];
+        try {
+            const sessionsResult = await db.query(`
+                SELECT created_at as started_at, expires_at as ended_at, 
+                       NULL as duration_minutes, is_active, user_agent, ip_address
+                FROM user_sessions 
+                WHERE user_id = $1 
+                ORDER BY created_at DESC 
+                LIMIT 10
+            `, [id]);
+            recentSessions = sessionsResult.rows;
+        } catch (sessionError) {
+            console.log('Таблица user_sessions не найдена, пробуем login_logs:', sessionError.message);
+            // Если user_sessions нет, пробуем login_logs
+            try {
+                const loginLogsResult = await db.query(`
+                    SELECT login_time as started_at, ip_address, user_agent,
+                           NULL as ended_at, NULL as duration_minutes, FALSE as is_active
+                    FROM login_logs 
+                    WHERE user_id = $1 AND success = true
+                    ORDER BY login_time DESC 
+                    LIMIT 10
+                `, [id]);
+                recentSessions = loginLogsResult.rows;
+            } catch (loginError) {
+                console.log('Таблица login_logs тоже не найдена:', loginError.message);
+            }
+        }
 
         // Получить историю действий
-        const actionsResult = await db.query(`
-            SELECT action, details, created_at, admin_id
-            FROM admin_logs 
-            WHERE target_user_id = $1 
-            ORDER BY created_at DESC 
-            LIMIT 20
-        `, [id]);
+        let actionHistory = [];
+        try {
+            const actionsResult = await db.query(`
+                SELECT action, details, created_at, admin_id
+                FROM admin_logs 
+                WHERE target_user_id = $1 
+                ORDER BY created_at DESC 
+                LIMIT 20
+            `, [id]);
+            actionHistory = actionsResult.rows;
+        } catch (actionError) {
+            console.log('Ошибка получения логов:', actionError.message);
+        }
 
         const user = userResult.rows[0];
-        user.recent_sessions = sessionsResult.rows;
-        user.action_history = actionsResult.rows;
+        user.recent_sessions = recentSessions;
+        user.action_history = actionHistory;
 
         res.json(user);
 
     } catch (error) {
         console.error('Ошибка получения деталей пользователя:', error);
+        res.status(500).json({
+            error: 'Внутренняя ошибка сервера'
+        });
+    }
+});
+
+// GET /api/admin/users/:id/activity - Получить активность пользователя
+router.get('/users/:id/activity', authenticateToken, requireRole(['admin', 'moderator']), async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Получить активность из логов входа
+        let activities = [];
+        
+        try {
+            const loginLogsResult = await db.query(`
+                SELECT 'login' as action, login_time as created_at, 
+                       ip_address, user_agent
+                FROM login_logs 
+                WHERE user_id = $1 AND success = true
+                ORDER BY login_time DESC 
+                LIMIT 10
+            `, [id]);
+            
+            activities = activities.concat(loginLogsResult.rows.map(row => ({
+                action: row.action,
+                created_at: row.created_at,
+                details: `Вход с IP: ${row.ip_address}`
+            })));
+        } catch (error) {
+            console.log('Ошибка получения логов входа:', error.message);
+        }
+        
+        try {
+            const adminLogsResult = await db.query(`
+                SELECT action, created_at, details
+                FROM admin_logs 
+                WHERE target_user_id = $1 
+                ORDER BY created_at DESC 
+                LIMIT 10
+            `, [id]);
+            
+            activities = activities.concat(adminLogsResult.rows);
+        } catch (error) {
+            console.log('Ошибка получения админ логов:', error.message);
+        }
+
+        // Сортируем по дате
+        activities.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        
+        res.json(activities.slice(0, 15));
+
+    } catch (error) {
+        console.error('Ошибка получения активности пользователя:', error);
         res.status(500).json({
             error: 'Внутренняя ошибка сервера'
         });
@@ -747,6 +1137,236 @@ router.post('/settings', [
         res.json({
             success: true,
             message: 'Настройки успешно сохранены'
+        });
+
+    } catch (error) {
+        console.error('Ошибка сохранения настроек:', error);
+        res.status(500).json({
+            error: 'Внутренняя ошибка сервера'
+        });
+    }
+});
+
+// POST /api/admin/test-email-settings - Тестирование email настроек
+router.post('/test-email-settings', [
+    authenticateToken,
+    requireRole(['admin']),
+    body('host').notEmpty(),
+    body('port').isInt({ min: 1, max: 65535 }),
+    body('user').notEmpty(),
+    body('from').isEmail(),
+    body('tls').isBoolean()
+], async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                error: 'Ошибка валидации',
+                details: errors.array()
+            });
+        }
+
+        const { host, port, user, from, tls } = req.body;
+        const nodemailer = require('nodemailer');
+
+        // Создаем тестовый транспорт
+        const testTransporter = nodemailer.createTransporter({
+            host: host,
+            port: port,
+            secure: port === 465,
+            auth: {
+                user: user,
+                pass: 'test' // Для тестирования используем заглушку
+            },
+            tls: {
+                rejectUnauthorized: !tls
+            }
+        });
+
+        // Проверяем соединение
+        await testTransporter.verify();
+
+        res.json({
+            success: true,
+            message: 'Email настройки корректны - соединение установлено'
+        });
+
+    } catch (error) {
+        console.error('Ошибка тестирования email:', error);
+        res.status(400).json({
+            error: error.message || 'Ошибка соединения с SMTP сервером'
+        });
+    }
+});
+
+// GET /api/admin/test-database - Тестирование соединения с базой данных
+router.get('/test-database', authenticateToken, requireRole(['admin']), async (req, res) => {
+    try {
+        // Выполняем простой запрос для проверки соединения
+        const result = await db.query('SELECT NOW() as server_time, version() as db_version');
+        const dbInfo = result.rows[0];
+
+        // Получаем количество таблиц
+        const tablesResult = await db.query(`
+            SELECT COUNT(*) as table_count 
+            FROM information_schema.tables 
+            WHERE table_schema = 'public'
+        `);
+        const tableCount = tablesResult.rows[0].table_count;
+
+        res.json({
+            success: true,
+            message: `База данных работает корректно`,
+            details: {
+                serverTime: dbInfo.server_time,
+                version: dbInfo.db_version,
+                tables: tableCount
+            }
+        });
+
+    } catch (error) {
+        console.error('Ошибка тестирования базы данных:', error);
+        res.status(500).json({
+            error: 'Ошибка соединения с базой данных: ' + error.message
+        });
+    }
+});
+
+// POST /api/admin/clear-cache - Очистка кеша
+router.post('/clear-cache', authenticateToken, requireRole(['admin']), async (req, res) => {
+    try {
+        // Очищаем require cache для перезагрузки настроек
+        Object.keys(require.cache).forEach(key => {
+            if (key.includes('/config/') || key.includes('/settings')) {
+                delete require.cache[key];
+            }
+        });
+
+        // Можно добавить очистку других видов кеша если они есть
+        
+        res.json({
+            success: true,
+            message: 'Кеш успешно очищен'
+        });
+
+    } catch (error) {
+        console.error('Ошибка очистки кеша:', error);
+        res.status(500).json({
+            error: 'Ошибка очистки кеша'
+        });
+    }
+});
+
+// PUT /api/admin/settings - Сохранение расширенных настроек
+router.put('/settings', [
+    authenticateToken,
+    requireRole(['admin']),
+    body('serverName').optional().isLength({ max: 100 }),
+    body('serverDescription').optional().isLength({ max: 500 }),
+    body('serverIp').optional().isLength({ max: 100 }),
+    body('serverPort').optional().isInt({ min: 1, max: 65535 }),
+    body('minMotivationLength').optional().isInt({ min: 10, max: 1000 }),
+    body('minPlansLength').optional().isInt({ min: 10, max: 1000 }),
+    body('maxApplicationsPerDay').optional().isInt({ min: 1, max: 50 }),
+    body('maxLoginAttempts').optional().isInt({ min: 1, max: 20 }),
+    body('rateLimitRequests').optional().isInt({ min: 10, max: 10000 })
+], async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                error: 'Ошибка валидации',
+                details: errors.array()
+            });
+        }
+
+        const settings = req.body;
+        const fs = require('fs').promises;
+        const path = require('path');
+
+        // Читаем текущий файл настроек
+        const settingsPath = path.join(__dirname, '../config/settings.js');
+        let currentConfig;
+        
+        try {
+            // Очищаем кеш и читаем заново
+            delete require.cache[require.resolve('../config/settings')];
+            currentConfig = require('../config/settings');
+        } catch (error) {
+            // Если файл не существует, создаем базовую структуру
+            currentConfig = {
+                server: {},
+                applications: {},
+                trustLevel: {},
+                security: {},
+                email: {}
+            };
+        }
+
+        // Обновляем настройки
+        if (settings.serverName !== undefined) currentConfig.server.name = settings.serverName;
+        if (settings.serverDescription !== undefined) currentConfig.server.description = settings.serverDescription;
+        if (settings.serverIp !== undefined) currentConfig.server.ip = settings.serverIp;
+        if (settings.serverPort !== undefined) currentConfig.server.port = settings.serverPort.toString();
+        if (settings.discordInvite !== undefined) currentConfig.server.discord = settings.discordInvite;
+        if (settings.telegramInvite !== undefined) currentConfig.server.telegram = settings.telegramInvite;
+
+        // Настройки заявок
+        if (settings.applicationsEnabled !== undefined) currentConfig.applications.enabled = settings.applicationsEnabled;
+        if (settings.minMotivationLength !== undefined) currentConfig.applications.minMotivationLength = settings.minMotivationLength;
+        if (settings.minPlansLength !== undefined) currentConfig.applications.minPlansLength = settings.minPlansLength;
+        if (settings.maxApplicationsPerDay !== undefined) currentConfig.applications.maxApplicationsPerDay = settings.maxApplicationsPerDay;
+        if (settings.autoApproveTrustLevel !== undefined) currentConfig.applications.autoApproveTrustLevel = settings.autoApproveTrustLevel;
+
+        // Trust Level настройки
+        if (settings.trustPointsEmail !== undefined) currentConfig.trustLevel.pointsForEmail = settings.trustPointsEmail;
+        if (settings.trustPointsDiscord !== undefined) currentConfig.trustLevel.pointsForDiscord = settings.trustPointsDiscord;
+        if (settings.trustPointsHour !== undefined) currentConfig.trustLevel.pointsPerHour = settings.trustPointsHour;
+        if (settings.trustLevel1Required !== undefined) currentConfig.trustLevel.level1Required = settings.trustLevel1Required;
+        if (settings.trustLevel2Required !== undefined) currentConfig.trustLevel.level2Required = settings.trustLevel2Required;
+        if (settings.trustLevel3Required !== undefined) currentConfig.trustLevel.level3Required = settings.trustLevel3Required;
+
+        // Настройки безопасности
+        if (settings.maxLoginAttempts !== undefined) currentConfig.security.maxLoginAttempts = settings.maxLoginAttempts;
+        if (settings.loginLockoutDuration !== undefined) currentConfig.security.lockoutDuration = settings.loginLockoutDuration;
+        if (settings.jwtExpiresDays !== undefined) currentConfig.security.jwtExpiresDays = settings.jwtExpiresDays;
+        if (settings.requireEmailVerification !== undefined) currentConfig.security.requireEmailVerification = settings.requireEmailVerification;
+        if (settings.twoFactorEnabled !== undefined) currentConfig.security.twoFactorEnabled = settings.twoFactorEnabled;
+        if (settings.rateLimitRequests !== undefined) currentConfig.security.rateLimitRequests = settings.rateLimitRequests;
+
+        // Email настройки
+        if (settings.smtpHost !== undefined) currentConfig.email.host = settings.smtpHost;
+        if (settings.smtpPort !== undefined) currentConfig.email.port = settings.smtpPort;
+        if (settings.smtpFrom !== undefined) currentConfig.email.from = settings.smtpFrom;
+        if (settings.smtpUser !== undefined) currentConfig.email.user = settings.smtpUser;
+        if (settings.smtpPassword !== undefined) currentConfig.email.password = settings.smtpPassword;
+        if (settings.smtpTls !== undefined) currentConfig.email.tls = settings.smtpTls;
+
+        // Записываем обновленный файл настроек
+        const configContent = `// Настройки сервера
+// Автоматически сгенерировано админ-панелью
+
+module.exports = ${JSON.stringify(currentConfig, null, 4)};
+`;
+
+        await fs.writeFile(settingsPath, configContent, 'utf-8');
+
+        // Очищаем кеш настроек
+        delete require.cache[require.resolve('../config/settings')];
+
+        // Логируем изменение настроек
+        await db.query(`
+            INSERT INTO admin_logs (admin_id, action, details)
+            VALUES ($1, $2, $3)
+        `, [
+            req.user.id,
+            'settings_updated',
+            'Настройки сервера обновлены через админ-панель'
+        ]);
+
+        res.json({
+            success: true,
+            message: 'Настройки успешно сохранены и применены'
         });
 
     } catch (error) {

@@ -69,11 +69,20 @@ router.get('/', authenticateToken, async (req, res) => {
             ORDER BY ua.earned_at DESC
         `, [req.user.id]);
 
+        // Получаем репутацию пользователя
+        const reputationResult = await db.query(`
+            SELECT reputation_score, positive_votes, negative_votes
+            FROM user_reputation 
+            WHERE user_id = $1
+        `, [req.user.id]);
+        
+        const reputation = reputationResult.rows[0] || { reputation_score: 0, positive_votes: 0, negative_votes: 0 };
+
         // Формируем статистику
         const stats = {
             playtime: user.time_played_minutes || 0,
             days_registered: Math.floor((new Date() - new Date(user.registered_at)) / (1000 * 60 * 60 * 24)),
-            reputation: user.reputation || 0,
+            reputation: reputation.reputation_score || 0,
             friends: 0, // Пока заглушка
             achievements_count: user.achievements_count || 0,
             total_logins: 0 // Можно добавить подсчет из login_logs
@@ -109,6 +118,11 @@ router.get('/', authenticateToken, async (req, res) => {
             role: user.role || 'user',
             trust_level: user.trust_level || 0,
             trust_level_name: getTrustLevelName(user.trust_level || 0),
+            reputation: reputation.reputation_score || 0,
+            reputation_votes: {
+                positive: reputation.positive_votes || 0,
+                negative: reputation.negative_votes || 0
+            },
             is_email_verified: user.is_email_verified,
             is_banned: user.is_banned || false,
             status: user.status || 'active',
@@ -369,12 +383,10 @@ function getTrustLevelRequirements(currentLevel) {
 // Функция для получения названия Trust Level на русском
 function getTrustLevelName(level) {
     const names = {
-        0: 'Новичок',
-        1: 'Игрок', 
+        0: 'Проходимец',
+        1: 'Новичок', 
         2: 'Проверенный',
-        3: 'Ветеран',
-        4: 'Модератор',
-        5: 'Администратор'
+        3: 'Ветеран'
     };
     return names[level] || 'Неизвестно';
 }

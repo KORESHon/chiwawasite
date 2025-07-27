@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Онлайн - Test Server</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'minecraft-dark': '#0a0a0a',
+                        'minecraft-darker': '#050505',
+                        'minecraft-gold': '#FFAA00',
+                        'minecraft-yellow': '#FFFF55',
+                        'minecraft-gray': '#2a2a2a',
+                        'minecraft-light-gray': '#3a3a3a',
+                        'minecraft-lighter-gray': '#404040'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .glass-effect {
+            background: rgba(42, 42, 42, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 170, 0, 0.1);
+        }
+        
+        .text-shadow {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+        
+        .player-avatar {
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="%23228B22"/><rect x="8" y="8" width="48" height="48" fill="%2332CD32"/><rect x="20" y="20" width="8" height="8" fill="%23000"/><rect x="36" y="20" width="8" height="8" fill="%23000"/><rect x="24" y="36" width="16" height="4" fill="%23000"/></svg>');
+            background-size: cover;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Навигация -->
+    <nav class="glass-effect sticky top-0 z-50 border-b border-minecraft-gold/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-minecraft-yellow text-shadow">Test</a>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <a href="/" class="text-white hover:text-minecraft-gold transition-colors text-shadow">Главная</a>
+                    <a href="/rules" class="text-white hover:text-minecraft-gold transition-colors text-shadow">Правила</a>
+                    <a href="/online" class="text-minecraft-gold font-medium text-shadow">Онлайн</a>
+                    <a href="/map" target="_blank" class="text-white hover:text-minecraft-gold transition-colors text-shadow">Карта</a>
+                </div>
+                <div class="flex items-center">
+                    <a href="/" class="text-minecraft-gold hover:text-minecraft-yellow transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>Назад
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Основной контент -->
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <!-- Заголовок -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-minecraft-gold mb-4 text-shadow">
+                <i class="fas fa-users mr-3"></i>Игроки онлайн
+            </h1>
+            <p class="text-gray-300 text-lg">Список игроков, находящихся в данный момент на сервере</p>
+        </div>
+
+        <!-- Статистика сервера -->
+        <div class="grid md:grid-cols-3 gap-6 mb-8">
+            <div class="glass-effect rounded-xl p-6 text-center">
+                <div class="text-3xl font-bold text-minecraft-gold mb-2" id="online-count">Загрузка...</div>
+                <div class="text-gray-300">Игроков онлайн</div>
+            </div>
+            <div class="glass-effect rounded-xl p-6 text-center">
+                <div class="text-3xl font-bold text-green-400 mb-2" id="server-status">Загрузка...</div>
+                <div class="text-gray-300">Статус сервера</div>
+            </div>
+            <div class="glass-effect rounded-xl p-6 text-center">
+                <div class="text-3xl font-bold text-blue-400 mb-2" id="server-version">Загрузка...</div>
+                <div class="text-gray-300">Версия</div>
+            </div>
+        </div>
+
+        <!-- Список игроков -->
+        <div class="glass-effect rounded-xl p-6">
+            <h2 class="text-2xl font-semibold text-minecraft-yellow mb-6 flex items-center">
+                <i class="fas fa-list mr-3"></i>
+                Игроки в сети
+            </h2>
+            
+            <!-- Поиск -->
+            <div class="mb-6">
+                <div class="relative">
+                    <input type="text" id="player-search" placeholder="Поиск игрока..." 
+                        class="w-full px-4 py-3 pl-12 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-minecraft-gold">
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+            </div>
+
+            <!-- Загрузка -->
+            <div id="loading" class="text-center py-8">
+                <i class="fas fa-spinner fa-spin text-minecraft-gold text-2xl mb-4"></i>
+                <p class="text-gray-300">Загрузка списка игроков...</p>
+            </div>
+
+            <!-- Пустой список -->
+            <div id="no-players" class="text-center py-8 hidden">
+                <i class="fas fa-user-slash text-gray-500 text-4xl mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-400 mb-2">Сервер пуст</h3>
+                <p class="text-gray-500">В данный момент на сервере нет игроков</p>
+            </div>
+
+            <!-- Список игроков -->
+            <div id="players-grid" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 hidden">
+                <!-- Игроки будут добавлены динамически -->
+            </div>
+
+            <!-- Результаты поиска -->
+            <div id="search-results" class="hidden">
+                <p class="text-gray-400 mb-4" id="search-info"></p>
+                <div id="filtered-players" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <!-- Отфильтрованные игроки -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Информация -->
+        <div class="glass-effect rounded-xl p-6 mt-8">
+            <h3 class="text-xl font-semibold text-minecraft-yellow mb-4">
+                <i class="fas fa-info-circle mr-2"></i>
+                Информация
+            </h3>
+            <div class="grid md:grid-cols-2 gap-6 text-gray-300">
+                <div>
+                    <h4 class="font-medium text-white mb-2">IP сервера:</h4>
+                    <code class="bg-minecraft-gray px-3 py-1 rounded text-minecraft-gold" id="server-ip">play.test.ru</code>
+                </div>
+                <div>
+                    <h4 class="font-medium text-white mb-2">Порт:</h4>
+                    <code class="bg-minecraft-gray px-3 py-1 rounded text-minecraft-gold" id="server-port">25565</code>
+                </div>
+            </div>
+            <p class="text-sm text-gray-400 mt-4">
+                <i class="fas fa-clock mr-2"></i>
+                Данные обновляются каждые 30 секунд
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let allPlayers = [];
+
+        // Загрузка данных о сервере
+        async function loadServerData() {
+            try {
+                const response = await fetch('/api/server-info');
+                const data = await response.json();
+                
+                // Обновляем статистику
+                document.getElementById('online-count').textContent = data.players?.online || 0;
+                document.getElementById('server-status').textContent = data.status === 'online' ? 'Онлайн' : 'Оффлайн';
+                document.getElementById('server-version').textContent = data.version || '1.20+';
+                
+                // Обновляем IP и порт
+                document.getElementById('server-ip').textContent = data.ip || 'play.test.ru';
+                document.getElementById('server-port').textContent = data.port || '25565';
+                
+                // Обновляем список игроков
+                updatePlayersList(data.players?.list || []);
+                
+            } catch (error) {
+                console.error('Ошибка загрузки данных сервера:', error);
+                document.getElementById('online-count').textContent = '0';
+                document.getElementById('server-status').textContent = 'Оффлайн';
+                document.getElementById('server-version').textContent = 'N/A';
+                updatePlayersList([]);
+            }
+        }
+
+        // Обновление списка игроков
+        function updatePlayersList(players) {
+            allPlayers = players;
+            const loading = document.getElementById('loading');
+            const noPlayers = document.getElementById('no-players');
+            const playersGrid = document.getElementById('players-grid');
+            
+            loading.classList.add('hidden');
+            
+            if (players.length === 0) {
+                noPlayers.classList.remove('hidden');
+                playersGrid.classList.add('hidden');
+                return;
+            }
+            
+            noPlayers.classList.add('hidden');
+            playersGrid.classList.remove('hidden');
+            
+            // Генерируем карточки игроков
+            playersGrid.innerHTML = players.map(player => createPlayerCard(player)).join('');
+        }
+
+        // Создание карточки игрока
+        function createPlayerCard(player) {
+            const nickname = player.name || player.nickname || 'Неизвестный';
+            const playTime = formatPlayTime(player.playtime || 0);
+            const trustLevel = getTrustLevelInfo(player.trust_level || 0);
+            
+            return `
+                <div class="bg-minecraft-gray border border-minecraft-gold/20 rounded-lg p-4 hover:border-minecraft-gold/50 transition-all">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 player-avatar rounded-lg border-2 border-minecraft-gold/30"></div>
+                        <div class="flex-1">
+                            <h3 class="font-bold text-white">${nickname}</h3>
+                            <div class="flex items-center space-x-2 text-sm text-gray-400">
+                                <span class="flex items-center">
+                                    <i class="fas fa-clock mr-1"></i>
+                                    ${playTime}
+                                </span>
+                                <span class="text-minecraft-gold">•</span>
+                                <span class="${trustLevel.color}">${trustLevel.name}</span>
+                            </div>
+                        </div>
+                        <div class="text-green-400">
+                            <i class="fas fa-circle text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Форматирование времени игры
+        function formatPlayTime(minutes) {
+            if (minutes < 60) return `${minutes} мин`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours} ч`;
+            const days = Math.floor(hours / 24);
+            return `${days} дн`;
+        }
+
+        // Информация о Trust Level
+        function getTrustLevelInfo(level) {
+            const levels = {
+                0: { name: 'Проходимец', color: 'text-gray-400' },
+                1: { name: 'Новичок', color: 'text-blue-400' },
+                2: { name: 'Проверенный', color: 'text-green-400' },
+                3: { name: 'Ветеран', color: 'text-minecraft-gold' }
+            };
+            return levels[level] || levels[0];
+        }
+
+        // Поиск игроков
+        function setupSearch() {
+            const searchInput = document.getElementById('player-search');
+            const playersGrid = document.getElementById('players-grid');
+            const searchResults = document.getElementById('search-results');
+            const searchInfo = document.getElementById('search-info');
+            const filteredPlayers = document.getElementById('filtered-players');
+
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                
+                if (query === '') {
+                    // Показываем все игроков
+                    searchResults.classList.add('hidden');
+                    playersGrid.classList.remove('hidden');
+                    return;
+                }
+
+                // Фильтруем игроков
+                const filtered = allPlayers.filter(player => 
+                    (player.name || player.nickname || '').toLowerCase().includes(query)
+                );
+
+                // Показываем результаты поиска
+                playersGrid.classList.add('hidden');
+                searchResults.classList.remove('hidden');
+                
+                searchInfo.textContent = `Найдено: ${filtered.length} игроков`;
+                filteredPlayers.innerHTML = filtered.map(player => createPlayerCard(player)).join('');
+            });
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            loadServerData();
+            setupSearch();
+            
+            // Обновляем данные каждые 30 секунд
+            setInterval(loadServerData, 30000);
+        });
+    </script>
+</body>
+</html>

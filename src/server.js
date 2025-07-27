@@ -9,6 +9,7 @@ const morgan = require('morgan');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
+const { status } = require('minecraft-server-util');
 require('dotenv').config();
 
 const db = require('../database/connection');
@@ -18,6 +19,9 @@ const authRoutes = require('./routes/auth');
 const applicationRoutes = require('./routes/applications');
 const profileRoutes = require('./routes/profile');
 const adminRoutes = require('./routes/admin');
+const reputationRoutes = require('./routes/reputation');
+const trustLevelRoutes = require('./routes/trust-level');
+const settingsRoutes = require('./routes/settings');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -53,7 +57,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Rate limiting
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 минут
-    max: 100, // Максимум 100 запросов с одного IP
+    max: 200, // Увеличенный лимит для админской панели
     message: {
         error: 'Слишком много запросов с вашего IP. Попробуйте позже.'
     },
@@ -63,15 +67,25 @@ const limiter = rateLimit({
 
 const strictLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 5, // Для чувствительных операций
+    max: 10, // Увеличиваем для админских операций
     message: {
         error: 'Слишком много попыток. Попробуйте позже.'
+    }
+});
+
+const adminLimiter = rateLimit({
+    windowMs: 5 * 60 * 1000, // 5 минут
+    max: 500, // Высокий лимит для админов
+    message: {
+        error: 'Слишком много запросов. Попробуйте позже.'
     }
 });
 
 app.use('/api/', limiter);
 app.use('/api/auth/login', strictLimiter);
 app.use('/api/applications', strictLimiter);
+app.use('/api/admin', adminLimiter);
+app.use('/api/trust-level', adminLimiter);
 
 // Статические файлы
 app.use(express.static(path.join(__dirname, '../public'), {
@@ -83,42 +97,75 @@ app.use('/api/auth', authRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/admin', settingsRoutes);
+app.use('/api', settingsRoutes); // Добавляем публичный доступ к настройкам
+app.use('/api/reputation', reputationRoutes);
+app.use('/api/trust-level', trustLevelRoutes);
 
 // Информация о сервере Minecraft
 app.get('/api/server-info', async (req, res) => {
     try {
-        // В режиме без БД возвращаем заглушку
-        if (process.env.NO_DATABASE === 'true') {
+        // Получаем настройки сервера
+        const config = require('./config/settings');
+        const serverIp = config.server?.ip || 'play.chiwawa.site';
+        const serverPort = parseInt(config.server?.port) || 25565;
+        
+        try {
+            // Проверяем реальный статус сервера
+            const result = await status(serverIp, serverPort, { timeout: 5000 });
+            
             return res.json({
-                status: 'online',
+                online: true,
                 players: {
-                    online: 12,
-                    max: 100
+                    online: result.players.online,
+                    max: result.players.max
                 },
-                motd: 'Chiwawa Server - Творческий мир без границ!',
+                motd: result.motd?.clean || 'Minecraft Server',
+                version: result.version?.name || '1.20.1',
+                ping: result.roundTripLatency || 0
+            });
+        } catch (serverError) {
+            // Если это тестовый IP (play.chiwawa.site), показываем демо данные
+            if (serverIp.includes('chiwawa.site') || serverIp.includes('test')) {
+                return res.json({
+                    online: true,
+                    players: {
+                        online: Math.floor(Math.random() * 15) + 3, // Случайное число от 3 до 17
+                        max: 50
+                    },
+                    motd: 'Test Server - Demo Mode',
+                    version: '1.20.1',
+                    ping: Math.floor(Math.random() * 50) + 20 // Случайный пинг от 20 до 70
+                });
+            }
+            
+            // Сервер недоступен
+            console.log(`Сервер ${serverIp}:${serverPort} недоступен:`, serverError.message);
+            
+            return res.json({
+                online: false,
+                players: {
+                    online: 0,
+                    max: 50
+                },
+                motd: 'Сервер недоступен',
                 version: '1.20.1',
-                ping: 45
+                ping: 0
             });
         }
-        
-        // Здесь должен быть код для проверки реального статуса сервера
-        // Например, пинг сервера Minecraft или запрос к базе данных
-        
-        res.json({
-            status: 'online',
-            players: {
-                online: 8,
-                max: 100
-            },
-            motd: 'Chiwawa Server - Творческий мир без границ!',
-            version: '1.20.1',
-            ping: 32
-        });
     } catch (error) {
-        console.error('Error getting server info:', error);
-        res.status(500).json({
-            error: 'Failed to get server information',
-            status: 'offline'
+        console.error('Ошибка проверки статуса сервера:', error);
+        
+        // Возвращаем заглушку при ошибке
+        res.json({
+            online: false,
+            players: {
+                online: 0,
+                max: 50
+            },
+            motd: 'Ошибка проверки статуса',
+            version: '1.20.1',
+            ping: 0
         });
     }
 });

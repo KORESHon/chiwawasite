@@ -664,32 +664,60 @@
                     document.getElementById('user-created').textContent = new Date(data.registered_at).toLocaleDateString('ru-RU');
 
                     // Trust Level информация
-                    document.getElementById('trust-current').textContent = data.trust_level || 0;
+                    const trustLevelNames = {
+                        0: '🚶 Проходимец',
+                        1: '👤 Новичок', 
+                        2: '✅ Проверенный',
+                        3: '🏆 Ветеран'
+                    };
                     
-                    // Прогресс Trust Level
                     const trustLevel = data.trust_level || 0;
-                    const progressPercent = Math.min((trustLevel / 5) * 100, 100);
-                    document.getElementById('trust-progress').style.width = progressPercent + '%';
-                    document.getElementById('trust-progress-header').style.width = progressPercent + '%';
+                    const trustLevelName = trustLevelNames[trustLevel] || 'Неизвестный уровень';
                     
-                    // Для администратора показываем символ бесконечности
-                    if (trustLevel >= 5) {
-                        document.getElementById('trust-progress-text').innerHTML = '∞';
+                    document.getElementById('user-trust-level').textContent = `${trustLevelName} (Уровень ${trustLevel})`;
+                    document.getElementById('trust-current').textContent = trustLevel;
+                    document.getElementById('trust-current-name').textContent = trustLevelName;
+                    
+                    // Прогресс Trust Level (теперь основан на репутации и требованиях)
+                    const requirements = {
+                        0: { hours: 0, reputation: 0 },
+                        1: { hours: 0, reputation: 0 },
+                        2: { hours: 25, reputation: 10 },
+                        3: { hours: 50, reputation: 20 }
+                    };
+                    
+                    const currentHours = Math.floor((stats.playtime || 0) / 60);
+                    const currentReputation = data.reputation || 0;
+                    
+                    let progressPercent = 0;
+                    let progressText = '';
+                    
+                    if (trustLevel >= 3) {
+                        progressPercent = 100;
+                        progressText = 'Максимальный уровень';
                     } else {
-                        const current = trustLevel * 20; // Условный прогресс
-                        const required = (trustLevel + 1) * 20;
-                        document.getElementById('trust-progress-text').textContent = `${current}/${required}`;
+                        const nextLevel = trustLevel + 1;
+                        const nextRequirements = requirements[nextLevel];
+                        
+                        const hoursProgress = Math.min(currentHours / nextRequirements.hours, 1) * 50;
+                        const reputationProgress = Math.min(currentReputation / nextRequirements.reputation, 1) * 50;
+                        progressPercent = hoursProgress + reputationProgress;
+                        
+                        progressText = `${currentHours}/${nextRequirements.hours} часов, ${currentReputation}/${nextRequirements.reputation} репутации`;
                     }
                     
-                    // Заполняем форму настроек
-                    document.getElementById('settings-firstname').value = data.first_name || '';
+                    document.getElementById('trust-progress').style.width = progressPercent + '%';
+                    document.getElementById('trust-progress-header').style.width = progressPercent + '%';
+                    document.getElementById('trust-progress-text').textContent = progressText;
                     
                     // Статистика репутации
-                    document.getElementById('trust-reputation').textContent = trustLevel * 20;
-                    if (trustLevel >= 5) {
-                        document.getElementById('trust-next').textContent = '∞';
+                    document.getElementById('trust-reputation').textContent = currentReputation;
+                    if (trustLevel >= 3) {
+                        document.getElementById('trust-next').textContent = 'Макс. уровень';
                     } else {
-                        document.getElementById('trust-next').textContent = ((trustLevel + 1) * 20) - (trustLevel * 20);
+                        const nextLevel = trustLevel + 1;
+                        const nextRequirements = requirements[nextLevel];
+                        document.getElementById('trust-next').textContent = `${nextRequirements.reputation - currentReputation} репутации`;
                     }
                     
                     // Привилегии уровня
@@ -728,9 +756,9 @@
                         verifyBtn.classList.remove('hidden');
                     }
                     
-                    // Показываем кнопку админ панели для уровня доверия 5 или роли админа
+                    // Показываем кнопку админ панели для администраторов и модераторов
                     const adminLink = document.getElementById('admin-link');
-                    if ((data.trust_level >= 5) || (data.role === 'admin' || data.role === 'moderator')) {
+                    if (data.role === 'admin' || data.role === 'moderator') {
                         adminLink.classList.remove('hidden');
                     } else {
                         adminLink.classList.add('hidden');
@@ -775,12 +803,10 @@
 
         function getTrustLevelPrivileges(level) {
             const privileges = {
-                0: 'Базовые права пользователя, лимит игрового времени',
-                1: 'Неограниченное время игры, доступ к форуму',
-                2: 'Участие в голосованиях, система репутации',
-                3: 'Создание ивентов, приглашение друзей, наставничество',
-                4: 'Модерация заявок, управление ивентами, просмотр логов',
-                5: 'Полные административные права'
+                0: '🚶 Проходимец: Лимит 10 часов игры до подтверждения почты',
+                1: '👤 Новичок: Неограниченное время игры после подтверждения почты',
+                2: '✅ Проверенный: Участие в голосованиях, система репутации, особые привилегии',
+                3: '🏆 Ветеран: Наставничество новичков, создание ивентов, особый статус'
             };
             return privileges[level] || 'Неизвестный уровень';
         }

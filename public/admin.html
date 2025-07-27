@@ -3,10 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Админ-панель - Chiwawa Server</title>
+    <meta name="description" content="Панель администратора для управления сервером Chiwawa">
+    <meta name="author" content="ebluffy">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJhIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjZmJiZjI0Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZjU5ZTBiIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTIiIGZpbGw9InVybCgjYSkiLz48dGV4dCB4PSIzMiIgeT0iNDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIzMiIgZmlsbD0iIzFmMjkzNyIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+QlTwvdGV4dD48L3N2Zz4=">
+    
+    <!-- Создатель: ebluffy -->
     
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?v=2"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -19,6 +29,19 @@
                         'minecraft-gray': '#2a2a2a',
                         'minecraft-light-gray': '#404040',
                         'minecraft-lighter-gray': '#555555'
+                    },
+                    fontFamily: {
+                        'minecraft': ['Courier New', 'monospace']
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate'
+                    },
+                    keyframes: {
+                        glow: {
+                            '0%': { boxShadow: '0 0 5px #FFAA00' },
+                            '100%': { boxShadow: '0 0 20px #FFAA00, 0 0 30px #FFAA00' }
+                        }
                     },
                     backdropBlur: {
                         'xs': '2px',
@@ -52,12 +75,25 @@
         
         body {
             background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .minecraft-bg {
+            background-image: 
+                radial-gradient(circle at 25% 25%, #2a2a2a 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, #404040 0%, transparent 50%),
+                linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
         }
         
         .glass-effect {
             background: rgba(42, 42, 42, 0.2);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 170, 0, 0.1);
+        }
+        
+        .text-shadow {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
         }
         
         .btn-minecraft {
@@ -75,27 +111,99 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(255, 170, 0, 0.4);
         }
+        
+        .nav-item:hover {
+            color: #FFAA00 !important;
+            transition: all 0.3s ease;
+        }
+        
+        .admin-badge {
+            background: linear-gradient(45deg, #ff0000, #ff6600);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        .admin-tab.active {
+            border-bottom-color: #FFAA00 !important;
+            color: #FFAA00 !important;
+        }
+        
+        .admin-tab:hover {
+            color: #FFAA00 !important;
+        }
+        
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 170, 0, 0.2);
+        }
     </style>
 </head>
-<body class="bg-minecraft-dark min-h-screen">
+<body class="minecraft-bg min-h-screen overflow-x-hidden relative">
     <!-- Навигация -->
-    <nav class="bg-minecraft-gray shadow-lg sticky top-0 z-50 border-b border-minecraft-gold/20">
+    <nav class="glass-effect sticky top-0 z-50 border-b border-minecraft-gold/30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
+                <!-- Левая часть - название админ панели -->
                 <div class="flex items-center">
-                    <a href="/" class="flex items-center hover:scale-105 transition-transform duration-200">
-                        <i class="fas fa-cubes text-minecraft-gold text-2xl mr-2"></i>
-                        <span class="text-xl font-bold text-white">Chiwawa Server</span>
-                    </a>
-                    <span class="ml-2 px-2 py-1 bg-red-500/20 text-red-400 text-xs font-medium rounded border border-red-500/40">ADMIN</span>
+                    <span class="text-2xl font-bold text-minecraft-yellow text-shadow flex items-center">
+                        <i class="fas fa-crown text-minecraft-gold mr-2"></i>
+                        Admin Panel
+                    </span>
                 </div>
-                <div class="flex space-x-4">
-                    <a href="/" class="text-gray-300 hover:text-minecraft-gold transition-colors">Главная</a>
-                    <a href="/profile" class="text-gray-300 hover:text-minecraft-gold transition-colors">Профиль</a>
-                    <a href="/admin" class="text-minecraft-gold font-medium">Админ</a>
-                    <button id="logout-btn" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors">
-                        Выйти
-                    </button>
+                
+                <!-- Центральная часть - основные кнопки -->
+                <div class="flex items-center space-x-6">
+                    <a href="/" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Главная</a>
+                    <a href="/rules" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Правила</a>
+                    <a href="/forum" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Форум</a>
+                    <a href="/online" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Онлайн</a>
+                    <a href="/map" target="_blank" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Карта</a>
+                </div>
+                
+                <!-- Правая часть - социальные сети и профиль -->
+                <div class="flex items-center space-x-4">
+                    <!-- Социальные сети -->
+                    <div class="flex items-center space-x-2">
+                        <a href="https://discord.gg/chiwawa" target="_blank" id="discord-link" class="text-gray-400 hover:text-purple-400 transition-colors text-lg" title="Discord">
+                            <i class="fab fa-discord"></i>
+                        </a>
+                        <a href="https://t.me/chiwawa" target="_blank" id="telegram-link" class="text-gray-400 hover:text-blue-400 transition-colors text-lg" title="Telegram">
+                            <i class="fab fa-telegram"></i>
+                        </a>
+                    </div>
+                    
+                    <!-- Разделитель -->
+                    <div class="h-6 w-px bg-minecraft-gold/30"></div>
+                    
+                    <!-- Профиль администратора -->
+                    <div class="relative">
+                        <button id="profile-dropdown-btn" class="nav-item bg-gradient-to-r from-minecraft-gold to-yellow-500 text-minecraft-dark px-4 py-2 rounded-lg font-bold hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-minecraft-gold/50 cursor-pointer flex items-center space-x-2">
+                            <div class="w-8 h-8 bg-minecraft-dark rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-minecraft-gold text-sm"></i>
+                            </div>
+                            <span id="admin-nickname" class="font-medium">ebluffy</span>
+                            <span class="ml-2 px-2 py-1 bg-red-500/80 text-white text-xs font-bold rounded-full border border-red-500/40">
+                                <i class="fas fa-crown mr-1"></i>ADMIN
+                            </span>
+                            <i class="fas fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        
+                        <!-- Dropdown меню -->
+                        <div id="profileDropdown" class="absolute top-full right-0 mt-2 w-48 bg-minecraft-gray rounded-lg shadow-xl border border-minecraft-gold/30 hidden z-50">
+                            <a href="/profile" class="block px-4 py-3 text-white hover:bg-minecraft-light-gray transition-colors border-b border-minecraft-gold/20">
+                                <i class="fas fa-user-circle mr-2 text-minecraft-gold"></i>Личный кабинет
+                            </a>
+                            <a href="/admin" class="block px-4 py-3 text-minecraft-gold hover:bg-minecraft-light-gray transition-colors border-b border-minecraft-gold/20">
+                                <i class="fas fa-crown mr-2 text-minecraft-gold"></i>Админ панель
+                            </a>
+                            <button id="logout-dropdown-btn" class="w-full text-left px-4 py-3 text-red-400 hover:bg-minecraft-light-gray transition-colors">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Выйти
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -126,7 +234,7 @@
 
             <!-- Статистика -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="glass-effect rounded-xl shadow-lg p-6">
+                <div class="glass-effect rounded-xl shadow-lg p-6 stat-card">
                     <div class="flex items-center">
                         <div class="w-12 h-12 bg-minecraft-gold/20 rounded-lg flex items-center justify-center mr-4">
                             <i class="fas fa-users text-minecraft-gold text-xl"></i>
@@ -137,7 +245,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="glass-effect rounded-xl shadow-lg p-6">
+                <div class="glass-effect rounded-xl shadow-lg p-6 stat-card">
                     <div class="flex items-center">
                         <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center mr-4">
                             <i class="fas fa-file-alt text-green-400 text-xl"></i>
@@ -148,7 +256,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="glass-effect rounded-xl shadow-lg p-6">
+                <div class="glass-effect rounded-xl shadow-lg p-6 stat-card">
                     <div class="flex items-center">
                         <div class="w-12 h-12 bg-yellow-500/20 rounded-lg flex items-center justify-center mr-4">
                             <i class="fas fa-clock text-yellow-400 text-xl"></i>
@@ -159,7 +267,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="glass-effect rounded-xl shadow-lg p-6">
+                <div class="glass-effect rounded-xl shadow-lg p-6 stat-card">
                     <div class="flex items-center">
                         <div class="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center mr-4">
                             <i class="fas fa-ban text-red-400 text-xl"></i>
@@ -176,14 +284,17 @@
             <div class="glass-effect rounded-xl shadow-lg mb-8">
                 <div class="border-b border-minecraft-gold/20">
                     <nav class="flex space-x-8 px-6">
-                        <button class="admin-tab py-4 px-2 border-b-2 border-minecraft-gold text-minecraft-gold font-medium" data-tab="applications">
+                        <button class="admin-tab active py-4 px-2 border-b-2 border-minecraft-gold text-minecraft-gold font-medium" data-tab="applications">
                             <i class="fas fa-file-alt mr-2"></i>Заявки
                         </button>
                         <button class="admin-tab py-4 px-2 border-b-2 border-transparent text-gray-300 hover:text-minecraft-gold" data-tab="users">
                             <i class="fas fa-users mr-2"></i>Пользователи
                         </button>
+                        <button class="admin-tab py-4 px-2 border-b-2 border-transparent text-gray-300 hover:text-minecraft-gold" data-tab="trust-levels">
+                            <i class="fas fa-medal mr-2"></i>Trust Level
+                        </button>
                         <button class="admin-tab py-4 px-2 border-b-2 border-transparent text-gray-300 hover:text-minecraft-gold" data-tab="settings">
-                            <i class="fas fa-cog mr-2"></i>Настройки сайта
+                            <i class="fas fa-cog mr-2"></i>Настройки
                         </button>
                         <button class="admin-tab py-4 px-2 border-b-2 border-transparent text-gray-300 hover:text-minecraft-gold" data-tab="technical">
                             <i class="fas fa-server mr-2"></i>Техническое
@@ -220,8 +331,9 @@
                             <h3 class="text-lg font-semibold text-white">Управление пользователями</h3>
                             <div class="flex space-x-3">
                                 <input type="text" id="user-search" placeholder="Поиск пользователей..."
-                                    class="px-4 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white placeholder-gray-400">
-                                <select id="user-status-filter" class="px-4 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
+                                    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                                    class="px-4 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white placeholder-gray-400 focus:border-minecraft-gold focus:outline-none">
+                                <select id="user-status-filter" class="px-4 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
                                     <option value="all">Все пользователи</option>
                                     <option value="active">Активные</option>
                                     <option value="banned">Заблокированные</option>
@@ -232,6 +344,72 @@
                             <div class="text-center py-8">
                                 <i class="fas fa-spinner fa-spin text-2xl text-minecraft-gold mb-2"></i>
                                 <p class="text-gray-300">Загрузка пользователей...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trust Level система -->
+                    <div id="tab-trust-levels" class="admin-tab-content hidden">
+                        <h3 class="text-lg font-semibold text-white mb-6">Управление системой Trust Level</h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-8 mb-8">
+                            <!-- Информация о системе -->
+                            <div class="glass-effect rounded-lg p-6">
+                                <h4 class="font-medium text-white mb-4">
+                                    <i class="fas fa-info-circle mr-2 text-minecraft-gold"></i>Система уровней доверия
+                                </h4>
+                                <div class="space-y-3 text-sm">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-300">🚶 Проходимец (Уровень 0):</span>
+                                        <span class="text-white">Лимит 10 часов до подтверждения почты</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-300">👤 Новичок (Уровень 1):</span>
+                                        <span class="text-white">Стандартный уровень после подтверждения почты</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-300">✅ Проверенный (Уровень 2):</span>
+                                        <span class="text-white">25 часов + почта + 10+ репутации + заявка</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-300">🏆 Ветеран (Уровень 3):</span>
+                                        <span class="text-white">50 часов + почта + 20+ репутации + заявка</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Статистика по уровням -->
+                            <div class="glass-effect rounded-lg p-6">
+                                <h4 class="font-medium text-white mb-4">
+                                    <i class="fas fa-chart-bar mr-2 text-minecraft-gold"></i>Распределение по уровням
+                                </h4>
+                                <div id="trust-level-stats" class="space-y-3 text-sm">
+                                    <div class="text-center py-4">
+                                        <i class="fas fa-spinner fa-spin text-minecraft-gold"></i>
+                                        <p class="text-gray-300 mt-2">Загрузка статистики...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Заявки на повышение траст левела -->
+                        <div class="glass-effect rounded-lg p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h4 class="font-medium text-white">
+                                    <i class="fas fa-arrow-up mr-2 text-minecraft-gold"></i>Заявки на повышение уровня
+                                </h4>
+                                <select id="trust-app-status-filter" class="px-4 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
+                                    <option value="all">Все заявки</option>
+                                    <option value="pending">На рассмотрении</option>
+                                    <option value="approved">Одобренные</option>
+                                    <option value="rejected">Отклоненные</option>
+                                </select>
+                            </div>
+                            <div id="trust-applications-list" class="space-y-4">
+                                <div class="text-center py-8">
+                                    <i class="fas fa-spinner fa-spin text-2xl text-minecraft-gold mb-2"></i>
+                                    <p class="text-gray-300">Загрузка заявок...</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -249,23 +427,37 @@
                                 <div class="space-y-4">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-2">Название сервера</label>
-                                        <input type="text" id="server-name" value="Chiwawa Server" 
-                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
+                                        <input type="text" id="server-name" value="Test" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-2">Описание</label>
-                                        <textarea rows="3" id="server-description"
-                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">Приватный Minecraft сервер с дружелюбным сообществом</textarea>
+                                        <textarea rows="3" id="server-description" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none resize-none">Приватный Minecraft сервер с дружелюбным сообществом</textarea>
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-2">IP сервера</label>
-                                        <input type="text" id="server-ip" value="212.15.49.139" 
-                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
+                                        <input type="text" id="server-ip" value="play.chiwawa.site" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-2">Порт</label>
-                                        <input type="number" id="server-port" value="25565" 
-                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
+                                        <input type="number" id="server-port" value="25565" autocomplete="off"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">
+                                            <i class="fab fa-discord mr-1 text-purple-400"></i>Discord приглашение
+                                        </label>
+                                        <input type="text" id="discord-invite" value="https://discord.gg/chiwawa" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">
+                                            <i class="fab fa-telegram mr-1 text-blue-400"></i>Telegram приглашение
+                                        </label>
+                                        <input type="text" id="telegram-invite" value="https://t.me/chiwawa" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
                                     </div>
                                 </div>
                             </div>
@@ -279,24 +471,33 @@
                                     <div class="flex items-center justify-between">
                                         <span class="text-sm text-gray-300">Прием заявок</span>
                                         <label class="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" checked class="sr-only peer">
-                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:glass-effect after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-chiwawa-primary"></div>
+                                            <input type="checkbox" id="applications-enabled" checked class="sr-only peer">
+                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:glass-effect after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-minecraft-gold"></div>
                                         </label>
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-2">Мин. символов в мотивации</label>
-                                        <input type="number" value="50" 
-                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
+                                        <input type="number" id="min-motivation-length" value="50" min="10" max="500" autocomplete="off"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-2">Мин. символов в планах</label>
-                                        <input type="number" value="30" 
-                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
+                                        <input type="number" id="min-plans-length" value="30" min="10" max="300" autocomplete="off"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-2">Лимит заявок с IP в день</label>
-                                        <input type="number" value="10" 
-                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
+                                        <input type="number" id="max-applications-per-day" value="3" min="1" max="20" autocomplete="off"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Автоматическое одобрение Trust Level</label>
+                                        <select id="auto-approve-trust-level" autocomplete="off" class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
+                                            <option value="0">Отключено</option>
+                                            <option value="1">Trust Level 1+</option>
+                                            <option value="2">Trust Level 2+</option>
+                                            <option value="3">Trust Level 3+</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -304,28 +505,38 @@
                             <!-- Настройки Trust Level -->
                             <div class="glass-effect rounded-lg p-6">
                                 <h4 class="font-medium text-white mb-4">
-                                    <i class="fas fa-medal mr-2"></i>Trust Level система
+                                    <i class="fas fa-medal mr-2 text-minecraft-gold"></i>Trust Level система
                                 </h4>
                                 <div class="space-y-4">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-2">Очки за подтверждение email</label>
-                                        <input type="number" value="10" 
-                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
+                                        <input type="number" id="trust-points-email" value="10" min="0" max="100" autocomplete="off"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-2">Очки за Discord связку</label>
-                                        <input type="number" value="15" 
-                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
+                                        <input type="number" id="trust-points-discord" value="15" min="0" max="100" autocomplete="off"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-2">Очки за час игры</label>
-                                        <input type="number" value="1" 
-                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
+                                        <input type="number" id="trust-points-hour" value="1" min="0" max="10" autocomplete="off"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-300 mb-2">Очки для уровня 1</label>
-                                        <input type="number" value="25" 
-                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Очки для Trust Level 1</label>
+                                        <input type="number" id="trust-level-1-required" value="25" min="1" max="1000" autocomplete="off"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Очки для Trust Level 2</label>
+                                        <input type="number" id="trust-level-2-required" value="100" min="1" max="1000" autocomplete="off"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Очки для Trust Level 3</label>
+                                        <input type="number" id="trust-level-3-required" value="500" min="1" max="1000" autocomplete="off"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
                                     </div>
                                 </div>
                             </div>
@@ -333,36 +544,97 @@
                             <!-- Настройки безопасности -->
                             <div class="glass-effect rounded-lg p-6">
                                 <h4 class="font-medium text-white mb-4">
-                                    <i class="fas fa-shield-alt mr-2"></i>Безопасность
+                                    <i class="fas fa-shield-alt mr-2 text-minecraft-gold"></i>Безопасность
                                 </h4>
                                 <div class="space-y-4">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-2">Максимум попыток входа</label>
-                                        <input type="number" value="5" 
-                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
+                                        <input type="number" id="max-login-attempts" value="5" min="3" max="20" autocomplete="off"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-2">Время блокировки (минуты)</label>
-                                        <input type="number" value="15" 
-                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
+                                        <input type="number" id="login-lockout-duration" value="15" min="5" max="1440" autocomplete="off"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-2">Время жизни JWT (дни)</label>
-                                        <input type="number" value="7" 
-                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
+                                        <input type="number" id="jwt-expires-days" value="7" min="1" max="365" autocomplete="off"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Требовать подтверждение email</label>
+                                        <select id="require-email-verification" autocomplete="off" class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
+                                            <option value="true">Да</option>
+                                            <option value="false">Нет</option>
+                                        </select>
                                     </div>
                                     <div class="flex items-center justify-between">
                                         <span class="text-sm text-gray-300">Двухфакторная аутентификация</span>
                                         <label class="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" class="sr-only peer">
-                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:glass-effect after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-chiwawa-primary"></div>
+                                            <input type="checkbox" id="two-factor-enabled" class="sr-only peer">
+                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:glass-effect after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-minecraft-gold"></div>
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Rate Limiting (запросов в минуту)</label>
+                                        <input type="number" id="rate-limit-requests" value="100" min="10" max="1000" autocomplete="off"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Email настройки -->
+                            <div class="glass-effect rounded-lg p-6">
+                                <h4 class="font-medium text-white mb-4">
+                                    <i class="fas fa-envelope mr-2 text-minecraft-gold"></i>Email настройки
+                                </h4>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">SMTP сервер</label>
+                                        <input type="text" id="smtp-host" placeholder="smtp.gmail.com" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">SMTP порт</label>
+                                        <input type="number" id="smtp-port" value="587" min="25" max="65535" autocomplete="off"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Email отправителя</label>
+                                        <input type="email" id="smtp-from" placeholder="noreply@chiwawa.site" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">SMTP пользователь</label>
+                                        <input type="text" id="smtp-user" placeholder="username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">SMTP пароль</label>
+                                        <input type="password" id="smtp-password" placeholder="••••••••" autocomplete="new-password"
+                                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-gray-300">Использовать TLS</span>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" id="smtp-tls" checked class="sr-only peer">
+                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:glass-effect after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-minecraft-gold"></div>
                                         </label>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="mt-8 text-center">
+                        <div class="mt-8 flex justify-center space-x-4">
+                            <button id="test-settings-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                                <i class="fas fa-vial mr-2"></i>
+                                Тестировать настройки
+                            </button>
+                            <button id="reset-settings-btn" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                                <i class="fas fa-undo mr-2"></i>
+                                Сбросить к умолчанию
+                            </button>
                             <button id="save-settings-btn" class="btn-minecraft px-8 py-3 rounded-lg font-medium">
                                 <i class="fas fa-save mr-2"></i>
                                 Сохранить все настройки
@@ -383,23 +655,23 @@
                                 <div class="space-y-3 text-sm">
                                     <div class="flex justify-between">
                                         <span class="text-gray-300">Хост:</span>
-                                        <span class="font-mono">localhost/212.15.49.139</span>
+                                        <span class="font-mono text-white">localhost/212.15.49.139</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-gray-300">Пользователь:</span>
-                                        <span class="font-mono">chiwawa</span>
+                                        <span class="font-mono text-white">chiwawa</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-gray-300">База данных:</span>
-                                        <span class="font-mono">chiwawa</span>
+                                        <span class="font-mono text-white">chiwawa</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-gray-300">Статус:</span>
-                                        <span class="text-green-600 font-medium">Подключена</span>
+                                        <span class="text-green-400 font-medium">Подключена</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-gray-300">Таблиц:</span>
-                                        <span class="font-medium">15</span>
+                                        <span class="font-medium text-white">15</span>
                                     </div>
                                 </div>
                             </div>
@@ -412,19 +684,19 @@
                                 <div class="space-y-3 text-sm">
                                     <div class="flex justify-between">
                                         <span class="text-gray-300">Node.js версия:</span>
-                                        <span class="font-mono" id="node-version">Loading...</span>
+                                        <span class="font-mono text-white" id="node-version">Loading...</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-gray-300">Время работы:</span>
-                                        <span class="font-mono" id="uptime">Loading...</span>
+                                        <span class="font-mono text-white" id="uptime">Loading...</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-gray-300">Память (RSS):</span>
-                                        <span class="font-mono" id="memory-rss">Loading...</span>
+                                        <span class="font-mono text-white" id="memory-rss">Loading...</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-gray-300">Память (Heap):</span>
-                                        <span class="font-mono" id="memory-heap">Loading...</span>
+                                        <span class="font-mono text-white" id="memory-heap">Loading...</span>
                                     </div>
                                 </div>
                             </div>
@@ -437,19 +709,19 @@
                                 <div class="space-y-3 text-sm">
                                     <div class="flex justify-between">
                                         <span class="text-gray-300">Всего запросов:</span>
-                                        <span class="font-medium">1,234</span>
+                                        <span class="font-medium text-white">1,234</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-gray-300">Сегодня:</span>
-                                        <span class="font-medium">156</span>
+                                        <span class="font-medium text-white">156</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-gray-300">Ошибки 5xx:</span>
-                                        <span class="font-medium text-red-600">3</span>
+                                        <span class="font-medium text-red-400">3</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-gray-300">Ошибки 4xx:</span>
-                                        <span class="font-medium text-yellow-600">27</span>
+                                        <span class="font-medium text-yellow-400">27</span>
                                     </div>
                                 </div>
                             </div>
@@ -462,19 +734,19 @@
                                 <div class="space-y-3 text-sm">
                                     <div class="flex justify-between">
                                         <span class="text-gray-300">Порт:</span>
-                                        <span class="font-mono">3001</span>
+                                        <span class="font-mono text-white">3001</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-gray-300">Режим:</span>
-                                        <span class="font-mono">production</span>
+                                        <span class="font-mono text-white">production</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-gray-300">CORS:</span>
-                                        <span class="text-green-600">Включен</span>
+                                        <span class="text-green-400">Включен</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-gray-300">Rate Limiting:</span>
-                                        <span class="text-green-600">Активен</span>
+                                        <span class="text-green-400">Активен</span>
                                     </div>
                                 </div>
                             </div>
@@ -542,12 +814,495 @@
         </div>
     </div>
 
+    <!-- Модальные окна -->
+    <!-- Модальное окно подробной информации о пользователе -->
+    <div id="user-details-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="glass-effect rounded-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-white">
+                        <i class="fas fa-user-circle mr-2 text-minecraft-gold"></i>
+                        Подробная информация о пользователе
+                    </h3>
+                    <button data-action="close-modal" data-modal="user-details-modal" class="text-gray-400 hover:text-white">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <!-- Основная информация -->
+                <div class="space-y-4 mb-6">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-sm text-gray-400">Никнейм:</label>
+                                <div class="text-white font-medium text-lg" id="modal-user-nickname">-</div>
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-400">Email:</label>
+                                <div class="text-white" id="modal-user-email">-</div>
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-400">Роль:</label>
+                                <div class="text-white" id="modal-user-role">-</div>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-sm text-gray-400">Trust Level:</label>
+                                <div class="text-white" id="modal-user-trust-level">-</div>
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-400">Статус:</label>
+                                <div id="modal-user-status">-</div>
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-400">Дата регистрации:</label>
+                                <div class="text-white" id="modal-user-created">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Блок активности -->
+                <div class="mb-6">
+                    <label class="text-sm text-gray-400 mb-3 block">Последняя активность на сайте:</label>
+                    <div class="bg-minecraft-dark/30 rounded-lg border border-minecraft-gold/20 max-h-60 overflow-y-auto p-3" id="modal-user-activity">
+                        <div class="text-center py-4 text-gray-400">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <div class="mt-2">Загрузка активности...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Вкладки и кнопки внизу -->
+                <div class="border-t border-minecraft-gold/20 pt-4">
+                    <!-- Вкладки "Сайт" и "Сервер" -->
+                    <div class="flex justify-center space-x-1 mb-4">
+                        <button class="modal-tab active px-6 py-2 rounded-md text-white bg-minecraft-gold/20 font-medium transition-all" data-tab="website">
+                            <i class="fas fa-globe mr-2"></i>Сайт
+                        </button>
+                        <button class="modal-tab px-6 py-2 rounded-md text-gray-300 hover:text-white hover:bg-minecraft-gold/10 font-medium transition-all" data-tab="server">
+                            <i class="fas fa-server mr-2"></i>Сервер
+                        </button>
+                    </div>
+                    
+                    <!-- Контент вкладок -->
+                    <div class="mb-4">
+                        <!-- Вкладка "Сайт" -->
+                        <div id="modal-tab-website" class="modal-tab-content">
+                            <div class="bg-minecraft-dark/20 rounded-lg p-4 text-center">
+                                <p class="text-gray-300 text-sm">
+                                    <i class="fas fa-chart-line mr-2 text-minecraft-gold"></i>
+                                    Статистика активности на сайте отображается выше
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Вкладка "Сервер" -->
+                        <div id="modal-tab-server" class="modal-tab-content hidden">
+                            <div class="space-y-4">
+                                <div class="grid md:grid-cols-2 gap-4">
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="text-sm text-gray-400">Статус на сервере:</label>
+                                            <div class="text-green-400" id="modal-server-status">🟢 Онлайн</div>
+                                        </div>
+                                        <div>
+                                            <label class="text-sm text-gray-400">Время игры:</label>
+                                            <div class="text-white" id="modal-server-playtime">42ч 15м</div>
+                                        </div>
+                                        <div>
+                                            <label class="text-sm text-gray-400">Последний заход на сервер:</label>
+                                            <div class="text-white" id="modal-server-last-seen">5 минут назад</div>
+                                        </div>
+                                        <div>
+                                            <label class="text-sm text-gray-400">Местоположение:</label>
+                                            <div class="text-white" id="modal-server-location">x: 1245, y: 64, z: -892</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="text-sm text-gray-400">Уровень:</label>
+                                            <div class="text-minecraft-gold" id="modal-server-level">Level 27</div>
+                                        </div>
+                                        <div>
+                                            <label class="text-sm text-gray-400">Опыт:</label>
+                                            <div class="text-white" id="modal-server-exp">15,432 XP</div>
+                                        </div>
+                                        <div>
+                                            <label class="text-sm text-gray-400">Смертей:</label>
+                                            <div class="text-red-400" id="modal-server-deaths">23</div>
+                                        </div>
+                                        <div>
+                                            <label class="text-sm text-gray-400">Убийств мобов:</label>
+                                            <div class="text-white" id="modal-server-kills">1,847</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4 p-3 bg-minecraft-dark/30 rounded-lg">
+                                    <label class="text-sm text-gray-400 mb-2 block">Последние действия на сервере:</label>
+                                    <div class="space-y-1 text-sm">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-300">🏗️ Построил дом</span>
+                                            <span class="text-gray-500">15 мин назад</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-300">⛏️ Добыл 64 железной руды</span>
+                                            <span class="text-gray-500">1ч назад</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-300">💀 Умер от лавы</span>
+                                            <span class="text-gray-500">2ч назад</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-300">🎣 Поймал рыбу</span>
+                                            <span class="text-gray-500">3ч назад</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4 text-xs text-gray-500 text-center">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    Данные получены с игрового сервера (демо-данные)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Кнопка закрытия -->
+                    <div class="flex justify-center">
+                        <button data-action="close-modal" data-modal="user-details-modal" class="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors">
+                            Закрыть
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно блокировки пользователя -->
+    <div id="ban-user-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="glass-effect rounded-lg max-w-md w-full mx-4">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-white">
+                        <i class="fas fa-ban mr-2 text-red-400"></i>
+                        Заблокировать пользователя
+                    </h3>
+                    <button data-action="close-modal" data-modal="ban-user-modal" class="text-gray-400 hover:text-white">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm text-gray-400">Пользователь:</label>
+                        <div class="text-white font-medium" id="ban-modal-user-nickname">-</div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Тип блокировки:</label>
+                        <select id="ban-type" autocomplete="off" class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
+                            <option value="temporary">Временная</option>
+                            <option value="permanent">Постоянная</option>
+                            <option value="delete">УДАЛИТЬ АККАУНТ</option>
+                        </select>
+                    </div>
+                    
+                    <div id="ban-duration-container">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Длительность (дни):</label>
+                        <input type="number" id="ban-duration" min="1" max="365" value="7" autocomplete="off"
+                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Причина блокировки:</label>
+                        <textarea id="ban-reason" rows="3" placeholder="Опишите причину блокировки..." required
+                            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white placeholder-gray-400 focus:border-minecraft-gold focus:outline-none resize-none"></textarea>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button data-action="close-modal" data-modal="ban-user-modal" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors">
+                        Отмена
+                    </button>
+                    <button id="confirm-ban-btn" data-action="confirm-ban-user" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors">
+                        Заблокировать
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно изменения роли -->
+    <div id="change-role-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="glass-effect rounded-lg max-w-md w-full mx-4">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-white">
+                        <i class="fas fa-user-tag mr-2 text-minecraft-gold"></i>
+                        Изменить роль пользователя
+                    </h3>
+                    <button data-action="close-modal" data-modal="change-role-modal" class="text-gray-400 hover:text-white">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm text-gray-400">Пользователь:</label>
+                        <div class="text-white font-medium" id="role-modal-user-nickname">-</div>
+                    </div>
+                    
+                    <div>
+                        <label class="text-sm text-gray-400">Текущая роль:</label>
+                        <div class="text-white" id="role-modal-current-role">-</div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Новая роль:</label>
+                        <select id="role-select" autocomplete="off" class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
+                            <option value="user">Пользователь</option>
+                            <option value="moderator">Модератор</option>
+                            <option value="admin">Администратор</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Причина изменения:</label>
+                        <textarea id="role-change-reason" rows="3" placeholder="Опишите причину изменения роли..." 
+                            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white placeholder-gray-400 focus:border-minecraft-gold focus:outline-none resize-none"></textarea>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button data-action="close-modal" data-modal="change-role-modal" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors">
+                        Отмена
+                    </button>
+                    <button data-action="update-user-role" class="px-4 py-2 bg-minecraft-gold hover:bg-yellow-600 text-minecraft-dark rounded-lg font-medium transition-colors">
+                        Изменить роль
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Футер -->
+    <footer class="glass-effect border-t border-minecraft-gold/30 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <p class="text-gray-400">
+                    Chiwawa © 2025, Создано с 
+                    <span class="text-minecraft-gold">❤️</span> от 
+                    <strong class="text-minecraft-yellow">ebluffy</strong>
+                </p>
+            </div>
+        </div>
+    </footer>
+
     <!-- JavaScript -->
     <script>
         let currentUser = null;
+        
+        // Управление выпадающим меню профиля
+        function toggleProfileDropdown() {
+            const profileDropdown = document.getElementById('profileDropdown');
+            profileDropdown.classList.toggle('hidden');
+        }
+        
+        // Функция выхода
+        function logout() {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('remember_me');
+            localStorage.removeItem('token_expires');
+            window.location.href = '/';
+        }
+        
+        // Инициализация обработчиков событий при загрузке DOM
+        function initializeEventHandlers() {
+            // Обработчик кнопки профиля
+            const profileButton = document.getElementById('profile-dropdown-btn');
+            if (profileButton) {
+                profileButton.addEventListener('click', toggleProfileDropdown);
+            }
+            
+            // Обработчик кнопки выхода в dropdown
+            const logoutButton = document.getElementById('logout-dropdown-btn');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', logout);
+            }
+            
+            // Закрытие меню при клике вне его
+            document.addEventListener('click', function(event) {
+                const profileDropdown = document.getElementById('profileDropdown');
+                const profileButton = document.getElementById('profile-dropdown-btn');
+                
+                if (profileButton && !profileButton.contains(event.target) && !profileDropdown.contains(event.target)) {
+                    profileDropdown.classList.add('hidden');
+                }
+                
+                // Закрытие модальных окон при клике вне их
+                if (event.target.classList.contains('fixed') && event.target.classList.contains('bg-black')) {
+                    const modalId = event.target.id;
+                    if (modalId) {
+                        closeModal(modalId);
+                    }
+                }
+            });
+            
+            // Делегирование событий для динамических кнопок
+            document.addEventListener('click', function(event) {
+                const target = event.target;
+                
+                // Кнопки одобрения/отклонения заявок
+                if (target.matches('[data-action="approve-app"]')) {
+                    const appId = target.getAttribute('data-app-id');
+                    reviewApplication(appId, 'approved');
+                } else if (target.matches('[data-action="reject-app"]')) {
+                    const appId = target.getAttribute('data-app-id');
+                    reviewApplication(appId, 'rejected');
+                }
+                
+                // Кнопки для пользователей
+                else if (target.matches('[data-action="show-user-details"]')) {
+                    const userId = target.getAttribute('data-user-id');
+                    showUserDetails(userId);
+                } else if (target.matches('[data-action="ban-user"]')) {
+                    const userId = target.getAttribute('data-user-id');
+                    const nickname = target.getAttribute('data-user-nickname');
+                    banUser(userId, nickname);
+                } else if (target.matches('[data-action="unban-user"]')) {
+                    const userId = target.getAttribute('data-user-id');
+                    const nickname = target.getAttribute('data-user-nickname');
+                    unbanUser(userId, nickname);
+                }
+                
+                // Trust Level заявки
+                else if (target.matches('[data-action="approve-trust-app"]')) {
+                    const appId = target.getAttribute('data-app-id');
+                    reviewTrustApplication(appId, 'approved');
+                } else if (target.matches('[data-action="reject-trust-app"]')) {
+                    const appId = target.getAttribute('data-app-id');
+                    reviewTrustApplication(appId, 'rejected');
+                }
+                
+                // Кнопки закрытия модалов
+                else if (target.matches('[data-action="close-modal"]') || target.closest('[data-action="close-modal"]')) {
+                    const closeButton = target.matches('[data-action="close-modal"]') ? target : target.closest('[data-action="close-modal"]');
+                    const modalId = closeButton.getAttribute('data-modal');
+                    closeModal(modalId);
+                }
+                
+                // Кнопки в модалах
+                else if (target.matches('[data-action="update-user-role"]')) {
+                    updateUserRole();
+                } else if (target.matches('[data-action="confirm-ban-user"]')) {
+                    confirmBanUser();
+                }
+                
+                // Вкладки в модальном окне пользователя
+                else if (target.matches('.modal-tab')) {
+                    const tabName = target.getAttribute('data-tab');
+                    switchModalTab(tabName);
+                }
+            });
+            
+            // Делегирование для select элементов
+            document.addEventListener('change', function(event) {
+                const target = event.target;
+                
+                // Изменение типа блокировки
+                if (target.id === 'ban-type') {
+                    const durationContainer = document.getElementById('ban-duration-container');
+                    const confirmBtn = document.getElementById('confirm-ban-btn');
+                    
+                    if (target.value === 'permanent' || target.value === 'delete') {
+                        durationContainer.style.display = 'none';
+                    } else {
+                        durationContainer.style.display = 'block';
+                    }
+                    
+                    // Изменяем текст кнопки для удаления аккаунта
+                    if (target.value === 'delete') {
+                        confirmBtn.textContent = 'УДАЛИТЬ АККАУНТ';
+                        confirmBtn.className = 'px-4 py-2 bg-red-800 hover:bg-red-900 text-white rounded-lg font-medium transition-colors';
+                    } else {
+                        confirmBtn.textContent = 'Заблокировать';
+                        confirmBtn.className = 'px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors';
+                    }
+                }
+                
+                // Изменение роли через выпадающий список
+                if (target.matches('[data-action="change-user-role"]')) {
+                    const userId = target.getAttribute('data-user-id');
+                    const nickname = target.getAttribute('data-user-nickname');
+                    const newRole = target.value;
+                    changeUserRoleSelect(userId, nickname, newRole);
+                }
+                
+                if (target.matches('[data-action="change-trust-level"]')) {
+                    const userId = target.getAttribute('data-user-id');
+                    const newLevel = target.value;
+                    changeTrustLevel(userId, newLevel);
+                }
+            });
+        }
+        
+        // Глобальная переменная для хранения настроек сервера
+        let serverSettings = {
+            name: 'Test',
+            description: 'Приватный Minecraft сервер с дружелюбным сообществом',
+            ip: 'play.chiwawa.site',
+            port: '25565',
+            discordInvite: 'https://discord.gg/chiwawa',
+            telegramInvite: 'https://t.me/chiwawa'
+        };
+
+        // Функция загрузки настроек сервера
+        async function loadServerSettings() {
+            try {
+                const response = await fetch('/api/settings/public');
+                if (response.ok) {
+                    const settings = await response.json();
+                    
+                    // Обновляем глобальные настройки
+                    serverSettings.name = settings.serverName || serverSettings.name;
+                    serverSettings.description = settings.serverDescription || serverSettings.description;
+                    serverSettings.ip = settings.serverIp || serverSettings.ip;
+                    serverSettings.port = settings.serverPort || serverSettings.port;
+                    serverSettings.discordInvite = settings.discordInvite || serverSettings.discordInvite;
+                    serverSettings.telegramInvite = settings.telegramInvite || serverSettings.telegramInvite;
+                    
+                    // Обновляем элементы на странице
+                    updateServerElements();
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки настроек сервера:', error);
+            }
+        }
+
+        // Функция обновления элементов на странице
+        function updateServerElements() {
+            // Обновляем название сервера в навигации
+            const serverNameNav = document.getElementById('server-name');
+            if (serverNameNav) {
+                serverNameNav.textContent = serverSettings.name;
+            }
+            
+            // Обновляем заголовок страницы
+            document.title = `Админ-панель - ${serverSettings.name}`;
+        }
 
         // Проверка доступа при загрузке
         document.addEventListener('DOMContentLoaded', async () => {
+            // Инициализируем обработчики событий
+            initializeEventHandlers();
+            
             const token = localStorage.getItem('auth_token');
             if (!token) {
                 window.location.href = '/profile';
@@ -562,17 +1317,26 @@
                 if (response.ok) {
                     const userData = await response.json();
                     currentUser = userData.user;
-                    console.log('Данные пользователя в админ панели:', userData.user); // Отладочный лог
+                    console.log('Данные пользователя в админ панели:', userData.user);
+                    
+                    // Обновляем отображение никнейма админа
+                    const adminNickname = document.getElementById('admin-nickname');
+                    if (adminNickname && userData.user) {
+                        adminNickname.textContent = userData.user.nickname || userData.user.email || 'Admin';
+                    }
                     
                     // Проверяем права администратора
                     if (currentUser.role !== 'admin' && currentUser.role !== 'moderator') {
-                        console.log('Доступ запрещен. Роль пользователя:', currentUser.role); // Отладочный лог
+                        console.log('Доступ запрещен. Роль пользователя:', currentUser.role);
                         document.getElementById('access-denied').classList.remove('hidden');
                         return;
                     }
                     
                     document.getElementById('admin-content').classList.remove('hidden');
-                    loadDashboard();
+                    
+                    // Загружаем настройки сервера и статистику
+                    await loadServerSettings();
+                    await loadDashboard();
                 } else {
                     window.location.href = '/profile';
                 }
@@ -583,69 +1347,528 @@
         });
 
         // Выход
-        document.getElementById('logout-btn').addEventListener('click', async () => {
-            const token = localStorage.getItem('auth_token');
-            if (token) {
-                try {
-                    await fetch('/api/auth/logout', {
-                        method: 'POST',
-                        headers: { 'Authorization': `Bearer ${token}` }
+        document.addEventListener('DOMContentLoaded', () => {
+            // Переключение вкладок
+            document.querySelectorAll('.admin-tab').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.dataset.tab;
+                    
+                    // Убираем активность с всех кнопок и контента
+                    document.querySelectorAll('.admin-tab').forEach(b => {
+                        b.classList.remove('active', 'border-minecraft-gold', 'text-minecraft-gold');
+                        b.classList.add('border-transparent', 'text-gray-300');
                     });
-                } catch (error) {
-                    console.error('Ошибка выхода:', error);
-                }
+                    document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.add('hidden'));
+                    
+                    // Активируем текущую вкладку
+                    btn.classList.remove('border-transparent', 'text-gray-300');
+                    btn.classList.add('active', 'border-minecraft-gold', 'text-minecraft-gold');
+                    document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+                    
+                    // Загружаем данные для вкладки
+                    switch(tabId) {
+                        case 'applications':
+                            loadApplications();
+                            break;
+                        case 'users':
+                            loadUsers();
+                            break;
+                        case 'trust-levels':
+                            loadTrustLevels();
+                            break;
+                        case 'settings':
+                            loadSettings();
+                            break;
+                        case 'technical':
+                            loadTechnicalInfo();
+                            break;
+                        case 'logs':
+                            loadLogs();
+                            break;
+                    }
+                });
+            });
+
+            // Фильтры
+            document.getElementById('app-status-filter')?.addEventListener('change', loadApplications);
+            document.getElementById('user-status-filter')?.addEventListener('change', loadUsers);
+            document.getElementById('user-search')?.addEventListener('input', debounce(loadUsers, 500));
+            document.getElementById('trust-app-status-filter')?.addEventListener('change', loadTrustApplications);
+            document.getElementById('log-action-filter')?.addEventListener('change', loadLogs);
+            document.getElementById('refresh-logs')?.addEventListener('click', loadLogs);
+
+            // Системные утилиты
+            document.getElementById('test-email-btn')?.addEventListener('click', testEmail);
+            document.getElementById('test-db-btn')?.addEventListener('click', testDatabase);
+            document.getElementById('clear-cache-btn')?.addEventListener('click', clearCache);
+            
+            // Кнопка сохранения настроек
+            document.getElementById('save-settings-btn')?.addEventListener('click', saveSettings);
+            
+            // Кнопка тестирования настроек
+            document.getElementById('test-settings-btn')?.addEventListener('click', testSettings);
+            
+            // Кнопка сброса настроек
+            document.getElementById('reset-settings-btn')?.addEventListener('click', resetSettings);
+        });
+
+        // Вспомогательная функция debounce для поиска
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Функции для работы с модальными окнами
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Функция переключения вкладок в модальном окне
+        function switchModalTab(tabName) {
+            // Убираем активность со всех вкладок
+            document.querySelectorAll('.modal-tab').forEach(tab => {
+                tab.classList.remove('active', 'bg-minecraft-gold/20', 'text-white');
+                tab.classList.add('text-gray-300');
+            });
+            
+            // Скрываем все содержимые вкладок
+            document.querySelectorAll('.modal-tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Активируем выбранную вкладку
+            const activeTab = document.querySelector(`[data-tab="${tabName}"]`);
+            if (activeTab) {
+                activeTab.classList.add('active', 'bg-minecraft-gold/20', 'text-white');
+                activeTab.classList.remove('text-gray-300');
             }
             
-            localStorage.removeItem('auth_token');
-            window.location.href = '/';
-        });
+            // Показываем соответствующий контент
+            const activeContent = document.getElementById(`modal-tab-${tabName}`);
+            if (activeContent) {
+                activeContent.classList.remove('hidden');
+            }
+            
+            // Если переключились на вкладку "Сервер", генерируем данные
+            if (tabName === 'server') {
+                generateServerData();
+            }
+        }
 
-        // Переключение вкладок
-        document.querySelectorAll('.admin-tab').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tabId = btn.dataset.tab;
-                
-                // Убираем активность с всех кнопок и контента
-                document.querySelectorAll('.admin-tab').forEach(b => {
-                    b.classList.remove('border-chiwawa-primary', 'text-chiwawa-primary');
-                    b.classList.add('border-transparent', 'text-gray-500');
+        // Функция генерации демо-данных для вкладки "Сервер"
+        function generateServerData() {
+            // Генерируем случайные, но реалистичные данные
+            const onlineChance = Math.random() > 0.3; // 70% шанс что онлайн
+            const playtimeHours = Math.floor(Math.random() * 200) + 5; // 5-205 часов
+            const playtimeMinutes = Math.floor(Math.random() * 60);
+            const level = Math.floor(Math.random() * 50) + 1; // 1-50 уровень
+            const exp = Math.floor(Math.random() * 50000) + 1000; // 1000-51000 опыта
+            const deaths = Math.floor(Math.random() * 100); // 0-100 смертей
+            const kills = Math.floor(Math.random() * 5000) + 100; // 100-5100 убийств
+            
+            // Генерируем координаты
+            const x = Math.floor(Math.random() * 4000) - 2000; // -2000 до 2000
+            const y = Math.floor(Math.random() * 100) + 5; // 5-105
+            const z = Math.floor(Math.random() * 4000) - 2000; // -2000 до 2000
+            
+            // Время последнего захода
+            const lastSeenMinutes = onlineChance ? 0 : Math.floor(Math.random() * 10080); // 0-7 дней в минутах
+            const lastSeenText = onlineChance ? 'Сейчас онлайн' : getTimeAgoText(lastSeenMinutes);
+            
+            // Обновляем элементы
+            document.getElementById('modal-server-status').innerHTML = onlineChance 
+                ? '🟢 <span class="text-green-400">Онлайн</span>' 
+                : '🔴 <span class="text-red-400">Оффлайн</span>';
+            document.getElementById('modal-server-playtime').textContent = `${playtimeHours}ч ${playtimeMinutes}м`;
+            document.getElementById('modal-server-last-seen').textContent = lastSeenText;
+            document.getElementById('modal-server-location').textContent = `x: ${x}, y: ${y}, z: ${z}`;
+            document.getElementById('modal-server-level').textContent = `Level ${level}`;
+            document.getElementById('modal-server-exp').textContent = `${exp.toLocaleString()} XP`;
+            document.getElementById('modal-server-deaths').textContent = deaths;
+            document.getElementById('modal-server-kills').textContent = kills.toLocaleString();
+        }
+
+        // Вспомогательная функция для форматирования времени
+        function getTimeAgoText(minutes) {
+            if (minutes < 60) return `${minutes} мин назад`;
+            if (minutes < 1440) return `${Math.floor(minutes / 60)}ч назад`;
+            return `${Math.floor(minutes / 1440)}д назад`;
+        }
+
+        // Глобальные переменные для хранения данных модальных окон
+        let currentUserId = null;
+
+        // Функция показа подробной информации о пользователе
+        async function showUserDetails(userId) {
+            currentUserId = userId;
+            
+            // Сначала открываем модальное окно с загрузкой
+            openModal('user-details-modal');
+            
+            // Сбрасываем содержимое на состояние загрузки
+            document.getElementById('modal-user-nickname').textContent = 'Загрузка...';
+            document.getElementById('modal-user-email').textContent = 'Загрузка...';
+            document.getElementById('modal-user-role').textContent = 'Загрузка...';
+            document.getElementById('modal-user-trust-level').textContent = 'Загрузка...';
+            document.getElementById('modal-user-status').innerHTML = 'Загрузка...';
+            document.getElementById('modal-user-created').textContent = 'Загрузка...';
+            document.getElementById('modal-user-activity').innerHTML = '<div class="text-center py-4 text-gray-400"><i class="fas fa-spinner fa-spin"></i><div class="mt-2">Загрузка активности...</div></div>';
+            
+            // Инициализируем вкладку "Сайт" как активную
+            switchModalTab('website');
+            
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch(`/api/admin/users/${userId}/details`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
                 });
-                document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.add('hidden'));
-                
-                // Активируем текущую вкладку
-                btn.classList.remove('border-transparent', 'text-gray-500');
-                btn.classList.add('border-chiwawa-primary', 'text-chiwawa-primary');
-                document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-                
-                // Загружаем данные для вкладки
-                switch(tabId) {
-                    case 'applications':
-                        loadApplications();
-                        break;
-                    case 'users':
-                        loadUsers();
-                        break;
-                    case 'technical':
-                        loadTechnicalInfo();
-                        break;
-                    case 'logs':
-                        loadLogs();
-                        break;
+
+                if (!response.ok) {
+                    throw new Error('Ошибка получения данных пользователя');
                 }
-            });
-        });
 
-        // Фильтры
-        document.getElementById('app-status-filter').addEventListener('change', loadApplications);
-        document.getElementById('user-status-filter').addEventListener('change', loadUsers);
-        document.getElementById('user-search').addEventListener('input', debounce(loadUsers, 500));
-        document.getElementById('log-action-filter').addEventListener('change', loadLogs);
-        document.getElementById('refresh-logs').addEventListener('click', loadLogs);
+                const user = await response.json();
+                
+                // Заполняем модальное окно данными
+                document.getElementById('modal-user-nickname').textContent = user.nickname || '-';
+                document.getElementById('modal-user-email').textContent = user.email || '-';
+                document.getElementById('modal-user-role').textContent = getRoleText(user.role);
+                document.getElementById('modal-user-trust-level').textContent = `Уровень ${user.trust_level || 0}`;
+                
+                const statusElement = document.getElementById('modal-user-status');
+                if (user.is_banned) {
+                    statusElement.innerHTML = '<span class="text-red-400">Заблокирован</span>';
+                } else {
+                    statusElement.innerHTML = '<span class="text-green-400">Активен</span>';
+                }
+                
+                document.getElementById('modal-user-created').textContent = formatDate(user.registered_at);
+                
+                // Загружаем активность пользователя
+                loadUserActivity(userId);
+                
+            } catch (error) {
+                console.error('Ошибка загрузки данных пользователя:', error);
+                
+                // Показываем ошибку в модальном окне
+                document.getElementById('modal-user-nickname').textContent = 'Ошибка загрузки';
+                document.getElementById('modal-user-email').textContent = '-';
+                document.getElementById('modal-user-role').textContent = '-';
+                document.getElementById('modal-user-trust-level').textContent = '-';
+                document.getElementById('modal-user-status').innerHTML = '<span class="text-red-400">Ошибка</span>';
+                document.getElementById('modal-user-created').textContent = '-';
+                document.getElementById('modal-user-activity').innerHTML = '<div class="text-red-400 text-sm">Ошибка загрузки данных пользователя</div>';
+            }
+        }
 
-        // Системные утилиты
-        document.getElementById('test-email-btn').addEventListener('click', testEmail);
-        document.getElementById('test-db-btn').addEventListener('click', testDatabase);
-        document.getElementById('clear-cache-btn').addEventListener('click', clearCache);
+        // Функция загрузки активности пользователя
+        async function loadUserActivity(userId) {
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch(`/api/admin/users/${userId}/activity`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const activityContainer = document.getElementById('modal-user-activity');
+                
+                if (!response.ok) {
+                    activityContainer.innerHTML = '<div class="text-red-400 text-sm">Ошибка загрузки активности</div>';
+                    return;
+                }
+
+                const activityData = await response.json();
+                
+                // Объединяем сессии и логи входов в один массив активности
+                const sessions = activityData.sessions || [];
+                const loginLogs = activityData.loginLogs || [];
+                
+                const activities = [
+                    ...sessions.map(session => ({
+                        action: 'session',
+                        created_at: session.created_at,
+                        ip_address: session.ip_address,
+                        details: `Сессия ${session.is_active ? 'активна' : 'завершена'}`
+                    })),
+                    ...loginLogs.map(log => ({
+                        action: 'login',
+                        created_at: log.login_time,
+                        ip_address: log.ip_address,
+                        details: log.success ? 'Успешный вход' : 'Неудачная попытка входа'
+                    }))
+                ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                
+                if (activities.length === 0) {
+                    activityContainer.innerHTML = '<div class="text-gray-400 text-sm">Нет записей активности</div>';
+                    return;
+                }
+
+                const activityHtml = activities.slice(0, 10).map(activity => `
+                    <div class="flex justify-between items-center py-3 px-3 rounded-lg bg-minecraft-dark/20 border border-minecraft-gold/10 mb-2">
+                        <div class="flex items-center space-x-3">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-circle text-xs ${getActivityColor(activity.action)}"></i>
+                            </div>
+                            <div>
+                                <span class="text-sm text-white font-medium">${getActivityText(activity.action)}</span>
+                                ${activity.details ? `<div class="text-xs text-gray-400 mt-1">${activity.details}</div>` : ''}
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs text-gray-400">${formatDate(activity.created_at)}</span>
+                            ${activity.ip_address ? `<div class="text-xs text-gray-500 font-mono">${activity.ip_address}</div>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+                
+                activityContainer.innerHTML = activityHtml;
+            } catch (error) {
+                document.getElementById('modal-user-activity').innerHTML = 
+                    '<div class="text-red-400 text-sm">Ошибка загрузки активности</div>';
+            }
+        }
+
+        // Функция изменения роли пользователя
+        async function changeUserRole(userId, nickname) {
+            currentUserId = userId;
+            
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch(`/api/admin/users/${userId}/details`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Ошибка получения данных пользователя');
+                }
+
+                const user = await response.json();
+                
+                // Заполняем модальное окно
+                document.getElementById('role-modal-user-nickname').textContent = nickname;
+                document.getElementById('role-modal-current-role').textContent = getRoleText(user.role);
+                document.getElementById('role-select').value = user.role;
+                document.getElementById('role-change-reason').value = '';
+                
+                openModal('change-role-modal');
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Ошибка загрузки данных пользователя');
+            }
+        }
+
+        // Функция блокировки пользователя (ускоренная версия)
+        async function banUser(userId, nickname) {
+            // Сначала сразу открываем модальное окно
+            openModal('ban-user-modal');
+            
+            const modal = document.getElementById('ban-user-modal');
+            const nicknameElement = modal.querySelector('#ban-modal-user-nickname');
+            const confirmBtn = modal.querySelector('#confirm-ban-btn');
+            
+            // Устанавливаем данные пользователя
+            nicknameElement.textContent = nickname;
+            confirmBtn.setAttribute('data-user-id', userId);
+            
+            // Сброс формы
+            const banTypeSelect = modal.querySelector('#ban-type');
+            const reasonTextarea = modal.querySelector('#ban-reason');
+            const durationInput = modal.querySelector('#ban-duration');
+            
+            banTypeSelect.value = 'temporary';
+            reasonTextarea.value = '';
+            durationInput.value = '7';
+            
+            // Показываем секцию длительности
+            modal.querySelector('#ban-duration-container').style.display = 'block';
+            
+            // Фокусируемся на поле причины для удобства
+            setTimeout(() => {
+                reasonTextarea.focus();
+            }, 100);
+        }
+
+        // Функция подтверждения блокировки
+        async function confirmBanUser() {
+            const modal = document.getElementById('ban-user-modal');
+            const banType = modal.querySelector('#ban-type').value;
+            const reason = modal.querySelector('#ban-reason').value.trim();
+            const confirmBtn = modal.querySelector('#confirm-ban-btn');
+            const userId = confirmBtn.getAttribute('data-user-id');
+            
+            if (!reason) {
+                showMessage('Пожалуйста, укажите причину блокировки', 'error');
+                return;
+            }
+            
+            if (!userId) {
+                showMessage('Ошибка: не указан ID пользователя', 'error');
+                return;
+            }
+            
+            // Показываем индикатор загрузки
+            const originalText = confirmBtn.innerHTML;
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Обработка...';
+            confirmBtn.disabled = true;
+            
+            try {
+                const token = localStorage.getItem('auth_token');
+                let requestData = { reason, type: banType };
+                let endpoint = `/api/admin/users/${userId}/ban`;
+                let method = 'PUT';
+                
+                // Для удаления аккаунта используем другой endpoint
+                if (banType === 'delete') {
+                    endpoint = `/api/admin/users/${userId}/delete`;
+                    method = 'DELETE';
+                    requestData = { reason }; // Для удаления передаем только причину
+                }
+                // Для временной блокировки добавляем длительность
+                else if (banType === 'temporary') {
+                    const duration = parseInt(modal.querySelector('#ban-duration').value);
+                    requestData.duration = duration;
+                    requestData.unit = 'days';
+                }
+                
+                const response = await fetch(endpoint, {
+                    method: method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Ошибка выполнения операции');
+                }
+
+                const result = await response.json();
+                showMessage(result.message || 'Операция выполнена успешно', 'success');
+                closeModal('ban-user-modal');
+                await loadUsers(); // Перезагружаем список пользователей
+                await loadDashboard(); // Обновляем статистику
+                
+            } catch (error) {
+                console.error('Ошибка операции:', error);
+                showMessage('Ошибка: ' + error.message, 'error');
+            } finally {
+                // Восстанавливаем кнопку
+                confirmBtn.innerHTML = originalText;
+                confirmBtn.disabled = false;
+            }
+        }
+
+        // Функция разблокировки пользователя
+        async function unbanUser(userId, nickname) {
+            if (!confirm(`Вы уверены, что хотите разблокировать пользователя ${nickname}?`)) {
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch(`/api/admin/users/${userId}/unban`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Ошибка разблокировки пользователя');
+                }
+
+                alert('Пользователь успешно разблокирован');
+                await loadUsers(); // Перезагружаем список пользователей
+            } catch (error) {
+                console.error('Ошибка разблокировки:', error);
+                alert('Ошибка разблокировки пользователя');
+            }
+        }
+
+        // Вспомогательные функции
+        function getRoleText(role) {
+            switch (role) {
+                case 'admin': return 'Администратор';
+                case 'moderator': return 'Модератор';
+                case 'user': return 'Пользователь';
+                default: return 'Неизвестно';
+            }
+        }
+
+        function getActivityColor(action) {
+            switch (action) {
+                case 'login': return 'text-green-400';
+                case 'logout': return 'text-gray-400';
+                case 'application_submitted': return 'text-blue-400';
+                case 'application_approved': return 'text-green-400';
+                case 'application_rejected': return 'text-red-400';
+                case 'user_banned': return 'text-red-400';
+                case 'user_unbanned': return 'text-green-400';
+                case 'role_changed': return 'text-yellow-400';
+                case 'trust_level_changed': return 'text-minecraft-gold';
+                case 'password_changed': return 'text-purple-400';
+                case 'email_verified': return 'text-cyan-400';
+                case 'profile_updated': return 'text-blue-300';
+                default: return 'text-gray-400';
+            }
+        }
+
+        function getActivityText(action) {
+            switch (action) {
+                case 'login': return 'Вход в систему';
+                case 'logout': return 'Выход из системы';
+                case 'application_submitted': return 'Подача заявки';
+                case 'application_approved': return 'Заявка одобрена';
+                case 'application_rejected': return 'Заявка отклонена';
+                case 'user_banned': return 'Блокировка';
+                case 'user_unbanned': return 'Разблокировка';
+                case 'role_changed': return 'Изменение роли';
+                case 'trust_level_changed': return 'Изменение Trust Level';
+                case 'password_changed': return 'Смена пароля';
+                case 'email_verified': return 'Подтверждение email';
+                case 'profile_updated': return 'Обновление профиля';
+                default: return action.replace(/_/g, ' ');
+            }
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleString('ru-RU');
+        }
 
         async function loadDashboard() {
             const token = localStorage.getItem('auth_token');
@@ -667,8 +1890,11 @@
                 console.error('Ошибка загрузки статистики:', error);
             }
             
-            // Загружаем заявки по умолчанию
-            loadApplications();
+            // Загружаем заявки только если активна вкладка заявок
+            const activeTab = document.querySelector('.admin-tab.active');
+            if (activeTab && activeTab.dataset.tab === 'applications') {
+                loadApplications();
+            }
         }
 
         async function loadApplications() {
@@ -699,10 +1925,10 @@
                                     <div class="flex items-center space-x-2">
                                         <span class="px-2 py-1 text-xs font-medium rounded ${getStatusBadge(app.status)}">${getStatusText(app.status)}</span>
                                         ${app.status === 'pending' ? `
-                                            <button onclick="reviewApplication(${app.id}, 'approved')" class="px-3 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600">
+                                            <button data-action="approve-app" data-app-id="${app.id}" class="px-3 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600">
                                                 Одобрить
                                             </button>
-                                            <button onclick="reviewApplication(${app.id}, 'rejected')" class="px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600">
+                                            <button data-action="reject-app" data-app-id="${app.id}" class="px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600">
                                                 Отклонить
                                             </button>
                                         ` : ''}
@@ -781,23 +2007,28 @@
                                             ${user.role === 'admin' ? 'Админ' : user.role === 'moderator' ? 'Модератор' : 'Пользователь'}
                                         </span>
                                         <div class="flex space-x-1">
-                                            <button onclick="showUserDetails(${user.id})" class="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600" title="Подробная информация">
+                                            <button data-action="show-user-details" data-user-id="${user.id}" class="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600" title="Подробная информация">
                                                 <i class="fas fa-info-circle"></i>
                                             </button>
-                                            <button onclick="changeUserRole(${user.id}, '${user.nickname}')" class="px-2 py-1 bg-purple-500 text-white text-xs rounded hover:bg-purple-600" title="Изменить роль">
-                                                <i class="fas fa-user-shield"></i>
-                                            </button>
+                                            <select data-action="change-user-role" data-user-id="${user.id}" data-user-nickname="${user.nickname}" class="px-2 py-1 text-xs bg-minecraft-gray border border-minecraft-gold/20 rounded text-white" title="Изменить роль">
+                                                <option value="user" ${user.role === 'user' ? 'selected' : ''}>👤 Пользователь</option>
+                                                <option value="moderator" ${user.role === 'moderator' ? 'selected' : ''}>🛡️ Модератор</option>
+                                                <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>👑 Админ</option>
+                                            </select>
                                             ${!user.is_banned ? `
-                                                <button onclick="banUser(${user.id}, '${user.nickname}')" class="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600" title="Заблокировать">
+                                                <button data-action="ban-user" data-user-id="${user.id}" data-user-nickname="${user.nickname}" class="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600" title="Заблокировать">
                                                     <i class="fas fa-ban"></i>
                                                 </button>
                                             ` : `
-                                                <button onclick="unbanUser(${user.id}, '${user.nickname}')" class="px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600" title="Разблокировать">
+                                                <button data-action="unban-user" data-user-id="${user.id}" data-user-nickname="${user.nickname}" class="px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600" title="Разблокировать">
                                                     <i class="fas fa-check"></i>
                                                 </button>
                                             `}
-                                            <select onchange="changeTrustLevel(${user.id}, this.value)" class="px-2 py-1 text-xs bg-minecraft-gray border border-minecraft-gold/20 rounded text-white" title="Изменить Trust Level">
-                                                ${[0,1,2,3,4,5].map(level => `<option value="${level}" ${user.trust_level == level ? 'selected' : ''}>TL${level}</option>`).join('')}
+                                            <select data-action="change-trust-level" data-user-id="${user.id}" class="px-2 py-1 text-xs bg-minecraft-gray border border-minecraft-gold/20 rounded text-white" title="Изменить Trust Level">
+                                                ${[0,1,2,3].map(level => {
+                                                    const levelNames = ['🚶 Проходимец', '👤 Новичок', '✅ Проверенный', '🏆 Ветеран'];
+                                                    return `<option value="${level}" ${user.trust_level == level ? 'selected' : ''}>${levelNames[level]} (${level})</option>`;
+                                                }).join('')}
                                             </select>
                                         </div>
                                     </div>
@@ -912,35 +2143,9 @@
         }
 
         // Действия с пользователями
-        async function banUser(id, nickname) {
-            const reason = prompt(`Причина блокировки пользователя ${nickname}:`);
-            if (!reason) return;
-            
-            const token = localStorage.getItem('auth_token');
-            
-            try {
-                const response = await fetch(`/api/admin/users/${id}/ban`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ reason })
-                });
-                
-                if (response.ok) {
-                    loadUsers();
-                    loadDashboard();
-                } else {
-                    const error = await response.json();
-                    alert('Ошибка: ' + error.error);
-                }
-            } catch (error) {
-                console.error('Ошибка блокировки пользователя:', error);
-                alert('Ошибка соединения с сервером');
-            }
-        }
-
+        // Эта функция использует готовые модальные окна, определенные в HTML
+        // Старая функция banUser удалена и заменена на правильную
+        
         async function unbanUser(id, nickname) {
             if (!confirm(`Разблокировать пользователя ${nickname}?`)) return;
             
@@ -966,7 +2171,18 @@
         }
 
         async function changeTrustLevel(id, level) {
-            const reason = prompt(`Причина изменения Trust Level на ${level}:`);
+            const levelNames = {
+                0: '🚶 Проходимец',
+                1: '👤 Новичок', 
+                2: '✅ Проверенный',
+                3: '🏆 Ветеран'
+            };
+            
+            const levelName = levelNames[level] || 'Неизвестный уровень';
+            const reason = prompt(`Причина изменения Trust Level на "${levelName}" (${level}):`);
+            
+            if (!reason) return; // Отменено пользователем
+            
             const token = localStorage.getItem('auth_token');
             
             try {
@@ -980,163 +2196,21 @@
                 });
                 
                 if (response.ok) {
+                    const result = await response.json();
+                    showMessage(result.message || 'Trust Level успешно изменен', 'success');
                     loadUsers();
+                    loadDashboard(); // Обновляем статистику
                 } else {
                     const error = await response.json();
-                    alert('Ошибка: ' + error.error);
+                    showMessage('Ошибка: ' + error.error, 'error');
                 }
             } catch (error) {
                 console.error('Ошибка изменения Trust Level:', error);
-                alert('Ошибка соединения с сервером');
+                showMessage('Ошибка соединения с сервером', 'error');
             }
         }
 
         // Функция просмотра подробной информации о пользователе
-        async function showUserDetails(userId) {
-            const token = localStorage.getItem('auth_token');
-            
-            try {
-                const response = await fetch(`/api/admin/users/${userId}/details`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                
-                if (response.ok) {
-                    const user = await response.json();
-                    
-                    const modal = document.createElement('div');
-                    modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
-                    modal.innerHTML = `
-                        <div class="glass-effect rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-xl font-bold text-white">Подробная информация о пользователе</h3>
-                                <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
-                            </div>
-                            <div class="space-y-4">
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <span class="text-gray-300 font-medium">Никнейм:</span>
-                                        <p class="text-white">${user.nickname}</p>
-                                    </div>
-                                    <div>
-                                        <span class="text-gray-300 font-medium">Email:</span>
-                                        <p class="text-white">${user.email}</p>
-                                    </div>
-                                    <div>
-                                        <span class="text-gray-300 font-medium">Роль:</span>
-                                        <p class="text-minecraft-gold">${user.role === 'admin' ? 'Администратор' : user.role === 'moderator' ? 'Модератор' : 'Пользователь'}</p>
-                                    </div>
-                                    <div>
-                                        <span class="text-gray-300 font-medium">Trust Level:</span>
-                                        <p class="text-minecraft-yellow">${user.trust_level}</p>
-                                    </div>
-                                    <div>
-                                        <span class="text-gray-300 font-medium">Время в игре:</span>
-                                        <p class="text-white">${Math.floor((user.total_minutes || 0) / 60)} ч ${(user.total_minutes || 0) % 60} мин</p>
-                                    </div>
-                                    <div>
-                                        <span class="text-gray-300 font-medium">Дата регистрации:</span>
-                                        <p class="text-white">${new Date(user.created_at).toLocaleDateString('ru-RU')}</p>
-                                    </div>
-                                    <div>
-                                        <span class="text-gray-300 font-medium">Статус:</span>
-                                        <p class="${user.is_banned ? 'text-red-400' : 'text-green-400'}">${user.is_banned ? 'Заблокирован' : 'Активен'}</p>
-                                    </div>
-                                    <div>
-                                        <span class="text-gray-300 font-medium">Последний вход:</span>
-                                        <p class="text-white">${user.last_login ? new Date(user.last_login).toLocaleString('ru-RU') : 'Никогда'}</p>
-                                    </div>
-                                </div>
-                                ${user.is_banned && user.ban_reason ? `
-                                    <div>
-                                        <span class="text-gray-300 font-medium">Причина блокировки:</span>
-                                        <p class="text-red-400">${user.ban_reason}</p>
-                                    </div>
-                                ` : ''}
-                                ${user.discord_id ? `
-                                    <div>
-                                        <span class="text-gray-300 font-medium">Discord ID:</span>
-                                        <p class="text-purple-400">${user.discord_id}</p>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                    `;
-                    document.body.appendChild(modal);
-                } else {
-                    alert('Ошибка загрузки данных пользователя');
-                }
-            } catch (error) {
-                console.error('Ошибка загрузки пользователя:', error);
-                alert('Ошибка соединения с сервером');
-            }
-        }
-
-        // Функция изменения роли пользователя
-        async function changeUserRole(userId, nickname) {
-            const roles = [
-                { value: 'user', label: 'Пользователь' },
-                { value: 'moderator', label: 'Модератор' },
-                { value: 'admin', label: 'Администратор' }
-            ];
-            
-            const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
-            modal.innerHTML = `
-                <div class="glass-effect rounded-xl p-6 max-w-md w-full mx-4">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-xl font-bold text-white">Изменить роль</h3>
-                        <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
-                    </div>
-                    <p class="text-gray-300 mb-4">Изменить роль пользователя <strong class="text-minecraft-gold">${nickname}</strong>?</p>
-                    <div class="space-y-3">
-                        <label class="text-gray-300 font-medium">Выберите новую роль:</label>
-                        <select id="role-select" class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white">
-                            ${roles.map(role => `<option value="${role.value}">${role.label}</option>`).join('')}
-                        </select>
-                        <div class="flex space-x-3 mt-4">
-                            <button onclick="updateUserRole(${userId})" class="btn-minecraft flex-1 py-2 rounded-lg">
-                                Изменить роль
-                            </button>
-                            <button onclick="this.closest('.fixed').remove()" class="bg-gray-600 text-white flex-1 py-2 rounded-lg hover:bg-gray-700">
-                                Отмена
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        // Функция обновления роли пользователя
-        async function updateUserRole(userId) {
-            const roleSelect = document.getElementById('role-select');
-            const newRole = roleSelect.value;
-            const token = localStorage.getItem('auth_token');
-            
-            try {
-                const response = await fetch(`/api/admin/users/${userId}/role`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ role: newRole })
-                });
-                
-                if (response.ok) {
-                    showMessage('Роль пользователя успешно изменена!', 'success');
-                    loadUsers();
-                    document.querySelector('.fixed').remove();
-                } else {
-                    const error = await response.json();
-                    alert('Ошибка: ' + error.error);
-                }
-            } catch (error) {
-                console.error('Ошибка изменения роли:', error);
-                alert('Ошибка соединения с сервером');
-            }
-        }
-
         // Утилиты
         function getStatusBadge(status) {
             const badges = {
@@ -1194,6 +2268,112 @@
                 clearTimeout(timeout);
                 timeout = setTimeout(later, wait);
             };
+        }
+
+        // Недостающие функции для Trust Level и других операций
+        async function loadTrustLevels() {
+            const token = localStorage.getItem('auth_token');
+            const statsElement = document.getElementById('trust-level-stats');
+            
+            if (statsElement) {
+                statsElement.innerHTML = '<div class="text-center py-4"><i class="fas fa-spinner fa-spin text-minecraft-gold"></i><p class="text-gray-300 mt-2">Загрузка статистики...</p></div>';
+                
+                try {
+                    const response = await fetch('/api/admin/trust-levels/stats', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        statsElement.innerHTML = `
+                            <div class="space-y-3 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-300">🚶 Проходимец (0):</span>
+                                    <span class="text-white font-bold">${data.level0 || 0} пользователей</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-300">👤 Новичок (1):</span>
+                                    <span class="text-white font-bold">${data.level1 || 0} пользователей</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-300">✅ Проверенный (2):</span>
+                                    <span class="text-white font-bold">${data.level2 || 0} пользователей</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-300">🏆 Ветеран (3):</span>
+                                    <span class="text-white font-bold">${data.level3 || 0} пользователей</span>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        statsElement.innerHTML = '<div class="text-center py-4 text-red-400">Ошибка загрузки статистики</div>';
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки статистики Trust Level:', error);
+                    statsElement.innerHTML = '<div class="text-center py-4 text-red-400">Ошибка соединения</div>';
+                }
+            }
+            
+            loadTrustApplications();
+        }
+
+        async function loadTrustApplications() {
+            const token = localStorage.getItem('auth_token');
+            const status = document.getElementById('trust-app-status-filter')?.value || 'all';
+            const appsList = document.getElementById('trust-applications-list');
+            
+            if (appsList) {
+                appsList.innerHTML = '<div class="text-center py-8"><i class="fas fa-spinner fa-spin text-2xl text-minecraft-gold mb-2"></i><p class="text-gray-300">Загрузка заявок...</p></div>';
+                
+                try {
+                    const response = await fetch(`/api/admin/trust-applications?status=${status}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.applications && data.applications.length > 0) {
+                            appsList.innerHTML = data.applications.map(app => `
+                                <div class="glass-effect rounded-lg p-6">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <div>
+                                            <h4 class="font-semibold text-white">${app.nickname}</h4>
+                                            <p class="text-sm text-gray-300">Заявка на ${app.requested_level} уровень</p>
+                                            <p class="text-xs text-gray-500">${new Date(app.submitted_at).toLocaleString('ru-RU')}</p>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <span class="px-2 py-1 text-xs font-medium rounded ${getStatusBadge(app.status)}">${getStatusText(app.status)}</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-sm text-gray-300">
+                                        <p><strong>Обоснование:</strong> ${app.reason}</p>
+                                    </div>
+                                </div>
+                            `).join('');
+                        } else {
+                            appsList.innerHTML = '<div class="text-center py-8 text-gray-500">Заявок не найдено</div>';
+                        }
+                    } else {
+                        appsList.innerHTML = '<div class="text-center py-8 text-red-500">Ошибка загрузки заявок</div>';
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки заявок Trust Level:', error);
+                    appsList.innerHTML = '<div class="text-center py-8 text-red-500">Ошибка соединения</div>';
+                }
+            }
+        }
+
+        function showTestResult(type, message) {
+            const resultDiv = document.getElementById('test-results');
+            const outputDiv = document.getElementById('test-output');
+            
+            if (resultDiv && outputDiv) {
+                resultDiv.classList.remove('hidden');
+                outputDiv.textContent = message;
+                outputDiv.className = `text-sm font-mono whitespace-pre-wrap ${
+                    type === 'success' ? 'text-green-400' : 'text-red-400'
+                }`;
+            }
         }
 
         // Функции тестирования
@@ -1301,10 +2481,19 @@
                 try {
                     // Собираем все настройки из формы
                     const settings = {
-                        serverName: document.getElementById('server-name')?.value,
-                        description: document.getElementById('server-description')?.value,
-                        serverIp: document.getElementById('server-ip')?.value,
-                        serverPort: document.getElementById('server-port')?.value,
+                        server: {
+                            name: document.getElementById('server-name')?.value,
+                            description: document.getElementById('server-description')?.value,
+                            ip: document.getElementById('server-ip')?.value,
+                            port: document.getElementById('server-port')?.value,
+                            discord: document.getElementById('discord-invite')?.value,
+                            telegram: document.getElementById('telegram-invite')?.value
+                        },
+                        applications: {
+                            minMotivationLength: parseInt(document.getElementById('min-motivation-length')?.value) || 50,
+                            minPlansLength: parseInt(document.getElementById('min-plans-length')?.value) || 30,
+                            maxApplicationsPerDay: parseInt(document.getElementById('max-applications-per-day')?.value) || 3,
+                        }
                     };
                     
                     const token = localStorage.getItem('auth_token');
@@ -1314,7 +2503,7 @@
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${token}`
                         },
-                        body: JSON.stringify(settings)
+                        body: JSON.stringify({ settings })
                     });
                     
                     const result = await response.json();
@@ -1352,6 +2541,839 @@
                     document.body.removeChild(message);
                 }, 300);
             }, 3000);
+        }
+
+        // Функции для управления траст левелами
+        async function loadTrustLevels() {
+            await loadTrustLevelStats();
+            await loadTrustApplications();
+        }
+
+        async function loadTrustLevelStats() {
+            const token = localStorage.getItem('auth_token');
+            const statsDiv = document.getElementById('trust-level-stats');
+            
+            try {
+                const response = await fetch('/api/admin/stats', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const trustLevels = data.trust_levels || [];
+                    
+                    // Создаем объект с количеством пользователей по уровням
+                    const levelCounts = { 0: 0, 1: 0, 2: 0, 3: 0 };
+                    trustLevels.forEach(level => {
+                        levelCounts[level.trust_level] = level.user_count;
+                    });
+                    
+                    statsDiv.innerHTML = `
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-300">🚶 Проходимцы:</span>
+                                <span class="text-white font-medium">${levelCounts[0]} пользователей</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-300">👤 Новички:</span>
+                                <span class="text-white font-medium">${levelCounts[1]} пользователей</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-300">✅ Проверенные:</span>
+                                <span class="text-white font-medium">${levelCounts[2]} пользователей</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-300">🏆 Ветераны:</span>
+                                <span class="text-white font-medium">${levelCounts[3]} пользователей</span>
+                            </div>
+                            ${data.trust_applications ? `
+                                <hr class="border-minecraft-gold/20 my-3">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-300">📝 Заявки на рассмотрении:</span>
+                                    <span class="text-minecraft-gold font-medium">${data.trust_applications.pending || 0}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки статистики траст левелов:', error);
+                statsDiv.innerHTML = '<div class="text-red-500 text-center">Ошибка загрузки статистики</div>';
+            }
+        }
+
+        async function loadTrustApplications() {
+            const token = localStorage.getItem('auth_token');
+            const status = document.getElementById('trust-app-status-filter').value;
+            const appsList = document.getElementById('trust-applications-list');
+            
+            appsList.innerHTML = '<div class="text-center py-8"><i class="fas fa-spinner fa-spin text-2xl text-minecraft-gold mb-2"></i><p class="text-gray-300">Загрузка заявок...</p></div>';
+            
+            try {
+                const params = new URLSearchParams({ status, limit: 20 });
+                const response = await fetch(`/api/trust-level/applications?${params}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (data.applications && data.applications.length > 0) {
+                        appsList.innerHTML = data.applications.map(app => `
+                            <div class="glass-effect border border-gray-200 rounded-lg p-6">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <h4 class="font-semibold text-white">${app.nickname}</h4>
+                                        <p class="text-sm text-gray-300">
+                                            Повышение с уровня ${app.current_level} до ${app.requested_level}
+                                        </p>
+                                        <p class="text-xs text-gray-500">${new Date(app.created_at).toLocaleString('ru-RU')}</p>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="px-2 py-1 text-xs font-medium rounded ${getTrustStatusBadge(app.status)}">${getTrustStatusText(app.status)}</span>
+                                        ${app.status === 'pending' ? `
+                                            <button data-action="approve-trust-app" data-app-id="${app.id}" class="px-3 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600">
+                                                Одобрить
+                                            </button>
+                                            <button data-action="reject-trust-app" data-app-id="${app.id}" class="px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600">
+                                                Отклонить
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                                <div class="grid md:grid-cols-3 gap-4 text-sm mb-4">
+                                    <div>
+                                        <strong>Время игры:</strong> ${Math.floor(app.hours_played || 0)} часов<br>
+                                        <strong>Репутация:</strong> ${app.current_reputation || app.reputation_score || 0}
+                                    </div>
+                                    <div>
+                                        <strong>Почта:</strong> ${app.email_verified ? '✅ Подтверждена' : '❌ Не подтверждена'}<br>
+                                        <strong>Требуемый уровень:</strong> ${getTrustLevelName(app.requested_level)}
+                                    </div>
+                                    <div>
+                                        ${app.reviewer_nickname ? `<strong>Рассмотрел:</strong> ${app.reviewer_nickname}<br>` : ''}
+                                        ${app.reviewed_at ? `<strong>Дата:</strong> ${new Date(app.reviewed_at).toLocaleString('ru-RU')}` : ''}
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <details class="text-sm">
+                                        <summary class="cursor-pointer text-minecraft-gold font-medium">Обоснование заявки</summary>
+                                        <div class="mt-2 text-gray-300">
+                                            ${app.reason}
+                                            ${app.review_comment ? `<div class="mt-2 p-3 bg-minecraft-gray rounded border-l-4 border-minecraft-gold"><strong>Комментарий администратора:</strong> ${app.review_comment}</div>` : ''}
+                                        </div>
+                                    </details>
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        appsList.innerHTML = '<div class="text-center py-8 text-gray-500">Заявок на повышение не найдено</div>';
+                    }
+                } else {
+                    appsList.innerHTML = '<div class="text-center py-8 text-red-500">Ошибка загрузки заявок</div>';
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки заявок на траст левел:', error);
+                appsList.innerHTML = '<div class="text-center py-8 text-red-500">Ошибка соединения</div>';
+            }
+        }
+
+        async function reviewTrustApplication(id, status) {
+            const comment = status === 'rejected' ? prompt('Причина отклонения (необязательно):') : prompt('Комментарий (необязательно):');
+            const token = localStorage.getItem('auth_token');
+            
+            try {
+                const response = await fetch(`/api/trust-level/applications/${id}/review`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ status, comment })
+                });
+                
+                if (response.ok) {
+                    showMessage(`Заявка ${status === 'approved' ? 'одобрена' : 'отклонена'}`, 'success');
+                    loadTrustApplications();
+                    loadTrustLevelStats();
+                    loadDashboard(); // Обновляем общую статистику
+                } else {
+                    const error = await response.json();
+                    showMessage('Ошибка: ' + error.error, 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка рассмотрения заявки:', error);
+                showMessage('Ошибка соединения с сервером', 'error');
+            }
+        }
+
+        function getTrustStatusBadge(status) {
+            const badges = {
+                'pending': 'bg-yellow-100 text-yellow-800',
+                'approved': 'bg-green-100 text-green-800',
+                'rejected': 'bg-red-100 text-red-800'
+            };
+            return badges[status] || 'bg-gray-100 text-gray-800';
+        }
+
+        function getTrustStatusText(status) {
+            const texts = {
+                'pending': 'На рассмотрении',
+                'approved': 'Одобрена',
+                'rejected': 'Отклонена'
+            };
+            return texts[status] || 'Неизвестно';
+        }
+
+        function getTrustLevelName(level) {
+            const names = {
+                0: '🚶 Проходимец',
+                1: '👤 Новичок', 
+                2: '✅ Проверенный',
+                3: '🏆 Ветеран'
+            };
+            return names[level] || 'Неизвестный уровень';
+        }
+
+        function getTrustLevelDisplayName(level) {
+            const names = {
+                0: '🚶 Проходимец (Уровень 0)',
+                1: '👤 Новичок (Уровень 1)', 
+                2: '✅ Проверенный (Уровень 2)',
+                3: '🏆 Ветеран (Уровень 3)'
+            };
+            return names[level] || `Неизвестный уровень (${level})`;
+        }
+
+        
+        // Функция сохранения настроек
+        async function saveSettings() {
+            const token = localStorage.getItem('auth_token');
+            const saveBtn = document.getElementById('save-settings-btn');
+            
+            // Показываем индикатор загрузки
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Сохранение...';
+            saveBtn.disabled = true;
+            
+            try {
+                // Собираем все настройки из формы
+                const settingsData = {
+                    // Основные настройки
+                    serverName: document.getElementById('server-name').value,
+                    serverDescription: document.getElementById('server-description').value,
+                    serverIp: document.getElementById('server-ip').value,
+                    serverPort: document.getElementById('server-port').value,
+                    discordInvite: document.getElementById('discord-invite').value,
+                    telegramInvite: document.getElementById('telegram-invite').value,
+                    
+                    // Настройки заявок
+                    applicationsEnabled: document.getElementById('applications-enabled').checked,
+                    minMotivationLength: parseInt(document.getElementById('min-motivation-length').value),
+                    minPlansLength: parseInt(document.getElementById('min-plans-length').value),
+                    maxApplicationsPerDay: parseInt(document.getElementById('max-applications-per-day').value),
+                    autoApproveTrustLevel: parseInt(document.getElementById('auto-approve-trust-level').value),
+                    
+                    // Trust Level настройки
+                    trustPointsEmail: parseInt(document.getElementById('trust-points-email').value),
+                    trustPointsDiscord: parseInt(document.getElementById('trust-points-discord').value),
+                    trustPointsHour: parseInt(document.getElementById('trust-points-hour').value),
+                    trustLevel1Required: parseInt(document.getElementById('trust-level-1-required').value),
+                    trustLevel2Required: parseInt(document.getElementById('trust-level-2-required').value),
+                    trustLevel3Required: parseInt(document.getElementById('trust-level-3-required').value),
+                    
+                    // Настройки безопасности
+                    maxLoginAttempts: parseInt(document.getElementById('max-login-attempts').value),
+                    loginLockoutDuration: parseInt(document.getElementById('login-lockout-duration').value),
+                    jwtExpiresDays: parseInt(document.getElementById('jwt-expires-days').value),
+                    requireEmailVerification: document.getElementById('require-email-verification').value === 'true',
+                    twoFactorEnabled: document.getElementById('two-factor-enabled').checked,
+                    rateLimitRequests: parseInt(document.getElementById('rate-limit-requests').value),
+                    
+                    // Email настройки
+                    smtpHost: document.getElementById('smtp-host').value,
+                    smtpPort: parseInt(document.getElementById('smtp-port').value),
+                    smtpFrom: document.getElementById('smtp-from').value,
+                    smtpUser: document.getElementById('smtp-user').value,
+                    smtpPassword: document.getElementById('smtp-password').value,
+                    smtpTls: document.getElementById('smtp-tls').checked
+                };
+                
+                const response = await fetch('/api/admin/settings', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(settingsData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    // Обновляем глобальные настройки
+                    serverSettings.name = settingsData.serverName;
+                    serverSettings.description = settingsData.serverDescription;
+                    serverSettings.ip = settingsData.serverIp;
+                    serverSettings.port = settingsData.serverPort;
+                    serverSettings.discordInvite = settingsData.discordInvite;
+                    serverSettings.telegramInvite = settingsData.telegramInvite;
+                    
+                    // Обновляем элементы на странице
+                    updateServerElements();
+                    
+                    showMessage(result.message || 'Настройки успешно сохранены!', 'success');
+                } else {
+                    const errorData = await response.json();
+                    showMessage('Ошибка сохранения: ' + (errorData.error || 'Неизвестная ошибка'), 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка сохранения настроек:', error);
+                showMessage('Ошибка соединения с сервером', 'error');
+            } finally {
+                // Восстанавливаем кнопку
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
+            }
+        }
+
+        // Функция тестирования настроек
+        async function testSettings() {
+            const btn = document.getElementById('test-settings-btn');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Тестирую...';
+            btn.disabled = true;
+            
+            try {
+                const token = localStorage.getItem('auth_token');
+                
+                // Тестируем email настройки
+                const emailData = {
+                    host: document.getElementById('smtp-host').value,
+                    port: parseInt(document.getElementById('smtp-port').value),
+                    user: document.getElementById('smtp-user').value,
+                    from: document.getElementById('smtp-from').value,
+                    tls: document.getElementById('smtp-tls').checked
+                };
+                
+                if (emailData.host && emailData.user && emailData.from) {
+                    const emailResponse = await fetch('/api/admin/test-email-settings', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(emailData)
+                    });
+                    
+                    const emailResult = await emailResponse.json();
+                    if (emailResponse.ok) {
+                        showMessage('Email настройки: ✅ ' + emailResult.message, 'success');
+                    } else {
+                        showMessage('Email настройки: ❌ ' + emailResult.error, 'error');
+                    }
+                } else {
+                    showMessage('Email настройки: ⚠️ Заполните все обязательные поля', 'error');
+                }
+                
+                // Тестируем соединение с базой данных
+                const dbResponse = await fetch('/api/admin/test-database', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const dbResult = await dbResponse.json();
+                if (dbResponse.ok) {
+                    showMessage('База данных: ✅ ' + dbResult.message, 'success');
+                } else {
+                    showMessage('База данных: ❌ ' + dbResult.error, 'error');
+                }
+                
+                // Тестируем Discord webhook (если указан)
+                const discordInvite = document.getElementById('discord-invite').value;
+                if (discordInvite && discordInvite.includes('discord.gg/')) {
+                    showMessage('Discord: ✅ Ссылка-приглашение корректна', 'success');
+                } else if (discordInvite) {
+                    showMessage('Discord: ⚠️ Проверьте формат ссылки-приглашения', 'error');
+                }
+                
+                // Тестируем Telegram (если указан)
+                const telegramInvite = document.getElementById('telegram-invite').value;
+                if (telegramInvite && telegramInvite.includes('t.me/')) {
+                    showMessage('Telegram: ✅ Ссылка корректна', 'success');
+                } else if (telegramInvite) {
+                    showMessage('Telegram: ⚠️ Проверьте формат ссылки', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Ошибка тестирования настроек:', error);
+                showMessage('Ошибка соединения при тестировании', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Функция сброса настроек к умолчанию
+        async function resetSettings() {
+            if (!confirm('Вы уверены, что хотите сбросить все настройки к значениям по умолчанию?')) {
+                return;
+            }
+            
+            const btn = document.getElementById('reset-settings-btn');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Сброс...';
+            btn.disabled = true;
+            
+            try {
+                // Устанавливаем значения по умолчанию
+                const defaultSettings = {
+                    // Основные настройки
+                    'server-name': 'Test',
+                    'server-description': 'Приватный Minecraft сервер с дружелюбным сообществом',
+                    'server-ip': 'play.chiwawa.site',
+                    'server-port': '25565',
+                    'discord-invite': 'https://discord.gg/chiwawa',
+                    'telegram-invite': 'https://t.me/chiwawa',
+                    
+                    // Настройки заявок
+                    'min-motivation-length': '50',
+                    'min-plans-length': '30',
+                    'max-applications-per-day': '3',
+                    'auto-approve-trust-level': '0',
+                    
+                    // Trust Level
+                    'trust-points-email': '10',
+                    'trust-points-discord': '15',
+                    'trust-points-hour': '1',
+                    'trust-level-1-required': '25',
+                    'trust-level-2-required': '100',
+                    'trust-level-3-required': '500',
+                    
+                    // Безопасность
+                    'max-login-attempts': '5',
+                    'login-lockout-duration': '15',
+                    'jwt-expires-days': '7',
+                    'rate-limit-requests': '100',
+                    
+                    // Email
+                    'smtp-host': '',
+                    'smtp-port': '587',
+                    'smtp-from': '',
+                    'smtp-user': '',
+                    'smtp-password': ''
+                };
+                
+                const defaultCheckboxes = {
+                    'applications-enabled': true,
+                    'two-factor-enabled': false,
+                    'smtp-tls': true
+                };
+                
+                const defaultSelects = {
+                    'require-email-verification': 'true'
+                };
+                
+                // Применяем настройки по умолчанию
+                Object.entries(defaultSettings).forEach(([id, value]) => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.value = value;
+                    }
+                });
+                
+                Object.entries(defaultCheckboxes).forEach(([id, checked]) => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.checked = checked;
+                    }
+                });
+                
+                Object.entries(defaultSelects).forEach(([id, value]) => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.value = value;
+                    }
+                });
+                
+                showMessage('Настройки сброшены к значениям по умолчанию', 'success');
+                
+            } catch (error) {
+                console.error('Ошибка сброса настроек:', error);
+                showMessage('Ошибка сброса настроек', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Функция показа сообщений
+        function showMessage(text, type) {
+            // Создаем элемент сообщения если его нет
+            let messageElement = document.getElementById('global-message');
+            if (!messageElement) {
+                messageElement = document.createElement('div');
+                messageElement.id = 'global-message';
+                messageElement.className = 'fixed top-4 right-4 z-50 px-6 py-4 rounded-lg font-medium';
+                document.body.appendChild(messageElement);
+            }
+            
+            messageElement.textContent = text;
+            messageElement.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg font-medium ${
+                type === 'success' ? 
+                'bg-green-900/90 text-green-300 border border-green-500/50' : 
+                'bg-red-900/90 text-red-300 border border-red-500/50'
+            }`;
+            
+            messageElement.style.display = 'block';
+            
+            setTimeout(() => {
+                messageElement.style.display = 'none';
+            }, 3000);
+        }
+
+        // Функция загрузки настроек
+        async function loadSettings() {
+            const token = localStorage.getItem('auth_token');
+            
+            try {
+                const response = await fetch('/api/admin/settings', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const settings = data.settings || {};
+                    
+                    // Основные настройки сервера
+                    document.getElementById('server-name').value = settings.serverName || serverSettings.name || 'Test';
+                    document.getElementById('server-description').value = settings.serverDescription || serverSettings.description || '';
+                    document.getElementById('server-ip').value = settings.serverIp || serverSettings.ip || '';
+                    document.getElementById('server-port').value = settings.serverPort || serverSettings.port || '25565';
+                    document.getElementById('discord-invite').value = settings.discordInvite || serverSettings.discordInvite || '';
+                    document.getElementById('telegram-invite').value = settings.telegramInvite || serverSettings.telegramInvite || '';
+                    
+                    // Настройки заявок
+                    document.getElementById('min-motivation-length').value = settings.minMotivationLength || 50;
+                    document.getElementById('min-plans-length').value = settings.minPlansLength || 30;
+                    document.getElementById('max-applications-per-day').value = settings.maxApplicationsPerDay || 3;
+                    
+                    // Настройки Trust Level
+                    const trustInputs = [
+                        'trust-points-email',
+                        'trust-points-discord', 
+                        'trust-points-hour',
+                        'trust-level-1-required',
+                        'trust-level-2-required',
+                        'trust-level-3-required'
+                    ];
+                    
+                    trustInputs.forEach(id => {
+                        const element = document.getElementById(id);
+                        if (element) {
+                            const settingKey = id.replace(/-/g, '_');
+                            element.value = settings[settingKey] || element.value;
+                        }
+                    });
+                    
+                    // Настройки безопасности
+                    const securityInputs = [
+                        'max-login-attempts',
+                        'login-lockout-duration',
+                        'jwt-expires-days',
+                        'rate-limit-requests'
+                    ];
+                    
+                    securityInputs.forEach(id => {
+                        const element = document.getElementById(id);
+                        if (element) {
+                            const settingKey = id.replace(/-/g, '_');
+                            element.value = settings[settingKey] || element.value;
+                        }
+                    });
+                    
+                    // Email настройки
+                    const emailInputs = [
+                        'smtp-host',
+                        'smtp-port',
+                        'smtp-from',
+                        'smtp-user',
+                        'smtp-password'
+                    ];
+                    
+                    emailInputs.forEach(id => {
+                        const element = document.getElementById(id);
+                        if (element) {
+                            const settingKey = id.replace(/-/g, '_');
+                            element.value = settings[settingKey] || element.value;
+                        }
+                    });
+                    
+                    // Переключатели (checkboxes)
+                    const applicationToggle = document.getElementById('applications-enabled');
+                    if (applicationToggle) {
+                        applicationToggle.checked = settings.applicationsEnabled !== false;
+                    }
+                    
+                    const twoFactorToggle = document.getElementById('two-factor-enabled');
+                    if (twoFactorToggle) {
+                        twoFactorToggle.checked = settings.twoFactorEnabled === true;
+                    }
+                    
+                    const smtpTlsToggle = document.getElementById('smtp-tls');
+                    if (smtpTlsToggle) {
+                        smtpTlsToggle.checked = settings.smtpTls !== false;
+                    }
+                    
+                    // Select поля
+                    const emailVerificationSelect = document.getElementById('require-email-verification');
+                    if (emailVerificationSelect) {
+                        emailVerificationSelect.value = settings.requireEmailVerification !== false ? 'true' : 'false';
+                    }
+                    
+                    const autoApproveSelect = document.getElementById('auto-approve-trust-level');
+                    if (autoApproveSelect) {
+                        autoApproveSelect.value = settings.autoApproveTrustLevel || '0';
+                    }
+                    
+                    console.log('Настройки успешно загружены:', settings);
+                } else {
+                    console.error('Ошибка загрузки настроек:', response.status);
+                    showMessage('Ошибка загрузки настроек', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки настроек:', error);
+                showMessage('Ошибка соединения при загрузке настроек', 'error');
+            }
+        }
+
+        async function changeTrustLevel(userId, newLevel) {
+            const levelNames = {
+                0: '🚶 Проходимец',
+                1: '👤 Новичок', 
+                2: '✅ Проверенный',
+                3: '🏆 Ветеран'
+            };
+            
+            const levelName = levelNames[newLevel] || 'Неизвестный уровень';
+            const reason = prompt(`Причина изменения Trust Level на "${levelName}" (${newLevel}):`);
+            
+            if (!reason) return; // Отменено пользователем
+            
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch(`/api/admin/users/${userId}/trust-level`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ level: parseInt(newLevel), reason: reason })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showMessage(result.message || 'Trust Level успешно изменен', 'success');
+                    loadUsers();
+                    loadDashboard();
+                } else {
+                    const error = await response.json();
+                    showMessage('Ошибка: ' + error.error, 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка изменения траст левела:', error);
+                showMessage('Ошибка соединения с сервером', 'error');
+            }
+        }
+
+        async function changeUserRoleSelect(userId, nickname, newRole) {
+            if (!confirm(`Изменить роль пользователя ${nickname} на ${getRoleText(newRole)}?`)) {
+                // Если отменили, возвращаем старое значение
+                loadUsers();
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch(`/api/admin/users/${userId}/role`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        role: newRole,
+                        reason: `Изменение роли через админ панель`
+                    })
+                });
+                
+                if (response.ok) {
+                    loadUsers();
+                    loadDashboard();
+                } else {
+                    const error = await response.json();
+                    alert('Ошибка: ' + error.error);
+                    loadUsers(); // Возвращаем старое значение
+                }
+            } catch (error) {
+                console.error('Ошибка изменения роли:', error);
+                alert('Ошибка соединения с сервером');
+                loadUsers(); // Возвращаем старое значение
+            }
+        }
+
+        async function unbanUser(userId, nickname) {
+            if (confirm(`Разблокировать пользователя ${nickname}?`)) {
+                try {
+                    const token = localStorage.getItem('auth_token');
+                    const response = await fetch(`/api/admin/users/${userId}/unban`, {
+                        method: 'PUT',
+                        headers: { 
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        loadUsers();
+                        loadDashboard();
+                    } else {
+                        const error = await response.json();
+                        alert('Ошибка: ' + error.error);
+                    }
+                } catch (error) {
+                    console.error('Ошибка разблокировки:', error);
+                    alert('Ошибка соединения с сервером');
+                }
+            }
+        }
+
+        async function reviewTrustApplication(id, status) {
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch(`/api/trust-level/applications/${id}/review`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        decision: status,
+                        comment: status === 'approved' ? 'Одобрено' : 'Отклонено'
+                    })
+                });
+                
+                if (response.ok) {
+                    loadTrustApplications();
+                    loadTrustLevelStats();
+                } else {
+                    const error = await response.json();
+                    alert('Ошибка: ' + error.error);
+                }
+            } catch (error) {
+                console.error('Ошибка рассмотрения заявки:', error);
+                alert('Ошибка соединения с сервером');
+            }
+        }
+
+        async function updateUserRole(userId) {
+            // Функция для обновления роли пользователя
+            console.log('Обновить роль пользователя:', userId);
+        }
+
+        // Функции для системных утилит
+        async function testEmail() {
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch('/api/admin/test/email', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const result = await response.json();
+                showTestResult(result.success ? 'Email тест прошел успешно' : 'Email тест не удался');
+            } catch (error) {
+                showTestResult('Ошибка теста email: ' + error.message);
+            }
+        }
+
+        async function testDatabase() {
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch('/api/admin/test/database', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const result = await response.json();
+                showTestResult(result.success ? 'База данных работает корректно' : 'Проблемы с базой данных');
+            } catch (error) {
+                showTestResult('Ошибка теста БД: ' + error.message);
+            }
+        }
+
+        async function clearCache() {
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch('/api/admin/cache/clear', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const result = await response.json();
+                showTestResult(result.success ? 'Кеш очищен успешно' : 'Ошибка очистки кеша');
+            } catch (error) {
+                showTestResult('Ошибка очистки кеша: ' + error.message);
+            }
+        }
+
+        function showTestResult(message) {
+            const testResults = document.getElementById('test-results');
+            const testOutput = document.getElementById('test-output');
+            
+            if (testResults && testOutput) {
+                testOutput.textContent = message;
+                testResults.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    testResults.classList.add('hidden');
+                }, 5000);
+            }
+        }
+
+        async function saveSettings() {
+            try {
+                const token = localStorage.getItem('auth_token');
+                const settings = {
+                    serverName: document.getElementById('server-name').value,
+                    serverDescription: document.getElementById('server-description').value,
+                    serverIp: document.getElementById('server-ip').value,
+                    serverPort: document.getElementById('server-port').value,
+                    discordInvite: document.getElementById('discord-invite').value,
+                    telegramInvite: document.getElementById('telegram-invite').value
+                };
+                
+                const response = await fetch('/api/admin/settings', {
+                    method: 'PUT',
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(settings)
+                });
+                
+                if (response.ok) {
+                    alert('Настройки сохранены успешно');
+                    await loadServerSettings();
+                } else {
+                    const error = await response.json();
+                    alert('Ошибка: ' + error.error);
+                }
+            } catch (error) {
+                console.error('Ошибка сохранения настроек:', error);
+                alert('Ошибка соединения с сервером');
+            }
         }
     </script>
 </body>
