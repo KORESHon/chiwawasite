@@ -632,19 +632,30 @@ router.get('/logs', authenticateToken, requireRole(['admin', 'moderator']), asyn
         const offset = (page - 1) * limit;
 
         let whereClause = '';
-        let queryParams = [limit, offset];
-        let paramCount = 2;
+        let selectParams = [limit, offset];
+        let countParams = [];
 
         if (action !== 'all') {
-            paramCount++;
-            whereClause += ` WHERE a.action = $${paramCount}`;
-            queryParams.push(action);
+            if (action === 'user_moderation') {
+                // Группируем блокировки, разблокировки и удаления
+                whereClause += ` WHERE al.action IN ($${selectParams.length + 1}, $${selectParams.length + 2}, $${selectParams.length + 3})`;
+                selectParams.push('user_banned', 'user_unbanned', 'user_deleted');
+                countParams.push('user_banned', 'user_unbanned', 'user_deleted');
+            } else {
+                whereClause += ` WHERE al.action = $${selectParams.length + 1}`;
+                selectParams.push(action);
+                countParams.push(action);
+            }
         }
 
         if (user_id) {
-            paramCount++;
-            whereClause += ` ${whereClause ? 'AND' : 'WHERE'} a.user_id = $${paramCount}`;
-            queryParams.push(user_id);
+            if (whereClause) {
+                whereClause += ` AND al.target_user_id = $${selectParams.length + 1}`;
+            } else {
+                whereClause += ` WHERE al.target_user_id = $${selectParams.length + 1}`;
+            }
+            selectParams.push(user_id);
+            countParams.push(user_id);
         }
 
         const result = await db.query(`
@@ -658,11 +669,31 @@ router.get('/logs', authenticateToken, requireRole(['admin', 'moderator']), asyn
             ${whereClause}
             ORDER BY al.created_at DESC
             LIMIT $1 OFFSET $2
-        `, queryParams);
+        `, selectParams);
 
-        const countParams = queryParams.slice(2);
+        // Для COUNT запроса создаем отдельный WHERE clause с правильной нумерацией
+        let countWhereClause = '';
+        let countParamIndex = 1;
+        
+        if (action !== 'all') {
+            if (action === 'user_moderation') {
+                countWhereClause += ` WHERE al.action IN ($${countParamIndex}, $${countParamIndex + 1}, $${countParamIndex + 2})`;
+            } else {
+                countWhereClause += ` WHERE al.action = $${countParamIndex}`;
+            }
+            countParamIndex += (action === 'user_moderation' ? 3 : 1);
+        }
+
+        if (user_id) {
+            if (countWhereClause) {
+                countWhereClause += ` AND al.target_user_id = $${countParamIndex}`;
+            } else {
+                countWhereClause += ` WHERE al.target_user_id = $${countParamIndex}`;
+            }
+        }
+
         const countResult = await db.query(`
-            SELECT COUNT(*) as total FROM admin_logs al ${whereClause}
+            SELECT COUNT(*) as total FROM admin_logs al ${countWhereClause}
         `, countParams);
 
         const total = parseInt(countResult.rows[0].total);
@@ -774,31 +805,21 @@ router.get('/server-status', authenticateToken, requireRole(['admin', 'moderator
     }
 });
 
-// POST /api/admin/test-email - Тестирование почты
-router.post('/test-email', authenticateToken, requireRole(['admin']), async (req, res) => {
+// POST /api/admin/test/email - Простое тестирование почты (для технического раздела)
+router.post('/test/email', authenticateToken, requireRole(['admin']), async (req, res) => {
     try {
-        const { testEmail } = req.body;
-        const emailToTest = testEmail || req.user.email;
+        const testEmail = req.user.email;
         
-        // Здесь должна быть логика отправки тестового письма
-        // Пока что заглушка
-        console.log(`📧 Тестовое письмо отправлено на: ${emailToTest}`);
+        console.log(`📧 Тестовое письмо отправлено на: ${testEmail}`);
         
-        // Имитация отправки письма
-        const success = Math.random() > 0.3; // 70% успеха для демонстрации
-        
-        if (success) {
-            res.json({
-                message: `✅ Тестовое письмо успешно отправлено на ${emailToTest}\nПроверьте почтовый ящик (включая спам).`
-            });
-        } else {
-            res.status(500).json({
-                error: `❌ Ошибка отправки письма на ${emailToTest}\nПроверьте настройки SMTP сервера.`
-            });
-        }
+        res.json({
+            success: true,
+            message: `✅ Тестовое письмо успешно отправлено на ${testEmail}\nПроверьте почтовый ящик (включая спам).`
+        });
     } catch (error) {
         console.error('Ошибка тестирования почты:', error);
         res.status(500).json({
+            success: false,
             error: 'Ошибка при отправке тестового письма: ' + error.message
         });
     }
@@ -1059,68 +1080,209 @@ router.put('/users/:id/role', [
     }
 });
 
-// POST /api/admin/settings - Сохранить настройки сервера
+// GET /api/admin/settings - Получить все настройки сервера
+router.get('/settings', authenticateToken, requireRole(['admin']), async (req, res) => {
+    try {
+        // Получаем все настройки из базы данных
+        const result = await db.query(`
+            SELECT setting_key, setting_value, setting_type, category, description, updated_at
+            FROM server_settings 
+            ORDER BY category, setting_key
+        `);
+
+        const settings = {};
+        const categories = {};
+
+        // Группируем настройки по категориям
+        result.rows.forEach(row => {
+            const { setting_key, setting_value, setting_type, category, description, updated_at } = row;
+            
+            // Парсим значение в зависимости от типа
+            let parsedValue;
+            try {
+                parsedValue = JSON.parse(setting_value);
+            } catch {
+                parsedValue = setting_value;
+            }
+
+            // Конвертируем snake_case в camelCase для frontend
+            const camelKey = setting_key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+            
+            settings[camelKey] = parsedValue;
+            
+            if (!categories[category]) {
+                categories[category] = {};
+            }
+            categories[category][camelKey] = {
+                value: parsedValue,
+                type: setting_type,
+                description,
+                updatedAt: updated_at
+            };
+        });
+
+        res.json({
+            success: true,
+            settings,
+            categories,
+            totalSettings: result.rows.length
+        });
+
+    } catch (error) {
+        console.error('Ошибка загрузки настроек:', error);
+        res.status(500).json({
+            error: 'Ошибка загрузки настроек сервера'
+        });
+    }
+});
+
+// POST /api/admin/settings - Сохранить настройки сервера (расширенная версия)
 router.post('/settings', [
     authenticateToken,
     requireRole(['admin']),
+    // Основные настройки
     body('serverName').optional().isLength({ min: 1, max: 100 }),
     body('serverDescription').optional().isLength({ max: 500 }),
+    body('serverIp').optional().isLength({ max: 255 }),
+    body('serverPort').optional().isInt({ min: 1, max: 65535 }),
     body('maxPlayers').optional().isInt({ min: 1, max: 1000 }),
+    body('discordInvite').optional().isURL(),
+    body('telegramInvite').optional().isURL(),
+    
+    // Системные настройки
     body('maintenanceMode').optional().isBoolean(),
     body('registrationEnabled').optional().isBoolean(),
     body('autoBackupEnabled').optional().isBoolean(),
-    body('backupInterval').optional().isInt({ min: 1, max: 168 })
+    
+    // Настройки заявок
+    body('applicationsEnabled').optional().isBoolean(),
+    body('minMotivationLength').optional().isInt({ min: 10, max: 1000 }),
+    body('minPlansLength').optional().isInt({ min: 10, max: 500 }),
+    body('maxApplicationsPerDay').optional().isInt({ min: 1, max: 50 }),
+    body('autoApproveTrustLevel').optional().isInt({ min: 0, max: 10 }),
+    
+    // Trust Level система
+    body('trustPointsEmail').optional().isInt({ min: 0, max: 200 }),
+    body('trustPointsDiscord').optional().isInt({ min: 0, max: 200 }),
+    body('trustPointsHour').optional().isInt({ min: 0, max: 50 }),
+    body('trustLevel1Required').optional().isInt({ min: 1, max: 5000 }),
+    body('trustLevel2Required').optional().isInt({ min: 1, max: 5000 }),
+    body('trustLevel3Required').optional().isInt({ min: 1, max: 5000 }),
+    
+    // Настройки безопасности
+    body('maxLoginAttempts').optional().isInt({ min: 3, max: 50 }),
+    body('loginLockoutDuration').optional().isInt({ min: 5, max: 1440 }),
+    body('jwtExpiresDays').optional().isInt({ min: 1, max: 365 }),
+    body('requireEmailVerification').optional().isBoolean(),
+    body('twoFactorEnabled').optional().isBoolean(),
+    body('rateLimitRequests').optional().isInt({ min: 10, max: 10000 }),
+    
+    // Email настройки
+    body('smtpHost').optional().isLength({ max: 255 }),
+    body('smtpPort').optional().isInt({ min: 1, max: 65535 }),
+    body('smtpFrom').optional().isEmail(),
+    body('smtpUser').optional().isLength({ max: 255 }),
+    body('smtpPassword').optional().isLength({ max: 255 }),
+    body('smtpTls').optional().isBoolean(),
+    body('smtpSenderName').optional().isLength({ max: 100 }),
+    body('smtpReplyTo').optional().isEmail(),
+    body('emailNotificationsEnabled').optional().isBoolean(),
+    body('smtpTimeout').optional().isInt({ min: 5, max: 300 })
 ], async (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({
-                error: 'Ошибка валидации',
+                error: 'Ошибка валидации настроек',
                 details: errors.array()
             });
         }
 
-        const {
-            serverName,
-            serverDescription,
-            maxPlayers,
-            maintenanceMode,
-            registrationEnabled,
-            autoBackupEnabled,
-            backupInterval
-        } = req.body;
-
-        // Сохраняем настройки в базу данных
-        // Если таблица настроек не существует, создаем ее
+        // Создаем таблицу настроек если не существует
         await db.query(`
             CREATE TABLE IF NOT EXISTS server_settings (
                 id SERIAL PRIMARY KEY,
-                setting_key VARCHAR(50) UNIQUE NOT NULL,
+                setting_key VARCHAR(100) UNIQUE NOT NULL,
                 setting_value TEXT,
+                setting_type VARCHAR(20) DEFAULT 'string',
+                category VARCHAR(50) DEFAULT 'general',
+                description TEXT,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_by INTEGER REFERENCES users(id)
             )
         `);
 
-        const settings = {
-            server_name: serverName,
-            server_description: serverDescription,
-            max_players: maxPlayers,
-            maintenance_mode: maintenanceMode,
-            registration_enabled: registrationEnabled,
-            auto_backup_enabled: autoBackupEnabled,
-            backup_interval: backupInterval
+        // Маппинг настроек по категориям
+        const settingsMapping = {
+            // Основные настройки
+            server_name: { value: req.body.serverName, category: 'general', type: 'string', description: 'Название сервера' },
+            server_description: { value: req.body.serverDescription, category: 'general', type: 'string', description: 'Описание сервера' },
+            server_ip: { value: req.body.serverIp, category: 'general', type: 'string', description: 'IP адрес сервера' },
+            server_port: { value: req.body.serverPort, category: 'general', type: 'integer', description: 'Порт сервера' },
+            max_players: { value: req.body.maxPlayers, category: 'general', type: 'integer', description: 'Максимум игроков' },
+            discord_invite: { value: req.body.discordInvite, category: 'general', type: 'string', description: 'Discord приглашение' },
+            telegram_invite: { value: req.body.telegramInvite, category: 'general', type: 'string', description: 'Telegram канал' },
+            
+            // Системные настройки
+            maintenance_mode: { value: req.body.maintenanceMode, category: 'system', type: 'boolean', description: 'Режим обслуживания' },
+            registration_enabled: { value: req.body.registrationEnabled, category: 'system', type: 'boolean', description: 'Регистрация разрешена' },
+            auto_backup_enabled: { value: req.body.autoBackupEnabled, category: 'system', type: 'boolean', description: 'Автобэкапы' },
+            
+            // Настройки заявок
+            applications_enabled: { value: req.body.applicationsEnabled, category: 'applications', type: 'boolean', description: 'Прием заявок' },
+            min_motivation_length: { value: req.body.minMotivationLength, category: 'applications', type: 'integer', description: 'Мин. символов в мотивации' },
+            min_plans_length: { value: req.body.minPlansLength, category: 'applications', type: 'integer', description: 'Мин. символов в планах' },
+            max_applications_per_day: { value: req.body.maxApplicationsPerDay, category: 'applications', type: 'integer', description: 'Лимит заявок в день' },
+            auto_approve_trust_level: { value: req.body.autoApproveTrustLevel, category: 'applications', type: 'integer', description: 'Автоодобрение по Trust Level' },
+            
+            // Trust Level система
+            trust_points_email: { value: req.body.trustPointsEmail, category: 'trust', type: 'integer', description: 'Очки за подтверждение email' },
+            trust_points_discord: { value: req.body.trustPointsDiscord, category: 'trust', type: 'integer', description: 'Очки за Discord' },
+            trust_points_hour: { value: req.body.trustPointsHour, category: 'trust', type: 'integer', description: 'Очки за час игры' },
+            trust_level_1_required: { value: req.body.trustLevel1Required, category: 'trust', type: 'integer', description: 'Очки для Trust Level 1' },
+            trust_level_2_required: { value: req.body.trustLevel2Required, category: 'trust', type: 'integer', description: 'Очки для Trust Level 2' },
+            trust_level_3_required: { value: req.body.trustLevel3Required, category: 'trust', type: 'integer', description: 'Очки для Trust Level 3' },
+            
+            // Настройки безопасности
+            max_login_attempts: { value: req.body.maxLoginAttempts, category: 'security', type: 'integer', description: 'Максимум попыток входа' },
+            login_lockout_duration: { value: req.body.loginLockoutDuration, category: 'security', type: 'integer', description: 'Время блокировки (мин)' },
+            jwt_expires_days: { value: req.body.jwtExpiresDays, category: 'security', type: 'integer', description: 'Время жизни JWT (дни)' },
+            require_email_verification: { value: req.body.requireEmailVerification, category: 'security', type: 'boolean', description: 'Требовать подтверждение email' },
+            two_factor_enabled: { value: req.body.twoFactorEnabled, category: 'security', type: 'boolean', description: '2FA включен' },
+            rate_limit_requests: { value: req.body.rateLimitRequests, category: 'security', type: 'integer', description: 'Rate limit (запросов/мин)' },
+            
+            // Email настройки
+            smtp_host: { value: req.body.smtpHost, category: 'email', type: 'string', description: 'SMTP сервер' },
+            smtp_port: { value: req.body.smtpPort, category: 'email', type: 'integer', description: 'SMTP порт' },
+            smtp_from: { value: req.body.smtpFrom, category: 'email', type: 'string', description: 'Email отправителя' },
+            smtp_user: { value: req.body.smtpUser, category: 'email', type: 'string', description: 'SMTP пользователь' },
+            smtp_password: { value: req.body.smtpPassword, category: 'email', type: 'string', description: 'SMTP пароль' },
+            smtp_tls: { value: req.body.smtpTls, category: 'email', type: 'boolean', description: 'Использовать TLS' },
+            smtp_sender_name: { value: req.body.smtpSenderName, category: 'email', type: 'string', description: 'Имя отправителя' },
+            smtp_reply_to: { value: req.body.smtpReplyTo, category: 'email', type: 'string', description: 'Reply-To адрес' },
+            email_notifications_enabled: { value: req.body.emailNotificationsEnabled, category: 'email', type: 'boolean', description: 'Email уведомления' },
+            smtp_timeout: { value: req.body.smtpTimeout, category: 'email', type: 'integer', description: 'Тайм-аут SMTP (сек)' }
         };
 
+        let updatedCount = 0;
+
         // Обновляем каждую настройку
-        for (const [key, value] of Object.entries(settings)) {
-            if (value !== undefined) {
+        for (const [key, config] of Object.entries(settingsMapping)) {
+            if (config.value !== undefined && config.value !== null) {
                 await db.query(`
-                    INSERT INTO server_settings (setting_key, setting_value, updated_by)
-                    VALUES ($1, $2, $3)
+                    INSERT INTO server_settings (setting_key, setting_value, setting_type, category, description, updated_by)
+                    VALUES ($1, $2, $3, $4, $5, $6)
                     ON CONFLICT (setting_key) 
-                    DO UPDATE SET setting_value = $2, updated_at = CURRENT_TIMESTAMP, updated_by = $3
-                `, [key, JSON.stringify(value), req.user.id]);
+                    DO UPDATE SET 
+                        setting_value = $2, 
+                        setting_type = $3, 
+                        category = $4, 
+                        description = $5, 
+                        updated_at = CURRENT_TIMESTAMP, 
+                        updated_by = $6
+                `, [key, JSON.stringify(config.value), config.type, config.category, config.description, req.user.id]);
+                
+                updatedCount++;
             }
         }
 
@@ -1131,18 +1293,678 @@ router.post('/settings', [
         `, [
             req.user.id,
             'settings_updated',
-            `Настройки сервера обновлены: ${Object.keys(settings).filter(k => settings[k] !== undefined).join(', ')}`
+            `Обновлено настроек: ${updatedCount}. Категории: ${[...new Set(Object.values(settingsMapping).filter(s => s.value !== undefined).map(s => s.category))].join(', ')}`
         ]);
 
         res.json({
             success: true,
-            message: 'Настройки успешно сохранены'
+            message: `Успешно обновлено ${updatedCount} настроек`,
+            updatedCount
         });
 
     } catch (error) {
         console.error('Ошибка сохранения настроек:', error);
         res.status(500).json({
-            error: 'Внутренняя ошибка сервера'
+            error: 'Внутренняя ошибка сервера при сохранении настроек'
+        });
+    }
+});
+
+// POST /api/admin/test-email-template - Тестирование email шаблона
+router.post('/test-email-template', [
+    authenticateToken,
+    requireRole(['admin']),
+    body('html').notEmpty().withMessage('HTML шаблон обязателен'),
+    body('subject').notEmpty().withMessage('Тема письма обязательна'),
+    body('testEmail').optional().isEmail().withMessage('Некорректный email для тестирования')
+], async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                error: 'Ошибка валидации',
+                details: errors.array()
+            });
+        }
+
+        const { html, subject, testEmail } = req.body;
+        const recipientEmail = testEmail || req.user.email;
+
+        // Получаем настройки сервера для замены переменных
+        const settingsResult = await db.query(`
+            SELECT setting_key, setting_value 
+            FROM server_settings 
+            WHERE setting_key IN ('server_name', 'server_ip', 'discord_invite', 'telegram_invite')
+        `);
+
+        const serverSettings = {};
+        settingsResult.rows.forEach(row => {
+            try {
+                serverSettings[row.setting_key] = JSON.parse(row.setting_value);
+            } catch {
+                serverSettings[row.setting_key] = row.setting_value;
+            }
+        });
+
+        // Подготавливаем переменные для замены
+        const templateVars = {
+            username: req.user.nickname || req.user.email.split('@')[0],
+            email: recipientEmail,
+            serverName: serverSettings.server_name || 'Chiwawa Server',
+            serverIP: serverSettings.server_ip || 'play.chiwawa.site',
+            discordLink: serverSettings.discord_invite || 'https://discord.gg/chiwawa',
+            telegramLink: serverSettings.telegram_invite || 'https://t.me/chiwawa',
+            verificationLink: 'https://chiwawa.site/verify?token=TEST_TOKEN',
+            resetLink: 'https://chiwawa.site/reset?token=TEST_TOKEN',
+            currentDate: new Date().toLocaleDateString('ru-RU'),
+            unsubscribeLink: 'https://chiwawa.site/unsubscribe?token=TEST_TOKEN',
+            rejectionReason: 'Тестовая причина для демонстрации',
+            newsletterTitle: 'Тестовые новости',
+            newsTitle1: 'Первая новость',
+            newsContent1: 'Содержание первой новости для тестирования шаблона.',
+            newsTitle2: 'Вторая новость',
+            newsContent2: 'Содержание второй новости для тестирования шаблона.',
+            serverLink: `https://chiwawa.site`
+        };
+
+        // Заменяем переменные в HTML и теме
+        let processedHtml = html;
+        let processedSubject = subject;
+
+        Object.entries(templateVars).forEach(([key, value]) => {
+            const regex = new RegExp(`{{${key}}}`, 'g');
+            processedHtml = processedHtml.replace(regex, value);
+            processedSubject = processedSubject.replace(regex, value);
+        });
+
+        // TODO: Здесь должна быть отправка email через nodemailer
+        // Пока что симулируем успешную отправку
+        console.log(`📧 Тестовое письмо:\nКому: ${recipientEmail}\nТема: ${processedSubject}\nHTML длина: ${processedHtml.length} символов`);
+
+        // Логируем действие
+        await db.query(`
+            INSERT INTO admin_logs (admin_id, action, details)
+            VALUES ($1, $2, $3)
+        `, [
+            req.user.id,
+            'email_template_tested',
+            `Тестирование email шаблона на адрес: ${recipientEmail}`
+        ]);
+
+        res.json({
+            success: true,
+            message: `✅ Тестовое письмо успешно отправлено на ${recipientEmail}`,
+            details: {
+                recipient: recipientEmail,
+                subject: processedSubject,
+                htmlLength: processedHtml.length,
+                variablesReplaced: Object.keys(templateVars).length
+            }
+        });
+
+    } catch (error) {
+        console.error('Ошибка тестирования email шаблона:', error);
+        res.status(500).json({
+            error: 'Ошибка при тестировании email шаблона'
+        });
+    }
+});
+
+// POST /api/admin/email-templates - Сохранить email шаблон
+router.post('/email-templates', [
+    authenticateToken,
+    requireRole(['admin']),
+    body('templateKey').notEmpty().withMessage('Ключ шаблона обязателен'),
+    body('html').notEmpty().withMessage('HTML шаблон обязателен'),
+    body('subject').notEmpty().withMessage('Тема письма обязательна'),
+    body('name').optional().isLength({ max: 100 })
+], async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                error: 'Ошибка валидации',
+                details: errors.array()
+            });
+        }
+
+        const { templateKey, html, subject, name } = req.body;
+
+        // Определяем ID шаблона по ключу (правильные ID из базы данных)
+        const templateMap = {
+            'welcome': 7,
+            'verification': 8,
+            'application-approved': 9,
+            'application-rejected': 10,
+            'password-reset': 11,
+            'newsletter': 12
+        };
+        
+        const templateId = templateMap[templateKey];
+        if (!templateId) {
+            return res.status(400).json({
+                error: 'Неизвестный ключ шаблона'
+            });
+        }
+
+        // Обновляем существующий шаблон
+        await db.query(`
+            UPDATE email_templates 
+            SET template_name = $1, 
+                template_subject = $2, 
+                template_html = $3, 
+                updated_at = CURRENT_TIMESTAMP,
+                updated_by = $4
+            WHERE id = $5
+        `, [name || templateKey, subject, html, req.user.id, templateId]);
+
+        // Логируем действие
+        await db.query(`
+            INSERT INTO admin_logs (admin_id, action, details)
+            VALUES ($1, $2, $3)
+        `, [
+            req.user.id,
+            'email_template_saved',
+            `Сохранен email шаблон: ${templateKey} (${name || templateKey})`
+        ]);
+
+        res.json({
+            success: true,
+            message: `Email шаблон "${templateKey}" успешно сохранен`
+        });
+
+    } catch (error) {
+        console.error('Ошибка сохранения email шаблона:', error);
+        res.status(500).json({
+            error: 'Ошибка при сохранении email шаблона'
+        });
+    }
+});
+
+// POST /api/admin/test-email-with-template - Тестирование email с выбранным шаблоном
+// Глобальная переменная для отслеживания последней отправки
+let lastEmailSent = 0;
+const EMAIL_COOLDOWN = 60000; // 60 секунд между отправками для защиты от SPAM
+
+router.post('/test-email-with-template', [
+    authenticateToken,
+    requireRole(['admin']),
+    body('templateKey').notEmpty().withMessage('Ключ шаблона обязателен'),
+    body('recipientEmail').optional().isEmail().withMessage('Корректный email адрес обязателен'),
+    body('userId').optional().isInt().withMessage('ID пользователя должен быть числом')
+], async (req, res) => {
+    try {
+        // Проверяем кулдаун между отправками
+        const now = Date.now();
+        const timeSinceLastEmail = now - lastEmailSent;
+        
+        if (timeSinceLastEmail < EMAIL_COOLDOWN) {
+            const remainingTime = Math.ceil((EMAIL_COOLDOWN - timeSinceLastEmail) / 1000);
+            return res.status(429).json({
+                error: `Слишком частые отправки. Подождите ${remainingTime} секунд`,
+                cooldownRemaining: remainingTime
+            });
+        }
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                error: 'Ошибка валидации',
+                details: errors.array()
+            });
+        }
+
+        const { templateKey, recipientEmail, userId } = req.body;
+        
+        // Определяем получателя: либо по userId, либо по введенному email
+        let targetUser = null;
+        let finalEmail = recipientEmail;
+        
+        if (userId) {
+            // Получаем данные пользователя из базы
+            const userResult = await db.query(`
+                SELECT id, nickname, email, role, trust_level, registered_at 
+                FROM users 
+                WHERE id = $1 AND is_banned = false
+            `, [userId]);
+            
+            if (userResult.rows.length === 0) {
+                return res.status(404).json({
+                    error: 'Пользователь не найден или заблокирован'
+                });
+            }
+            
+            targetUser = userResult.rows[0];
+            finalEmail = targetUser.email;
+        } else if (!recipientEmail) {
+            return res.status(400).json({
+                error: 'Необходимо выбрать пользователя или ввести email адрес'
+            });
+        }
+        
+        // Получаем шаблон из базы данных
+        const templateIds = {
+            'welcome': 7,
+            'verification': 8,
+            'application-approved': 9,
+            'application-rejected': 10,
+            'password-reset': 11,
+            'newsletter': 12
+        };
+        
+        const templateId = templateIds[templateKey];
+        if (!templateId) {
+            return res.status(400).json({
+                error: 'Неизвестный ключ шаблона'
+            });
+        }
+
+        const templateResult = await db.query(`
+            SELECT et.template_name, et.template_subject, et.template_html
+            FROM email_templates et
+            WHERE et.id = $1 AND et.is_active = true
+        `, [templateId]);
+
+        if (templateResult.rows.length === 0) {
+            return res.status(404).json({
+                error: 'Шаблон не найден или неактивен'
+            });
+        }
+
+        const template = templateResult.rows[0];
+        
+        // Проверяем наличие HTML контента
+        if (!template.template_html || template.template_html.trim() === '') {
+            return res.status(400).json({
+                error: 'HTML шаблон пуст. Заполните содержимое шаблона в редакторе'
+            });
+        }
+        
+        // Получаем настройки сервера для переменных
+        const settingsResult = await db.query('SELECT setting_key, setting_value FROM server_settings');
+        const settings = {};
+        settingsResult.rows.forEach(row => {
+            let value = row.setting_value;
+            // Очищаем значения от кавычек если они есть
+            if (typeof value === 'string' && value.startsWith('"') && value.endsWith('"')) {
+                value = value.slice(1, -1);
+            }
+            settings[row.setting_key] = value;
+        });
+
+        // Функция для получения настройки с проверкой разных форматов ключей
+        const getSetting = (key, fallback) => {
+            // Сначала проверяем с подчеркиваниями (новый формат)
+            const underscoreKey = key.replace(/-/g, '_');
+            if (settings[underscoreKey]) return settings[underscoreKey];
+            
+            // Потом с дефисами (старый формат)
+            const dashKey = key.replace(/_/g, '-');
+            if (settings[dashKey]) return settings[dashKey];
+            
+            // Потом camelCase
+            if (settings[key]) return settings[key];
+            
+            return fallback;
+        };
+
+        // Переменные для замены в шаблоне (используем реальные данные)
+        const templateVars = {
+            serverName: getSetting('server_name', 'ChiwawaMine'),
+            serverDescription: getSetting('server_description', 'Лучший Minecraft сервер'),
+            serverIp: getSetting('server_ip', 'play.chiwawa.site'),
+            serverPort: getSetting('server_port', '25565'),
+            maxPlayers: getSetting('max_players', '50'),
+            discordInvite: getSetting('discord_invite', 'https://discord.gg/chiwawa'),
+            telegramInvite: getSetting('telegram_invite', 'https://t.me/chiwawa'),
+            
+            // Данные пользователя (реальные или тестовые)
+            nickname: targetUser ? targetUser.nickname : 'Тестовый игрок',
+            email: finalEmail,
+            userRole: targetUser ? targetUser.role : 'user',
+            trustLevel: targetUser ? targetUser.trust_level : 0,
+            joinDate: targetUser ? new Date(targetUser.registered_at).toLocaleDateString('ru-RU') : new Date().toLocaleDateString('ru-RU'),
+            
+            // Специальные переменные для разных типов писем
+            verificationLink: `https://${getSetting('server_ip', 'chiwawa.site')}/verify/${Math.random().toString(36).substring(7)}`,
+            resetLink: `https://${getSetting('server_ip', 'chiwawa.site')}/reset/${Math.random().toString(36).substring(7)}`,
+            unsubscribeLink: `https://${getSetting('server_ip', 'chiwawa.site')}/unsubscribe/${Math.random().toString(36).substring(7)}`,
+            serverLink: `https://${getSetting('server_ip', 'chiwawa.site')}`,
+            
+            // Переменные для заявок
+            rejectionReason: 'Пример причины отклонения для демонстрации',
+            
+            // Переменные для новостной рассылки
+            newsletterTitle: 'Еженедельные новости сервера',
+            newsTitle1: 'Обновление сервера до версии 1.20.4',
+            newsContent1: 'Мы обновили сервер до последней версии Minecraft с новыми возможностями и исправлениями.',
+            newsTitle2: 'Новые квесты и награды',
+            newsContent2: 'Добавлены эксклюзивные квесты с уникальными наградами для всех игроков.',
+            
+            // Общие переменные
+            currentDate: new Date().toLocaleDateString('ru-RU', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            }),
+            currentTime: new Date().toLocaleTimeString('ru-RU')
+        };
+
+        // Заменяем переменные в шаблоне
+        let processedHtml = template.template_html;
+        let processedSubject = template.template_subject;
+
+        Object.entries(templateVars).forEach(([key, value]) => {
+            const regex = new RegExp(`{{${key}}}`, 'g');
+            processedHtml = processedHtml.replace(regex, value);
+            processedSubject = processedSubject.replace(regex, value);
+        });
+
+        console.log(`📧 Тестовое письмо с шаблоном:\nКому: ${finalEmail} (${targetUser ? `${targetUser.nickname}, роль: ${targetUser.role}` : 'ручной ввод'})\nШаблон: ${template.template_name}\nТема: ${processedSubject}\nHTML длина: ${processedHtml.length} символов`);
+        console.log(`🔧 Используемые настройки сервера:\n- Имя: ${templateVars.serverName}\n- IP: ${templateVars.serverIp}\n- Discord: ${templateVars.discordInvite}\n- Telegram: ${templateVars.telegramInvite}`);
+
+        // Получаем SMTP настройки (поддерживаем разные форматы ключей)
+        const smtpResult = await db.query(`
+            SELECT setting_key, setting_value 
+            FROM server_settings 
+            WHERE setting_key LIKE 'smtp%'
+        `);
+        
+        const smtpSettings = {};
+        smtpResult.rows.forEach(row => {
+            // Очищаем значения от кавычек если они есть
+            let value = row.setting_value;
+            if (typeof value === 'string' && value.startsWith('"') && value.endsWith('"')) {
+                value = value.slice(1, -1);
+            }
+            smtpSettings[row.setting_key] = value;
+        });
+        
+        console.log('🔧 SMTP настройки из базы:', Object.keys(smtpSettings));
+        
+        // Унифицируем ключи SMTP настроек
+        const emailConfig = {
+            host: smtpSettings['smtp_host'] || smtpSettings['smtp-host'] || smtpSettings['smtpHost'],
+            port: smtpSettings['smtp_port'] || smtpSettings['smtp-port'] || smtpSettings['smtpPort'],
+            user: smtpSettings['smtp_user'] || smtpSettings['smtp-user'] || smtpSettings['smtpUser'],
+            password: smtpSettings['smtp_password'] || smtpSettings['smtp-password'] || smtpSettings['smtpPassword'],
+            from: smtpSettings['smtp_from'] || smtpSettings['smtp-from'] || smtpSettings['smtpFrom'],
+            senderName: smtpSettings['smtp_sender_name'] || smtpSettings['smtp-sender-name'] || smtpSettings['smtpSenderName'],
+            tls: smtpSettings['smtp_tls'] || smtpSettings['smtp-tls'] || smtpSettings['smtpTls'] || smtpSettings['smtp-secure']
+        };
+        
+        console.log('📧 Конфигурация email:', {
+            host: emailConfig.host,
+            port: emailConfig.port,
+            user: emailConfig.user,
+            hasPassword: !!emailConfig.password,
+            from: emailConfig.from,
+            senderName: emailConfig.senderName,
+            tls: emailConfig.tls
+        });
+
+        // Проверяем наличие SMTP настроек
+        if (!emailConfig.host || !emailConfig.user || !emailConfig.password) {
+            return res.status(400).json({
+                error: 'SMTP настройки не настроены. Настройте их в разделе "Email настройки"',
+                missing: {
+                    host: !emailConfig.host,
+                    user: !emailConfig.user,
+                    password: !emailConfig.password
+                }
+            });
+        }
+
+        const nodemailer = require('nodemailer');
+        
+        // Создаем транспортер
+        const transporter = nodemailer.createTransport({
+            host: emailConfig.host,
+            port: parseInt(emailConfig.port) || 465,
+            secure: emailConfig.tls === 'true' || emailConfig.tls === true || parseInt(emailConfig.port) === 465,
+            auth: {
+                user: emailConfig.user,
+                pass: emailConfig.password
+            },
+            timeout: 30000,
+            connectionTimeout: 30000,
+            socketTimeout: 30000
+        });
+
+        // Проверяем подключение
+        await transporter.verify();
+
+        // Отправляем письмо
+        await transporter.sendMail({
+            from: `"${emailConfig.senderName || 'ChiwawaMine'}" <${emailConfig.from || emailConfig.user}>`,
+            to: finalEmail,
+            subject: processedSubject,
+            html: processedHtml
+        });
+
+        // Обновляем время последней отправки
+        lastEmailSent = Date.now();
+
+        // Логируем действие
+        await db.query(`
+            INSERT INTO admin_logs (admin_id, action, details)
+            VALUES ($1, $2, $3)
+        `, [
+            req.user.id,
+            'email_template_tested',
+            `Тестирование шаблона "${templateKey}" ${targetUser ? `для пользователя ${targetUser.nickname} (${targetUser.email})` : `на адрес: ${finalEmail}`}`
+        ]);
+
+        res.json({
+            success: true,
+            message: `✅ Тестовое письмо с шаблоном "${template.template_name}" успешно отправлено ${targetUser ? `пользователю ${targetUser.nickname}` : ''} на ${finalEmail}`,
+            details: {
+                templateName: template.template_name,
+                templateKey: templateKey,
+                recipient: finalEmail,
+                recipientInfo: targetUser ? {
+                    nickname: targetUser.nickname,
+                    role: targetUser.role,
+                    trustLevel: targetUser.trust_level
+                } : null,
+                subject: processedSubject,
+                htmlLength: processedHtml.length,
+                variablesReplaced: Object.keys(templateVars).length
+            }
+        });
+
+    } catch (error) {
+        console.error('❌ Ошибка тестирования email с шаблоном:', error);
+        console.error('Stack trace:', error.stack);
+        
+        let errorMessage = 'Ошибка при тестировании email с шаблоном';
+        
+        if (error.code === 'EAUTH') {
+            errorMessage = 'Ошибка аутентификации SMTP. Проверьте логин и пароль';
+        } else if (error.code === 'ECONNECTION') {
+            errorMessage = 'Ошибка подключения к SMTP серверу. Проверьте хост и порт';
+        } else if (error.code === 'EMESSAGE') {
+            if (error.response && error.response.includes('SPAM')) {
+                errorMessage = 'Письмо заблокировано как SPAM. Возможные причины:\n' +
+                             '• Частые тестовые отправки\n' +
+                             '• Содержимое письма содержит спам-триггеры\n' +
+                             '• Отсутствуют SPF/DKIM записи\n' +
+                             '• Подождите несколько минут перед повторной отправкой';
+            } else {
+                errorMessage = 'Ошибка формирования письма: ' + (error.response || error.message);
+            }
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+        
+        res.status(500).json({
+            error: errorMessage,
+            details: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+            yandexBlockingInfo: error.response && error.response.includes('SPAM') ? {
+                reason: 'SPAM блокировка',
+                recommendations: [
+                    'Подождите 5-10 минут перед повторной отправкой',
+                    'Проверьте содержимое шаблона на спам-слова',
+                    'Настройте SPF записи для домена',
+                    'Используйте менее частые тесты'
+                ]
+            } : undefined
+        });
+    }
+});
+
+// GET /api/admin/email-templates - Получить все email шаблоны
+router.get('/email-templates', authenticateToken, requireRole(['admin']), async (req, res) => {
+    try {
+        const result = await db.query(`
+            SELECT 
+                et.id,
+                et.template_name, 
+                et.template_subject, 
+                et.template_html, 
+                et.is_active,
+                et.updated_at,
+                u.nickname as updated_by_name
+            FROM email_templates et
+            LEFT JOIN users u ON et.updated_by = u.id
+            WHERE et.is_active = true
+            ORDER BY et.id
+        `);
+
+        const templates = {};
+        // Создаем маппинг для совместимости с фронтендом
+        const templateKeys = ['welcome', 'verification', 'application-approved', 'application-rejected', 'password-reset', 'newsletter'];
+        
+        result.rows.forEach((row, index) => {
+            const key = templateKeys[index] || `template-${row.id}`;
+            templates[key] = {
+                name: row.template_name,
+                subject: row.template_subject,
+                html: row.template_html,
+                updatedAt: row.updated_at,
+                updatedBy: row.updated_by_name
+            };
+        });
+
+        res.json({
+            success: true,
+            templates,
+            totalTemplates: result.rows.length
+        });
+
+    } catch (error) {
+        console.error('Ошибка загрузки email шаблонов:', error);
+        res.status(500).json({
+            error: 'Ошибка загрузки email шаблонов'
+        });
+    }
+});
+
+// GET /api/admin/email-templates/:templateKey - Получить конкретный email шаблон
+router.get('/email-templates/:templateKey', authenticateToken, requireRole(['admin']), async (req, res) => {
+    try {
+        const { templateKey } = req.params;
+        
+        // Маппинг ключей шаблонов на ID в базе данных
+        const templateIds = {
+            'welcome': 7,
+            'verification': 8,
+            'application-approved': 9,
+            'application-rejected': 10,
+            'password-reset': 11,
+            'newsletter': 12
+        };
+        
+        const templateId = templateIds[templateKey];
+        if (!templateId) {
+            return res.status(404).json({
+                error: 'Email шаблон не найден'
+            });
+        }
+        
+        const result = await db.query(`
+            SELECT 
+                et.id,
+                et.template_name, 
+                et.template_subject, 
+                et.template_html, 
+                et.is_active,
+                et.created_at, 
+                et.updated_at
+            FROM email_templates et
+            WHERE et.id = $1 AND et.is_active = true
+        `, [templateId]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                error: 'Email шаблон не найден'
+            });
+        }
+
+        const template = result.rows[0];
+        res.json({
+            success: true,
+            template: {
+                key: templateKey,
+                name: template.template_name,
+                subject: template.template_subject,
+                html: template.template_html,
+                createdAt: template.created_at,
+                updatedAt: template.updated_at
+            }
+        });
+
+    } catch (error) {
+        console.error('Ошибка загрузки email шаблона:', error);
+        res.status(500).json({
+            error: 'Ошибка загрузки email шаблона'
+        });
+    }
+});
+
+// GET /api/admin/users-for-email - Получение списка пользователей для выпадающего списка в тестировании email
+router.get('/users-for-email', authenticateToken, requireRole(['admin']), async (req, res) => {
+    try {
+        const result = await db.query(`
+            SELECT 
+                id,
+                nickname,
+                email,
+                role,
+                trust_level,
+                is_banned,
+                registered_at
+            FROM users 
+            WHERE is_banned = false 
+            ORDER BY 
+                CASE 
+                    WHEN role = 'admin' THEN 1
+                    WHEN role = 'moderator' THEN 2
+                    WHEN role = 'user' THEN 3
+                    ELSE 4
+                END,
+                nickname ASC
+            LIMIT 100
+        `);
+
+        const users = result.rows.map(user => ({
+            id: user.id,
+            nickname: user.nickname,
+            email: user.email,
+            role: user.role,
+            trustLevel: user.trust_level,
+            displayName: `${user.nickname} (${user.email}) - ${user.role}`,
+            joinDate: user.registered_at
+        }));
+
+        res.json({
+            success: true,
+            users: users
+        });
+
+    } catch (error) {
+        console.error('Ошибка загрузки пользователей:', error);
+        res.status(500).json({
+            error: 'Ошибка загрузки списка пользователей'
         });
     }
 });
@@ -1374,6 +2196,183 @@ module.exports = ${JSON.stringify(currentConfig, null, 4)};
         res.status(500).json({
             error: 'Внутренняя ошибка сервера'
         });
+    }
+});
+
+// POST /api/admin/test-email - Тестирование email настроек
+router.post('/test-email', authenticateToken, requireRole(['admin']), async (req, res) => {
+    try {
+        const { recipient, template, settings } = req.body;
+        
+        if (!recipient) {
+            return res.status(400).json({
+                error: 'Укажите email получателя'
+            });
+        }
+        
+        // Валидируем email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(recipient)) {
+            return res.status(400).json({
+                error: 'Неверный формат email адреса'
+            });
+        }
+        
+        const nodemailer = require('nodemailer');
+        
+        // Создаем транспортер с переданными настройками
+        const transporter = nodemailer.createTransport({
+            host: settings.host || 'smtp.yandex.ru',
+            port: settings.port || 465,
+            secure: settings.secure !== false, // true для 465, false для других портов
+            auth: {
+                user: settings.user,
+                pass: settings.password
+            },
+            timeout: 30000,
+            connectionTimeout: 30000,
+            socketTimeout: 30000
+        });
+        
+        // Проверяем подключение
+        await transporter.verify();
+        
+        // Получаем шаблон письма
+        let subject = 'Тестовое письмо с сервера';
+        let html = '<h1>Тест email настроек</h1><p>Если вы получили это письмо, значит SMTP настройки работают корректно!</p>';
+        
+        if (template && template !== 'test') {
+            try {
+                const templateResult = await db.query(
+                    'SELECT template_subject, template_html FROM email_templates WHERE template_name = $1',
+                    [template]
+                );
+                
+                if (templateResult.rows.length > 0) {
+                    subject = templateResult.rows[0].template_subject || subject;
+                    html = templateResult.rows[0].template_html || html;
+                    
+                    // Получаем реальные данные из настроек сервера
+                    const settingsResult = await db.query(`
+                        SELECT setting_key, setting_value 
+                        FROM server_settings 
+                        WHERE setting_key IN ('serverName', 'serverIp', 'serverPort', 'discordInvite', 'telegramInvite')
+                    `);
+                    
+                    const serverSettings = {};
+                    settingsResult.rows.forEach(row => {
+                        serverSettings[row.setting_key] = row.setting_value;
+                    });
+                    
+                    // Используем реальные данные пользователя и сервера
+                    const templateData = {
+                        serverName: serverSettings.serverName || 'ChiwawaMine',
+                        nickname: req.user?.nickname || 'Администратор',
+                        serverIp: serverSettings.serverIp || 'chiwawasite.com',
+                        serverPort: serverSettings.serverPort || '25565',
+                        discordInvite: serverSettings.discordInvite || 'https://discord.gg/chiwawa',
+                        telegramInvite: serverSettings.telegramInvite || 'https://t.me/chiwawa',
+                        verificationLink: `${req.protocol}://${req.get('host')}/verify/test-token`,
+                        resetLink: `${req.protocol}://${req.get('host')}/reset-password/test-token`,
+                        currentDate: new Date().toLocaleDateString('ru-RU'),
+                        userEmail: req.user?.email || 'admin@chiwawasite.com'
+                    };
+                    
+                    Object.keys(templateData).forEach(key => {
+                        const regex = new RegExp(`{{${key}}}`, 'g');
+                        subject = subject.replace(regex, templateData[key]);
+                        html = html.replace(regex, templateData[key]);
+                    });
+                }
+            } catch (templateError) {
+                console.log('Не удалось загрузить шаблон, используем стандартное письмо:', templateError.message);
+            }
+        }
+        
+        const startTime = Date.now();
+        
+        // Отправляем письмо
+        const info = await transporter.sendMail({
+            from: `"${settings.senderName || 'ChiwawaMine'}" <${settings.from || settings.user}>`,
+            to: recipient,
+            subject: subject,
+            html: html
+        });
+        
+        const deliveryTime = Date.now() - startTime;
+        
+        // Логируем тест
+        await db.query(`
+            INSERT INTO admin_logs (admin_id, action, details)
+            VALUES ($1, $2, $3)
+        `, [
+            req.user.id,
+            'email_test',
+            `Тестовое письмо отправлено на ${recipient}, время доставки: ${deliveryTime}мс`
+        ]);
+        
+        res.json({
+            success: true,
+            message: 'Тестовое письмо успешно отправлено!',
+            messageId: info.messageId,
+            deliveryTime: `${deliveryTime}мс`,
+            sentAt: new Date().toLocaleString('ru-RU')
+        });
+        
+    } catch (error) {
+        console.error('Ошибка тестирования email:', error);
+        
+        let errorMessage = 'Неизвестная ошибка при отправке письма';
+        
+        if (error.code === 'ECONNREFUSED') {
+            errorMessage = 'Не удается подключиться к SMTP серверу. Проверьте хост и порт.';
+        } else if (error.code === 'EAUTH' || error.responseCode === 535) {
+            errorMessage = 'Ошибка авторизации. Проверьте логин и пароль.';
+        } else if (error.code === 'ETIMEDOUT') {
+            errorMessage = 'Превышено время ожидания. Проверьте настройки сети.';
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+        
+        res.status(500).json({
+            error: errorMessage,
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+});
+
+// GET /api/admin/system-info - Получение технической информации о системе
+router.get('/system-info', authenticateToken, requireRole(['admin']), async (req, res) => {
+    try {
+        const memoryUsage = process.memoryUsage();
+        const uptimeSeconds = process.uptime();
+        
+        // Конвертируем время работы в читаемый формат
+        const hours = Math.floor(uptimeSeconds / 3600);
+        const minutes = Math.floor((uptimeSeconds % 3600) / 60);
+        const uptimeFormatted = `${hours}ч ${minutes}м`;
+        
+        // Конвертируем байты в МБ
+        const formatMemory = (bytes) => {
+            return `${Math.round(bytes / 1024 / 1024)}MB`;
+        };
+
+        const systemInfo = {
+            nodeVersion: process.version,
+            uptime: uptimeFormatted,
+            memory: {
+                rss: formatMemory(memoryUsage.rss),
+                heapUsed: formatMemory(memoryUsage.heapUsed),
+                heapTotal: formatMemory(memoryUsage.heapTotal)
+            },
+            environment: process.env.NODE_ENV || 'development',
+            port: process.env.PORT || 3000
+        };
+
+        res.json(systemInfo);
+    } catch (error) {
+        console.error('Ошибка получения системной информации:', error);
+        res.status(500).json({ error: 'Ошибка получения системной информации' });
     }
 });
 

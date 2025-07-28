@@ -4,11 +4,11 @@
 module.exports = {
     "server": {
         "name": "ChiwawaMine",
-        "description": "Приватный Minecraft сервер с дружелюбным сообществом",
+        "description": "Приватный Minecraft сервер для своих.<br><span class=\"text-chiwawa-primary font-semibold\">Вход только по заявку.</span>",
         "ip": "play.chiwawa.site",
         "port": "25164",
         "website": "https://chiwawa.ru",
-        "discord": "https://discord.gg/chiwawa",
+        "discord": "https://discord.gg/your-invite",
         "telegram": "https://t.me/chiwawa"
     },
     "applications": {

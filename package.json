@@ -12,6 +12,7 @@
     "format": "prettier --write src/",
     "db:create": "node scripts/create-database.js",
     "db:backup": "node scripts/backup.js backup",
+    "db:migrate": "node scripts/run-migration.js",
     "pm2:start": "pm2 start ecosystem.config.js",
     "pm2:stop": "pm2 stop chiwawa-server",
     "pm2:restart": "pm2 restart chiwawa-server",

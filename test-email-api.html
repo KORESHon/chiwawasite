@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Тест Email Templates API</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: #e5e5e5; }
+        .result { margin: 10px 0; padding: 10px; border: 1px solid #444; background: #2a2a2a; }
+        .success { border-color: #4CAF50; }
+        .error { border-color: #f44336; }
+        button { padding: 10px 20px; margin: 5px; background: #FFAA00; color: #000; border: none; cursor: pointer; }
+        button:hover { background: #ff9900; }
+    </style>
+</head>
+<body>
+    <h1>Тест Email Templates API</h1>
+    
+    <button onclick="testLogin()">1. Войти как админ</button>
+    <button onclick="testEmailTemplates()">2. Получить шаблоны</button>
+    <button onclick="testSpecificTemplate()">3. Получить конкретный шаблон</button>
+    
+    <div id="results"></div>
+
+    <script>
+        let authToken = null;
+        
+        function log(message, isError = false) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `result ${isError ? 'error' : 'success'}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+        }
+        
+        async function testLogin() {
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        nickname: 'ebluffy',
+                        password: 'test123'
+                    })
+                });
+                
+                const data = await response.json();
+                if (response.ok && data.token) {
+                    authToken = data.token;
+                    log(`Авторизация успешна. Токен получен.`);
+                } else {
+                    log(`Ошибка авторизации: ${data.error || 'Неизвестная ошибка'}`, true);
+                }
+            } catch (error) {
+                log(`Ошибка авторизации: ${error.message}`, true);
+            }
+        }
+        
+        async function testEmailTemplates() {
+            if (!authToken) {
+                log('Сначала нужно авторизоваться!', true);
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/email-templates', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    log(`Шаблоны получены успешно. Найдено: ${data.totalTemplates} шаблонов`);
+                    log(`Ключи шаблонов: ${Object.keys(data.templates).join(', ')}`);
+                } else {
+                    log(`Ошибка получения шаблонов: ${data.error || 'Неизвестная ошибка'}`, true);
+                }
+            } catch (error) {
+                log(`Ошибка получения шаблонов: ${error.message}`, true);
+            }
+        }
+        
+        async function testSpecificTemplate() {
+            if (!authToken) {
+                log('Сначала нужно авторизоваться!', true);
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/email-templates/welcome', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    log(`Шаблон "welcome" получен успешно: ${data.template.name}`);
+                    log(`Тема: ${data.template.subject}`);
+                } else {
+                    log(`Ошибка получения шаблона: ${data.error || 'Неизвестная ошибка'}`, true);
+                }
+            } catch (error) {
+                log(`Ошибка получения шаблона: ${error.message}`, true);
+            }
+        }
+    </script>
+</body>
+</html>
