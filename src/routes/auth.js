@@ -160,10 +160,27 @@ router.post('/register', [
         // Логируем успешную регистрацию
         await logLoginAttempt(newUser.id, clientIp, req.get('User-Agent'), true);
 
+        // Автоматически отправляем email подтверждения
+        try {
+            const verificationToken = uuidv4();
+            const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 часа
+
+            await db.query(
+                'INSERT INTO email_verification_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)',
+                [newUser.id, verificationToken, expiresAt]
+            );
+
+            console.log(`📧 Токен подтверждения email для ${email}: ${verificationToken}`);
+            console.log(`🌐 Ссылка: ${req.protocol}://${req.get('host')}/verify-email?token=${verificationToken}`);
+        } catch (emailError) {
+            console.error('Ошибка создания токена подтверждения email:', emailError);
+            // Не прерываем регистрацию из-за ошибки отправки email
+        }
+
         console.log(`✅ Новая регистрация: ${minecraft_nick} (${email})`);
 
         res.status(201).json({
-            message: 'Регистрация прошла успешно! Теперь вы можете войти в систему.',
+            message: 'Регистрация прошла успешно! Проверьте email для подтверждения адреса.',
             user: {
                 id: newUser.id,
                 nickname: newUser.nickname,
@@ -428,9 +445,9 @@ router.get('/verify-email', async (req, res) => {
 
         // Обновляем статус подтверждения email
         await db.query(`
-            UPDATE users 
-            SET is_email_verified = true, updated_at = NOW()
-            WHERE id = $1
+            UPDATE player_stats 
+            SET email_verified = true
+            WHERE user_id = $1
         `, [tokenData.user_id]);
 
         // Удаляем использованный токен
@@ -507,6 +524,211 @@ router.get('/discord/callback', async (req, res) => {
     } catch (error) {
         console.error('Ошибка Discord OAuth:', error);
         res.redirect('/?error=discord_oauth_error');
+    }
+});
+
+// POST /api/auth/forgot-password - Отправка ссылки для сброса пароля
+router.post('/forgot-password', [
+    body('email').isEmail().normalizeEmail()
+], async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                error: 'Некорректный email адрес'
+            });
+        }
+
+        const { email } = req.body;
+
+        // Проверяем, существует ли пользователь
+        const userResult = await db.query(
+            'SELECT id, nickname FROM users WHERE email = $1',
+            [email]
+        );
+
+        if (userResult.rows.length === 0) {
+            // В целях безопасности возвращаем тот же ответ
+            return res.json({
+                message: 'Если email существует в системе, ссылка для сброса пароля была отправлена'
+            });
+        }
+
+        const user = userResult.rows[0];
+        const resetToken = uuidv4();
+        const expiresAt = new Date(Date.now() + 3600000); // 1 час
+
+        // Удаляем старые токены для этого пользователя
+        await db.query(
+            'DELETE FROM password_reset_tokens WHERE user_id = $1',
+            [user.id]
+        );
+
+        // Создаем новый токен
+        await db.query(
+            'INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)',
+            [user.id, resetToken, expiresAt]
+        );
+
+        // Отправляем email (пока заглушка)
+        console.log(`🔐 Токен сброса пароля для ${email}: ${resetToken}`);
+        console.log(`🌐 Ссылка: ${req.protocol}://${req.get('host')}/reset-password?token=${resetToken}`);
+
+        res.json({
+            message: 'Если email существует в системе, ссылка для сброса пароля была отправлена'
+        });
+
+    } catch (error) {
+        console.error('Ошибка создания токена сброса пароля:', error);
+        res.status(500).json({
+            error: 'Внутренняя ошибка сервера'
+        });
+    }
+});
+
+// POST /api/auth/reset-password - Сброс пароля по токену
+router.post('/reset-password', [
+    body('token').notEmpty(),
+    body('password').isLength({ min: 6 })
+], async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                error: 'Некорректные данные'
+            });
+        }
+
+        const { token, password } = req.body;
+
+        // Проверяем токен
+        const tokenResult = await db.query(
+            'SELECT user_id FROM password_reset_tokens WHERE token = $1 AND expires_at > NOW() AND used = false',
+            [token]
+        );
+
+        if (tokenResult.rows.length === 0) {
+            return res.status(400).json({
+                error: 'Недействительный или просроченный токен'
+            });
+        }
+
+        const userId = tokenResult.rows[0].user_id;
+
+        // Хешируем новый пароль
+        const hashedPassword = await bcrypt.hash(password, 12);
+
+        // Обновляем пароль пользователя
+        await db.query(
+            'UPDATE users SET password_hash = $1 WHERE id = $2',
+            [hashedPassword, userId]
+        );
+
+        // Помечаем токен как использованный
+        await db.query(
+            'UPDATE password_reset_tokens SET used = true WHERE token = $1',
+            [token]
+        );
+
+        // Удаляем все активные сессии пользователя для безопасности
+        await db.query(
+            'UPDATE user_sessions SET is_active = false WHERE user_id = $1',
+            [userId]
+        );
+
+        res.json({
+            message: 'Пароль успешно изменен'
+        });
+
+    } catch (error) {
+        console.error('Ошибка сброса пароля:', error);
+        res.status(500).json({
+            error: 'Внутренняя ошибка сервера'
+        });
+    }
+});
+
+// GET /api/auth/verify-reset-token - Проверка токена сброса пароля
+router.get('/verify-reset-token', async (req, res) => {
+    try {
+        const { token } = req.query;
+
+        if (!token) {
+            return res.status(400).json({
+                error: 'Токен не указан'
+            });
+        }
+
+        // Проверяем токен
+        const tokenResult = await db.query(
+            'SELECT user_id FROM password_reset_tokens WHERE token = $1 AND expires_at > NOW() AND used = false',
+            [token]
+        );
+
+        if (tokenResult.rows.length === 0) {
+            return res.status(400).json({
+                error: 'Недействительный или просроченный токен'
+            });
+        }
+
+        res.json({
+            valid: true
+        });
+
+    } catch (error) {
+        console.error('Ошибка проверки токена:', error);
+        res.status(500).json({
+            error: 'Внутренняя ошибка сервера'
+        });
+    }
+});
+
+// GET /api/auth/verify-email-token - Подтверждение email по токену
+router.get('/verify-email-token', async (req, res) => {
+    try {
+        const { token } = req.query;
+
+        if (!token) {
+            return res.status(400).json({
+                error: 'Токен не указан'
+            });
+        }
+
+        // Проверяем токен верификации
+        const tokenResult = await db.query(
+            'SELECT user_id FROM email_verification_tokens WHERE token = $1 AND expires_at > NOW() AND used = false',
+            [token]
+        );
+
+        if (tokenResult.rows.length === 0) {
+            return res.status(400).json({
+                error: 'Недействительный или просроченный токен'
+            });
+        }
+
+        const userId = tokenResult.rows[0].user_id;
+
+        // Активируем пользователя
+        await db.query(
+            'UPDATE users SET email_verified = true WHERE id = $1',
+            [userId]
+        );
+
+        // Помечаем токен как использованный
+        await db.query(
+            'UPDATE email_verification_tokens SET used = true WHERE token = $1',
+            [token]
+        );
+
+        res.json({
+            message: 'Email успешно подтвержден'
+        });
+
+    } catch (error) {
+        console.error('Ошибка подтверждения email:', error);
+        res.status(500).json({
+            error: 'Внутренняя ошибка сервера'
+        });
     }
 });
 

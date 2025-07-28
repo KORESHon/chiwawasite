@@ -3,25 +3,91 @@ const router = express.Router();
 const fs = require('fs').promises;
 const path = require('path');
 const { authenticateToken, requireRole } = require('./auth');
+const db = require('../../database/connection');
+const { status } = require('minecraft-server-util');
 
 // Публичный endpoint для получения основных настроек сервера
 router.get('/settings/public', async (req, res) => {
     try {
-        // Читаем конфигурацию
-        const config = require('../config/settings');
+        // Получаем настройки из базы данных server_settings
+        const result = await db.query('SELECT setting_key, setting_value FROM server_settings');
+        const settings = {};
+        
+        // Преобразуем результат в объект
+        result.rows.forEach(row => {
+            settings[row.setting_key] = row.setting_value;
+        });
         
         // Возвращаем только публичную информацию
         res.json({
-            serverName: config.server?.name || 'Test',
-            serverDescription: config.server?.description || 'Приватный Minecraft сервер с дружелюбным сообществом',
-            serverIp: config.server?.ip || 'play.chiwawa.site',
-            serverPort: config.server?.port || '25565',
-            discordInvite: config.server?.discord || 'https://discord.gg/chiwawa',
-            telegramInvite: config.server?.telegram || 'https://t.me/chiwawa'
+            serverName: settings['server-name'] || 'Test',
+            serverDescription: settings['server-description'] || 'Приватный Minecraft сервер с дружелюбным сообществом',
+            serverIp: settings['server-ip'] || 'play.chiwawa.site',
+            serverPort: settings['server-port'] || '25565',
+            discordInvite: settings['discord-invite'] || 'https://discord.gg/chiwawa',
+            telegramInvite: settings['telegram-invite'] || 'https://t.me/chiwawa'
         });
     } catch (error) {
         console.error('Ошибка получения публичных настроек:', error);
-        res.status(500).json({ error: 'Ошибка сервера' });
+        // Fallback к значениям по умолчанию
+        res.json({
+            serverName: 'Test',
+            serverDescription: 'Приватный Minecraft сервер с дружелюбным сообществом',
+            serverIp: 'play.chiwawa.site',
+            serverPort: '25565',
+            discordInvite: 'https://discord.gg/chiwawa',
+            telegramInvite: 'https://t.me/chiwawa'
+        });
+    }
+});
+
+// Публичный endpoint для информации о статусе сервера
+router.get('/server-info', async (req, res) => {
+    try {
+        // Получаем IP и порт из настроек
+        const settingsResult = await db.query('SELECT setting_key, setting_value FROM server_settings WHERE setting_key IN ($1, $2)', ['server-ip', 'server-port']);
+        const settings = {};
+        settingsResult.rows.forEach(row => {
+            settings[row.setting_key] = row.setting_value;
+        });
+        
+        const serverIp = settings['server-ip'] || 'play.chiwawa.site';
+        const serverPort = parseInt(settings['server-port'] || '25565');
+        
+        // Проверяем статус Minecraft сервера
+        try {
+            const response = await status(serverIp, serverPort);
+            
+            res.json({
+                online: true,
+                players: {
+                    online: response.players.online,
+                    max: response.players.max
+                },
+                version: response.version?.name || 'Unknown',
+                motd: response.motd?.clean || 'Minecraft Server',
+                ping: response.roundTripLatency || 0
+            });
+        } catch (minecraftError) {
+            // Сервер недоступен
+            res.json({
+                online: false,
+                players: {
+                    online: 0,
+                    max: 50
+                },
+                version: 'Unknown',
+                motd: 'Server Offline',
+                ping: 0
+            });
+        }
+    } catch (error) {
+        console.error('Ошибка получения информации о сервере:', error);
+        res.status(500).json({
+            online: false,
+            players: { online: 0, max: 50 },
+            error: 'Ошибка сервера'
+        });
     }
 });
 

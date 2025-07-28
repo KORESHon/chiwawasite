@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тестирование Email и сброса пароля - Chiwawa Server</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'minecraft-dark': '#0a0a0a',
+                        'minecraft-darker': '#050505',
+                        'minecraft-gold': '#FFAA00',
+                        'minecraft-yellow': '#FFFF55',
+                        'minecraft-gray': '#2a2a2a',
+                        'minecraft-light-gray': '#404040'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: radial-gradient(circle at 20% 50%, rgba(255, 170, 0, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255, 255, 85, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 80%, rgba(255, 170, 0, 0.05) 0%, transparent 50%),
+                        linear-gradient(135deg, #0a0a0a 0%, #050505 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-effect {
+            background: rgba(42, 42, 42, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 170, 0, 0.1);
+        }
+        
+        .btn-minecraft {
+            background: linear-gradient(135deg, #FFAA00 0%, #FF8800 100%);
+            border: 2px solid #FFAA00;
+            color: #000;
+            font-weight: bold;
+            text-shadow: none;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-minecraft:hover {
+            background: linear-gradient(135deg, #FFFF55 0%, #FFAA00 100%);
+            border-color: #FFFF55;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 170, 0, 0.4);
+        }
+        
+        .gold-glow {
+            box-shadow: 0 0 30px rgba(255, 170, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen text-white">
+    <main class="relative z-10 py-20">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto">
+                <div class="glass-effect rounded-2xl p-8 border border-minecraft-gold/30 gold-glow">
+                    <div class="text-center mb-8">
+                        <h1 class="text-4xl font-bold mb-4">
+                            <span class="text-minecraft-gold">Система</span>
+                            <span class="text-white">аутентификации</span>
+                        </h1>
+                        <p class="text-gray-300">Тестирование функций сброса пароля и подтверждения email</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Сброс пароля -->
+                        <div class="glass-effect rounded-xl p-6 border border-minecraft-gold/20">
+                            <h2 class="text-2xl font-bold text-minecraft-gold mb-4">
+                                <i class="fas fa-key mr-2"></i>Сброс пароля
+                            </h2>
+                            
+                            <div class="space-y-4">
+                                <div class="bg-minecraft-gray/50 rounded-lg p-4">
+                                    <h3 class="font-bold text-minecraft-yellow mb-2">1. Запрос сброса</h3>
+                                    <p class="text-gray-300 mb-4">Перейдите на страницу восстановления пароля и введите email</p>
+                                    <a href="/forgot-password" class="btn-minecraft inline-block px-4 py-2 rounded-lg">
+                                        <i class="fas fa-envelope mr-2"></i>Забыли пароль?
+                                    </a>
+                                </div>
+
+                                <div class="bg-minecraft-gray/50 rounded-lg p-4">
+                                    <h3 class="font-bold text-minecraft-yellow mb-2">2. Тестовые ссылки</h3>
+                                    <p class="text-gray-300 text-sm mb-2">Токены появятся в консоли сервера</p>
+                                    <input type="text" id="resetToken" 
+                                           placeholder="Вставьте токен из консоли"
+                                           class="w-full bg-minecraft-gray border border-minecraft-gold/30 rounded px-3 py-2 text-white mb-2">
+                                    <button onclick="openResetPage()" class="btn-minecraft px-4 py-2 rounded-lg">
+                                        <i class="fas fa-lock-open mr-2"></i>Перейти к сбросу
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Подтверждение Email -->
+                        <div class="glass-effect rounded-xl p-6 border border-minecraft-gold/20">
+                            <h2 class="text-2xl font-bold text-minecraft-gold mb-4">
+                                <i class="fas fa-envelope-circle-check mr-2"></i>Подтверждение Email
+                            </h2>
+                            
+                            <div class="space-y-4">
+                                <div class="bg-minecraft-gray/50 rounded-lg p-4">
+                                    <h3 class="font-bold text-minecraft-yellow mb-2">1. Регистрация</h3>
+                                    <p class="text-gray-300 mb-4">При регистрации автоматически отправляется токен подтверждения</p>
+                                    <a href="/register" class="btn-minecraft inline-block px-4 py-2 rounded-lg">
+                                        <i class="fas fa-user-plus mr-2"></i>Регистрация
+                                    </a>
+                                </div>
+
+                                <div class="bg-minecraft-gray/50 rounded-lg p-4">
+                                    <h3 class="font-bold text-minecraft-yellow mb-2">2. Тестовые ссылки</h3>
+                                    <p class="text-gray-300 text-sm mb-2">Токены появятся в консоли сервера</p>
+                                    <input type="text" id="verifyToken" 
+                                           placeholder="Вставьте токен из консоли"
+                                           class="w-full bg-minecraft-gray border border-minecraft-gold/30 rounded px-3 py-2 text-white mb-2">
+                                    <button onclick="openVerifyPage()" class="btn-minecraft px-4 py-2 rounded-lg">
+                                        <i class="fas fa-check-circle mr-2"></i>Подтвердить Email
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- API Endpoints -->
+                    <div class="mt-8 glass-effect rounded-xl p-6 border border-minecraft-gold/20">
+                        <h2 class="text-2xl font-bold text-minecraft-gold mb-4">
+                            <i class="fas fa-code mr-2"></i>API Endpoints
+                        </h2>
+                        
+                        <div class="grid md:grid-cols-2 gap-4 text-sm">
+                            <div class="bg-minecraft-gray/50 rounded-lg p-4">
+                                <h3 class="font-bold text-minecraft-yellow mb-2">Сброс пароля</h3>
+                                <ul class="space-y-1 text-gray-300">
+                                    <li><code>POST /api/auth/forgot-password</code></li>
+                                    <li><code>GET /api/auth/verify-reset-token</code></li>
+                                    <li><code>POST /api/auth/reset-password</code></li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-minecraft-gray/50 rounded-lg p-4">
+                                <h3 class="font-bold text-minecraft-yellow mb-2">Подтверждение Email</h3>
+                                <ul class="space-y-1 text-gray-300">
+                                    <li><code>POST /api/auth/send-verification</code></li>
+                                    <li><code>GET /api/auth/verify-email-token</code></li>
+                                    <li><code>GET /api/auth/verify-email</code> (старый)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Навигация -->
+                    <div class="mt-8 text-center">
+                        <div class="flex flex-wrap justify-center gap-4">
+                            <a href="/" class="btn-minecraft px-4 py-2 rounded-lg">
+                                <i class="fas fa-home mr-2"></i>Главная
+                            </a>
+                            <a href="/login" class="btn-minecraft px-4 py-2 rounded-lg">
+                                <i class="fas fa-sign-in-alt mr-2"></i>Вход
+                            </a>
+                            <a href="/admin" class="btn-minecraft px-4 py-2 rounded-lg">
+                                <i class="fas fa-cog mr-2"></i>Админ
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function openResetPage() {
+            const token = document.getElementById('resetToken').value.trim();
+            if (token) {
+                window.open(`/reset-password?token=${token}`, '_blank');
+            } else {
+                alert('Введите токен сброса пароля');
+            }
+        }
+
+        function openVerifyPage() {
+            const token = document.getElementById('verifyToken').value.trim();
+            if (token) {
+                window.open(`/verify-email?token=${token}`, '_blank');
+            } else {
+                alert('Введите токен подтверждения email');
+            }
+        }
+
+        // Отображение логов в реальном времени (для демо)
+        console.log('🔐 Для тестирования:');
+        console.log('1. Зарегистрируйтесь или запросите сброс пароля');
+        console.log('2. Скопируйте токен из консоли сервера');
+        console.log('3. Вставьте токен в соответствующее поле');
+        console.log('4. Нажмите кнопку для перехода к странице');
+    </script>
+</body>
+</html>

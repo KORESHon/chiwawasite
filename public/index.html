@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Chiwawa Server - Приватный Minecraft сервер</title>
-    <meta name="description" content="Присоединяйтесь! © 2025 Test. Создано с любовью к приватному Minecraft серверу Chiwawa Server. Вход только по заявке. Дружелюбное сообщество и качественный геймплей.">
+    <meta name="description" content="Присоединяйтесь! © 2025 Chiwawa. Создано с любовью к приватному Minecraft серверу Chiwawa Server. Вход только по заявке. Дружелюбное сообщество и качественный геймплей.">
     <meta name="keywords" content="minecraft, сервер, приватный, chiwawa, геймплей, сообщество">
     <meta name="author" content="ebluffy">
     
@@ -248,7 +248,7 @@
             <div class="flex justify-between items-center h-16">
                 <!-- Левая часть - название сервера -->
                 <div class="flex items-center">
-                    <span id="server-name" class="text-2xl font-bold text-minecraft-yellow text-shadow">Test</span>
+                    <span id="server-name" class="text-2xl font-bold text-minecraft-yellow text-shadow">Chiwawa</span>
                 </div>
                 
                 <!-- Центральная часть - основные кнопки -->
@@ -311,7 +311,7 @@
                 <div class="glass-effect rounded-2xl p-12 mb-12 mx-auto gold-glow max-w-4xl">
                     <div class="animate-float">
                         <h1 id="hero-server-name" class="text-6xl md:text-7xl font-bold text-minecraft-gold text-shadow mb-6">
-                            Test
+                            Chiwawa
                         </h1>
                         <p id="hero-server-description" class="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto text-shadow">
                             Приватный Minecraft сервер с дружелюбным сообществом
@@ -323,12 +323,12 @@
                         <div class="flex items-center">
                             <div id="server-status" class="w-4 h-4 bg-green-400 rounded-full mr-3 animate-pulse"></div>
                             <span class="text-gray-300 text-lg">Сервер:</span>
-                            <span id="server-status-text" class="text-green-400 font-bold ml-2 text-lg">Онлайн</span>
+                            <span id="server-status-text" class="text-red-400 font-bold ml-2 text-lg">Оффлайн</span>
                         </div>
                         <div class="hidden md:block text-minecraft-gold text-2xl">│</div>
                         <div class="text-gray-300 text-lg">
                             <span>Игроков:</span>
-                            <span id="player-count" class="text-minecraft-yellow font-bold ml-2">5/50</span>
+                            <span id="player-count" class="text-minecraft-yellow font-bold ml-2">0/50</span>
                         </div>
                         <div class="hidden md:block text-minecraft-gold text-2xl">│</div>
                         <div class="text-gray-300 text-lg">
@@ -361,7 +361,7 @@
                 <!-- Название сервера -->
                 <div class="text-center md:text-left">
                     <h3 id="footer-server-name" class="text-2xl font-bold text-minecraft-yellow mb-2 text-shadow">
-                        <i class="fas fa-cubes mr-2"></i>Test
+                        <i class="fas fa-cubes mr-2"></i>Chiwawa
                     </h3>
                     <p id="footer-server-description" class="text-gray-300 leading-relaxed max-w-md">Приватный Minecraft сервер с качественным геймплеем и дружелюбным сообществом.</p>
                 </div>
@@ -509,10 +509,10 @@
 
         // Глобальная переменная для хранения настроек сервера
         let serverSettings = {
-            name: 'Test',
+            name: 'Chiwawa',
             description: 'Приватный Minecraft сервер с дружелюбным сообществом',
             ip: 'play.chiwawa.site',
-            port: '25565',
+            port: '25164',
             discordInvite: 'https://discord.gg/chiwawa',
             telegramInvite: 'https://t.me/chiwawa'
         };
@@ -811,22 +811,6 @@
             showMessage('Вы успешно вышли из системы', 'success');
         });
 
-        // Загрузка настроек сервера из навигации (устаревшая функция)
-        async function loadServerSettingsNav() {
-            try {
-                const response = await fetch('/api/admin/settings');
-                if (response.ok) {
-                    const data = await response.json();
-                    const serverNameElement = document.getElementById('server-name');
-                    if (serverNameElement && data.settings && data.settings.server) {
-                        serverNameElement.textContent = data.settings.server.name || 'Test';
-                    }
-                }
-            } catch (error) {
-                console.log('Не удалось загрузить настройки сервера, используем значение по умолчанию');
-            }
-        }
-
         // Инициализация
         document.addEventListener('DOMContentLoaded', () => {
             console.log('DOM загружен, инициализируем приложение');
@@ -846,13 +830,6 @@
                 copyButton.addEventListener('click', copyServerIP);
             } else {
                 console.error('Кнопка копирования НЕ найдена!');
-            }
-            
-            // Добавляем обработчик для тестовой кнопки
-            const testCopyBtn = document.getElementById('test-copy-btn');
-            if (testCopyBtn) {
-                testCopyBtn.addEventListener('click', copyServerIP);
-                console.log('Тестовая кнопка найдена и подключена');
             }
         });
     </script>

@@ -754,7 +754,7 @@
                                                     <i class="fas fa-info-circle text-xs text-gray-500 hover:text-minecraft-gold cursor-help"></i>
                                                 </span>
                                             </label>
-                                            <input type="text" id="server-name" value="Test" 
+                                            <input type="text" id="server-name" value="Chiwawa" 
                                                 class="setting-input w-full px-4 py-3 bg-minecraft-gray border border-minecraft-gold/30 rounded-lg text-white focus:border-minecraft-gold focus:outline-none transition-colors">
                                             <p class="text-xs text-gray-500 mt-2">Максимум 100 символов. Будет использоваться в заголовках email-писем.</p>
                                         </div>
@@ -2323,10 +2323,10 @@
         
         // Глобальная переменная для хранения настроек сервера
         let serverSettings = {
-            name: 'Test',
+            name: 'Chiwawa',
             description: 'Приватный Minecraft сервер с дружелюбным сообществом',
             ip: 'play.chiwawa.site',
-            port: '25565',
+            port: '25164',
             discordInvite: 'https://discord.gg/chiwawa',
             telegramInvite: 'https://t.me/chiwawa'
         };
@@ -2513,14 +2513,14 @@
             fetch('/api/settings/public')
                 .then(response => response.json())
                 .then(data => {
-                    if (data.serverName && data.serverName !== 'TestServer') {
-                        // Заменяем TestServer на реальное имя сервера во всех шаблонах
-                        replaceTestDataInTemplates('TestServer', data.serverName);
-                        replaceTestDataInTemplates('testserver', data.serverName.toLowerCase());
+                    if (data.serverName && data.serverName !== 'ChiwawaTest') {
+                        // Заменяем ChiwawaTest на реальное имя сервера во всех шаблонах
+                        replaceTestDataInTemplates('ChiwawaTest', data.serverName);
+                        replaceTestDataInTemplates('chiwawatest', data.serverName.toLowerCase());
                     }
                     
-                    if (data.serverIp && data.serverIp !== 'test.server.com') {
-                        replaceTestDataInTemplates('test.server.com', data.serverIp);
+                    if (data.serverIp && data.serverIp !== 'test.chiwawa.site') {
+                        replaceTestDataInTemplates('test.chiwawa.site', data.serverIp);
                     }
                 })
                 .catch(error => {
@@ -3852,47 +3852,49 @@
                 // Собираем все настройки из формы
                 const settingsData = {
                     // Основные настройки
-                    serverName: document.getElementById('server-name').value,
-                    serverDescription: document.getElementById('server-description').value,
-                    serverIp: document.getElementById('server-ip').value,
-                    serverPort: document.getElementById('server-port').value,
-                    discordInvite: document.getElementById('discord-invite').value,
-                    telegramInvite: document.getElementById('telegram-invite').value,
+                    serverName: document.getElementById('server-name')?.value,
+                    serverDescription: document.getElementById('server-description')?.value,
+                    serverIp: document.getElementById('server-ip')?.value,
+                    serverPort: parseInt(document.getElementById('server-port')?.value),
+                    discordInvite: document.getElementById('discord-invite')?.value,
+                    telegramInvite: document.getElementById('telegram-invite')?.value,
                     
                     // Настройки заявок
-                    applicationsEnabled: document.getElementById('applications-enabled').checked,
-                    minMotivationLength: parseInt(document.getElementById('min-motivation-length').value),
-                    minPlansLength: parseInt(document.getElementById('min-plans-length').value),
-                    maxApplicationsPerDay: parseInt(document.getElementById('max-applications-per-day').value),
-                    autoApproveTrustLevel: parseInt(document.getElementById('auto-approve-trust-level').value),
+                    applicationsEnabled: document.getElementById('applications-enabled')?.checked,
+                    minMotivationLength: parseInt(document.getElementById('min-motivation-length')?.value),
+                    minPlansLength: parseInt(document.getElementById('min-plans-length')?.value),
+                    maxApplicationsPerDay: parseInt(document.getElementById('max-applications-per-day')?.value),
+                    autoApproveTrustLevel: parseInt(document.getElementById('auto-approve-trust-level')?.value),
                     
                     // Trust Level настройки
-                    trustPointsEmail: parseInt(document.getElementById('trust-points-email').value),
-                    trustPointsDiscord: parseInt(document.getElementById('trust-points-discord').value),
-                    trustPointsHour: parseInt(document.getElementById('trust-points-hour').value),
-                    trustLevel1Required: parseInt(document.getElementById('trust-level-1-required').value),
-                    trustLevel2Required: parseInt(document.getElementById('trust-level-2-required').value),
-                    trustLevel3Required: parseInt(document.getElementById('trust-level-3-required').value),
+                    trustPointsEmail: parseInt(document.getElementById('trust-points-email')?.value),
+                    trustPointsDiscord: parseInt(document.getElementById('trust-points-discord')?.value),
+                    trustPointsHour: parseInt(document.getElementById('trust-points-hour')?.value),
+                    trustLevel1Required: parseInt(document.getElementById('trust-level-1-required')?.value),
+                    trustLevel2Required: parseInt(document.getElementById('trust-level-2-required')?.value),
+                    trustLevel3Required: parseInt(document.getElementById('trust-level-3-required')?.value),
                     
                     // Настройки безопасности
-                    maxLoginAttempts: parseInt(document.getElementById('max-login-attempts').value),
-                    loginLockoutDuration: parseInt(document.getElementById('login-lockout-duration').value),
-                    jwtExpiresDays: parseInt(document.getElementById('jwt-expires-days').value),
-                    requireEmailVerification: document.getElementById('require-email-verification').value === 'true',
-                    twoFactorEnabled: document.getElementById('two-factor-enabled').checked,
-                    rateLimitRequests: parseInt(document.getElementById('rate-limit-requests').value),
+                    maxLoginAttempts: parseInt(document.getElementById('max-login-attempts')?.value),
+                    loginLockoutDuration: parseInt(document.getElementById('login-lockout-duration')?.value),
+                    jwtExpiresDays: parseInt(document.getElementById('jwt-expires-days')?.value),
+                    requireEmailVerification: document.getElementById('require-email-verification')?.value === 'true',
+                    twoFactorEnabled: document.getElementById('two-factor-enabled')?.checked,
+                    rateLimitRequests: parseInt(document.getElementById('rate-limit-requests')?.value),
                     
                     // Email настройки
-                    smtpHost: document.getElementById('smtp-host').value,
-                    smtpPort: parseInt(document.getElementById('smtp-port').value),
-                    smtpFrom: document.getElementById('smtp-from').value,
-                    smtpUser: document.getElementById('smtp-user').value,
-                    smtpPassword: document.getElementById('smtp-password').value,
-                    smtpTls: document.getElementById('smtp-tls').checked
+                    smtpHost: document.getElementById('smtp-host')?.value,
+                    smtpPort: parseInt(document.getElementById('smtp-port')?.value),
+                    smtpFrom: document.getElementById('smtp-from')?.value,
+                    smtpUser: document.getElementById('smtp-user')?.value,
+                    smtpPassword: document.getElementById('smtp-password')?.value,
+                    smtpTls: document.getElementById('smtp-tls')?.checked
                 };
                 
+                console.log('Отправляемые настройки:', settingsData);
+                
                 const response = await fetch('/api/admin/settings', {
-                    method: 'PUT',
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
@@ -3903,25 +3905,20 @@
                 if (response.ok) {
                     const result = await response.json();
                     
-                    // Обновляем глобальные настройки
-                    serverSettings.name = settingsData.serverName;
-                    serverSettings.description = settingsData.serverDescription;
-                    serverSettings.ip = settingsData.serverIp;
-                    serverSettings.port = settingsData.serverPort;
-                    serverSettings.discordInvite = settingsData.discordInvite;
-                    serverSettings.telegramInvite = settingsData.telegramInvite;
+                    console.log('Ответ сервера:', result);
                     
-                    // Обновляем элементы на странице
-                    updateServerElements();
+                    // Перезагружаем настройки из административного API
+                    await loadSettings();
                     
-                    showMessage(result.message || 'Настройки успешно сохранены!', 'success');
+                    showNotification('success', result.message || 'Настройки успешно сохранены!');
                 } else {
                     const errorData = await response.json();
-                    showMessage('Ошибка сохранения: ' + (errorData.error || 'Неизвестная ошибка'), 'error');
+                    console.error('Ошибка сохранения:', errorData);
+                    showNotification('error', 'Ошибка сохранения: ' + (errorData.error || 'Неизвестная ошибка'));
                 }
             } catch (error) {
                 console.error('Ошибка сохранения настроек:', error);
-                showMessage('Ошибка соединения с сервером', 'error');
+                showNotification('error', 'Ошибка соединения с сервером');
             } finally {
                 // Восстанавливаем кнопку
                 saveBtn.innerHTML = originalText;
@@ -4040,10 +4037,10 @@
                 // Устанавливаем значения по умолчанию
                 const defaultSettings = {
                     // Основные настройки
-                    'server-name': 'Test',
+                    'server-name': 'Chiwawa',
                     'server-description': 'Приватный Minecraft сервер с дружелюбным сообществом',
                     'server-ip': 'play.chiwawa.site',
-                    'server-port': '25565',
+                    'server-port': '25164',
                     'discord-invite': 'https://discord.gg/chiwawa',
                     'telegram-invite': 'https://t.me/chiwawa',
                     
@@ -4156,98 +4153,68 @@
                     const data = await response.json();
                     const settings = data.settings || {};
                     
+                    console.log('Загруженные настройки:', settings);
+                    
+                    // Функция для безопасного заполнения поля
+                    const setElementValue = (id, value) => {
+                        const element = document.getElementById(id);
+                        if (element && value !== undefined && value !== null) {
+                            element.value = value;
+                        }
+                    };
+                    
+                    const setElementChecked = (id, checked) => {
+                        const element = document.getElementById(id);
+                        if (element && checked !== undefined && checked !== null) {
+                            element.checked = checked;
+                        }
+                    };
+                    
                     // Основные настройки сервера
-                    document.getElementById('server-name').value = settings.serverName || serverSettings.name || 'Test';
-                    document.getElementById('server-description').value = settings.serverDescription || serverSettings.description || '';
-                    document.getElementById('server-ip').value = settings.serverIp || serverSettings.ip || '';
-                    document.getElementById('server-port').value = settings.serverPort || serverSettings.port || '25565';
-                    document.getElementById('discord-invite').value = settings.discordInvite || serverSettings.discordInvite || '';
-                    document.getElementById('telegram-invite').value = settings.telegramInvite || serverSettings.telegramInvite || '';
+                    setElementValue('server-name', settings.serverName);
+                    setElementValue('server-description', settings.serverDescription);
+                    setElementValue('server-ip', settings.serverIp);
+                    setElementValue('server-port', settings.serverPort);
+                    setElementValue('discord-invite', settings.discordInvite);
+                    setElementValue('telegram-invite', settings.telegramInvite);
                     
                     // Настройки заявок
-                    document.getElementById('min-motivation-length').value = settings.minMotivationLength || 50;
-                    document.getElementById('min-plans-length').value = settings.minPlansLength || 30;
-                    document.getElementById('max-applications-per-day').value = settings.maxApplicationsPerDay || 3;
+                    setElementValue('min-motivation-length', settings.minMotivationLength);
+                    setElementValue('min-plans-length', settings.minPlansLength);
+                    setElementValue('max-applications-per-day', settings.maxApplicationsPerDay);
+                    setElementChecked('applications-enabled', settings.applicationsEnabled);
+                    setElementValue('auto-approve-trust-level', settings.autoApproveTrustLevel);
                     
-                    // Настройки Trust Level
-                    const trustInputs = [
-                        'trust-points-email',
-                        'trust-points-discord', 
-                        'trust-points-hour',
-                        'trust-level-1-required',
-                        'trust-level-2-required',
-                        'trust-level-3-required'
-                    ];
-                    
-                    trustInputs.forEach(id => {
-                        const element = document.getElementById(id);
-                        if (element) {
-                            const settingKey = id.replace(/-/g, '_');
-                            element.value = settings[settingKey] || element.value;
-                        }
-                    });
+                    // Trust Level настройки
+                    setElementValue('trust-points-email', settings.trustPointsEmail);
+                    setElementValue('trust-points-discord', settings.trustPointsDiscord);
+                    setElementValue('trust-points-hour', settings.trustPointsHour);
+                    setElementValue('trust-level-1-required', settings.trustLevel1Required);
+                    setElementValue('trust-level-2-required', settings.trustLevel2Required);
+                    setElementValue('trust-level-3-required', settings.trustLevel3Required);
                     
                     // Настройки безопасности
-                    const securityInputs = [
-                        'max-login-attempts',
-                        'login-lockout-duration',
-                        'jwt-expires-days',
-                        'rate-limit-requests'
-                    ];
-                    
-                    securityInputs.forEach(id => {
-                        const element = document.getElementById(id);
-                        if (element) {
-                            const settingKey = id.replace(/-/g, '_');
-                            element.value = settings[settingKey] || element.value;
-                        }
-                    });
+                    setElementValue('max-login-attempts', settings.maxLoginAttempts);
+                    setElementValue('login-lockout-duration', settings.loginLockoutDuration);
+                    setElementValue('jwt-expires-days', settings.jwtExpiresDays);
+                    setElementValue('rate-limit-requests', settings.rateLimitRequests);
+                    setElementChecked('two-factor-enabled', settings.twoFactorEnabled);
                     
                     // Email настройки
-                    const emailInputs = [
-                        'smtp-host',
-                        'smtp-port',
-                        'smtp-from',
-                        'smtp-user',
-                        'smtp-password'
-                    ];
-                    
-                    emailInputs.forEach(id => {
-                        const element = document.getElementById(id);
-                        if (element) {
-                            const settingKey = id.replace(/-/g, '_');
-                            element.value = settings[settingKey] || element.value;
-                        }
-                    });
-                    
-                    // Переключатели (checkboxes)
-                    const applicationToggle = document.getElementById('applications-enabled');
-                    if (applicationToggle) {
-                        applicationToggle.checked = settings.applicationsEnabled !== false;
-                    }
-                    
-                    const twoFactorToggle = document.getElementById('two-factor-enabled');
-                    if (twoFactorToggle) {
-                        twoFactorToggle.checked = settings.twoFactorEnabled === true;
-                    }
-                    
-                    const smtpTlsToggle = document.getElementById('smtp-tls');
-                    if (smtpTlsToggle) {
-                        smtpTlsToggle.checked = settings.smtpTls !== false;
-                    }
+                    setElementValue('smtp-host', settings.smtpHost);
+                    setElementValue('smtp-port', settings.smtpPort);
+                    setElementValue('smtp-from', settings.smtpFrom);
+                    setElementValue('smtp-user', settings.smtpUser);
+                    setElementValue('smtp-password', settings.smtpPassword);
+                    setElementChecked('smtp-tls', settings.smtpTls);
                     
                     // Select поля
                     const emailVerificationSelect = document.getElementById('require-email-verification');
-                    if (emailVerificationSelect) {
-                        emailVerificationSelect.value = settings.requireEmailVerification !== false ? 'true' : 'false';
+                    if (emailVerificationSelect && settings.requireEmailVerification !== undefined) {
+                        emailVerificationSelect.value = settings.requireEmailVerification ? 'true' : 'false';
                     }
                     
-                    const autoApproveSelect = document.getElementById('auto-approve-trust-level');
-                    if (autoApproveSelect) {
-                        autoApproveSelect.value = settings.autoApproveTrustLevel || '0';
-                    }
-                    
-                    console.log('Настройки успешно загружены:', settings);
+                    console.log('Настройки успешно загружены и применены к форме');
                 } else {
                     console.error('Ошибка загрузки настроек:', response.status);
                     showMessage('Ошибка загрузки настроек', 'error');

@@ -9,7 +9,6 @@ const morgan = require('morgan');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
-const { status } = require('minecraft-server-util');
 require('dotenv').config();
 
 const db = require('../database/connection');
@@ -97,78 +96,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/admin', settingsRoutes);
-app.use('/api', settingsRoutes); // Добавляем публичный доступ к настройкам
+app.use('/api', settingsRoutes); // Публичные настройки и информация о сервере
 app.use('/api/reputation', reputationRoutes);
 app.use('/api/trust-level', trustLevelRoutes);
-
-// Информация о сервере Minecraft
-app.get('/api/server-info', async (req, res) => {
-    try {
-        // Получаем настройки сервера
-        const config = require('./config/settings');
-        const serverIp = config.server?.ip || 'play.chiwawa.site';
-        const serverPort = parseInt(config.server?.port) || 25565;
-        
-        try {
-            // Проверяем реальный статус сервера
-            const result = await status(serverIp, serverPort, { timeout: 5000 });
-            
-            return res.json({
-                online: true,
-                players: {
-                    online: result.players.online,
-                    max: result.players.max
-                },
-                motd: result.motd?.clean || 'Minecraft Server',
-                version: result.version?.name || '1.20.1',
-                ping: result.roundTripLatency || 0
-            });
-        } catch (serverError) {
-            // Если это тестовый IP (play.chiwawa.site), показываем демо данные
-            if (serverIp.includes('chiwawa.site') || serverIp.includes('test')) {
-                return res.json({
-                    online: true,
-                    players: {
-                        online: Math.floor(Math.random() * 15) + 3, // Случайное число от 3 до 17
-                        max: 50
-                    },
-                    motd: 'Test Server - Demo Mode',
-                    version: '1.20.1',
-                    ping: Math.floor(Math.random() * 50) + 20 // Случайный пинг от 20 до 70
-                });
-            }
-            
-            // Сервер недоступен
-            console.log(`Сервер ${serverIp}:${serverPort} недоступен:`, serverError.message);
-            
-            return res.json({
-                online: false,
-                players: {
-                    online: 0,
-                    max: 50
-                },
-                motd: 'Сервер недоступен',
-                version: '1.20.1',
-                ping: 0
-            });
-        }
-    } catch (error) {
-        console.error('Ошибка проверки статуса сервера:', error);
-        
-        // Возвращаем заглушку при ошибке
-        res.json({
-            online: false,
-            players: {
-                online: 0,
-                max: 50
-            },
-            motd: 'Ошибка проверки статуса',
-            version: '1.20.1',
-            ping: 0
-        });
-    }
-});
 
 // Маршруты для страниц
 app.get('/', (req, res) => {
@@ -193,6 +123,26 @@ app.get('/profile', (req, res) => {
 
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/admin.html'));
+});
+
+app.get('/reset-password', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/reset-password.html'));
+});
+
+app.get('/verify-email', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/verify-email.html'));
+});
+
+app.get('/test-auth', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/test-auth.html'));
+});
+
+app.get('/rules', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/rules.html'));
+});
+
+app.get('/online', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/online.html'));
 });
 
 // Проверка здоровья системы

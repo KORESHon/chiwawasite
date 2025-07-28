@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Онлайн - Test Server</title>
+    <title>Онлайн - Chiwawa Server</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -53,7 +53,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
-                    <a href="/" class="text-2xl font-bold text-minecraft-yellow text-shadow">Test</a>
+                    <a href="/" class="text-2xl font-bold text-minecraft-yellow text-shadow">Chiwawa</a>
                 </div>
                 <div class="flex items-center space-x-6">
                     <a href="/" class="text-white hover:text-minecraft-gold transition-colors text-shadow">Главная</a>
@@ -148,11 +148,11 @@
             <div class="grid md:grid-cols-2 gap-6 text-gray-300">
                 <div>
                     <h4 class="font-medium text-white mb-2">IP сервера:</h4>
-                    <code class="bg-minecraft-gray px-3 py-1 rounded text-minecraft-gold" id="server-ip">play.test.ru</code>
+                    <code class="bg-minecraft-gray px-3 py-1 rounded text-minecraft-gold" id="server-ip">play.chiwawa.site</code>
                 </div>
                 <div>
                     <h4 class="font-medium text-white mb-2">Порт:</h4>
-                    <code class="bg-minecraft-gray px-3 py-1 rounded text-minecraft-gold" id="server-port">25565</code>
+                    <code class="bg-minecraft-gray px-3 py-1 rounded text-minecraft-gold" id="server-port">25164</code>
                 </div>
             </div>
             <p class="text-sm text-gray-400 mt-4">
@@ -177,9 +177,9 @@
                 document.getElementById('server-version').textContent = data.version || '1.20+';
                 
                 // Обновляем IP и порт
-                document.getElementById('server-ip').textContent = data.ip || 'play.test.ru';
-                document.getElementById('server-port').textContent = data.port || '25565';
-                
+                document.getElementById('server-ip').textContent = data.ip || 'play.chiwawa.site';
+                document.getElementById('server-port').textContent = data.port || '25164';
+
                 // Обновляем список игроков
                 updatePlayersList(data.players?.list || []);
                 

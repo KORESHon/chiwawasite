@@ -1100,13 +1100,19 @@ router.get('/settings', authenticateToken, requireRole(['admin']), async (req, r
             // Парсим значение в зависимости от типа
             let parsedValue;
             try {
-                parsedValue = JSON.parse(setting_value);
+                if (setting_type === 'boolean') {
+                    parsedValue = setting_value === 'true' || setting_value === true;
+                } else if (setting_type === 'integer') {
+                    parsedValue = parseInt(setting_value);
+                } else {
+                    parsedValue = setting_value;
+                }
             } catch {
                 parsedValue = setting_value;
             }
 
-            // Конвертируем snake_case в camelCase для frontend
-            const camelKey = setting_key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+            // Конвертируем kebab-case в camelCase для frontend
+            const camelKey = setting_key.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
             
             settings[camelKey] = parsedValue;
             
@@ -1212,56 +1218,56 @@ router.post('/settings', [
             )
         `);
 
-        // Маппинг настроек по категориям
+        // Маппинг настроек по категориям (используем kebab-case для соответствия БД)
         const settingsMapping = {
             // Основные настройки
-            server_name: { value: req.body.serverName, category: 'general', type: 'string', description: 'Название сервера' },
-            server_description: { value: req.body.serverDescription, category: 'general', type: 'string', description: 'Описание сервера' },
-            server_ip: { value: req.body.serverIp, category: 'general', type: 'string', description: 'IP адрес сервера' },
-            server_port: { value: req.body.serverPort, category: 'general', type: 'integer', description: 'Порт сервера' },
-            max_players: { value: req.body.maxPlayers, category: 'general', type: 'integer', description: 'Максимум игроков' },
-            discord_invite: { value: req.body.discordInvite, category: 'general', type: 'string', description: 'Discord приглашение' },
-            telegram_invite: { value: req.body.telegramInvite, category: 'general', type: 'string', description: 'Telegram канал' },
+            'server-name': { value: req.body.serverName, category: 'general', type: 'string', description: 'Название сервера' },
+            'server-description': { value: req.body.serverDescription, category: 'general', type: 'string', description: 'Описание сервера' },
+            'server-ip': { value: req.body.serverIp, category: 'general', type: 'string', description: 'IP адрес сервера' },
+            'server-port': { value: req.body.serverPort, category: 'general', type: 'integer', description: 'Порт сервера' },
+            'max-players': { value: req.body.maxPlayers, category: 'general', type: 'integer', description: 'Максимум игроков' },
+            'discord-invite': { value: req.body.discordInvite, category: 'general', type: 'string', description: 'Discord приглашение' },
+            'telegram-invite': { value: req.body.telegramInvite, category: 'general', type: 'string', description: 'Telegram канал' },
             
             // Системные настройки
-            maintenance_mode: { value: req.body.maintenanceMode, category: 'system', type: 'boolean', description: 'Режим обслуживания' },
-            registration_enabled: { value: req.body.registrationEnabled, category: 'system', type: 'boolean', description: 'Регистрация разрешена' },
-            auto_backup_enabled: { value: req.body.autoBackupEnabled, category: 'system', type: 'boolean', description: 'Автобэкапы' },
+            'maintenance-mode': { value: req.body.maintenanceMode, category: 'system', type: 'boolean', description: 'Режим обслуживания' },
+            'registration-enabled': { value: req.body.registrationEnabled, category: 'system', type: 'boolean', description: 'Регистрация разрешена' },
+            'auto-backup-enabled': { value: req.body.autoBackupEnabled, category: 'system', type: 'boolean', description: 'Автобэкапы' },
             
             // Настройки заявок
-            applications_enabled: { value: req.body.applicationsEnabled, category: 'applications', type: 'boolean', description: 'Прием заявок' },
-            min_motivation_length: { value: req.body.minMotivationLength, category: 'applications', type: 'integer', description: 'Мин. символов в мотивации' },
-            min_plans_length: { value: req.body.minPlansLength, category: 'applications', type: 'integer', description: 'Мин. символов в планах' },
-            max_applications_per_day: { value: req.body.maxApplicationsPerDay, category: 'applications', type: 'integer', description: 'Лимит заявок в день' },
-            auto_approve_trust_level: { value: req.body.autoApproveTrustLevel, category: 'applications', type: 'integer', description: 'Автоодобрение по Trust Level' },
+            'applications-enabled': { value: req.body.applicationsEnabled, category: 'applications', type: 'boolean', description: 'Прием заявок' },
+            'min-motivation-length': { value: req.body.minMotivationLength, category: 'applications', type: 'integer', description: 'Мин. символов в мотивации' },
+            'min-plans-length': { value: req.body.minPlansLength, category: 'applications', type: 'integer', description: 'Мин. символов в планах' },
+            'max-applications-per-day': { value: req.body.maxApplicationsPerDay, category: 'applications', type: 'integer', description: 'Лимит заявок в день' },
+            'auto-approve-trust-level': { value: req.body.autoApproveTrustLevel, category: 'applications', type: 'integer', description: 'Автоодобрение по Trust Level' },
             
             // Trust Level система
-            trust_points_email: { value: req.body.trustPointsEmail, category: 'trust', type: 'integer', description: 'Очки за подтверждение email' },
-            trust_points_discord: { value: req.body.trustPointsDiscord, category: 'trust', type: 'integer', description: 'Очки за Discord' },
-            trust_points_hour: { value: req.body.trustPointsHour, category: 'trust', type: 'integer', description: 'Очки за час игры' },
-            trust_level_1_required: { value: req.body.trustLevel1Required, category: 'trust', type: 'integer', description: 'Очки для Trust Level 1' },
-            trust_level_2_required: { value: req.body.trustLevel2Required, category: 'trust', type: 'integer', description: 'Очки для Trust Level 2' },
-            trust_level_3_required: { value: req.body.trustLevel3Required, category: 'trust', type: 'integer', description: 'Очки для Trust Level 3' },
+            'trust-points-email': { value: req.body.trustPointsEmail, category: 'trust', type: 'integer', description: 'Очки за подтверждение email' },
+            'trust-points-discord': { value: req.body.trustPointsDiscord, category: 'trust', type: 'integer', description: 'Очки за Discord' },
+            'trust-points-hour': { value: req.body.trustPointsHour, category: 'trust', type: 'integer', description: 'Очки за час игры' },
+            'trust-level-1-required': { value: req.body.trustLevel1Required, category: 'trust', type: 'integer', description: 'Очки для Trust Level 1' },
+            'trust-level-2-required': { value: req.body.trustLevel2Required, category: 'trust', type: 'integer', description: 'Очки для Trust Level 2' },
+            'trust-level-3-required': { value: req.body.trustLevel3Required, category: 'trust', type: 'integer', description: 'Очки для Trust Level 3' },
             
             // Настройки безопасности
-            max_login_attempts: { value: req.body.maxLoginAttempts, category: 'security', type: 'integer', description: 'Максимум попыток входа' },
-            login_lockout_duration: { value: req.body.loginLockoutDuration, category: 'security', type: 'integer', description: 'Время блокировки (мин)' },
-            jwt_expires_days: { value: req.body.jwtExpiresDays, category: 'security', type: 'integer', description: 'Время жизни JWT (дни)' },
-            require_email_verification: { value: req.body.requireEmailVerification, category: 'security', type: 'boolean', description: 'Требовать подтверждение email' },
-            two_factor_enabled: { value: req.body.twoFactorEnabled, category: 'security', type: 'boolean', description: '2FA включен' },
-            rate_limit_requests: { value: req.body.rateLimitRequests, category: 'security', type: 'integer', description: 'Rate limit (запросов/мин)' },
+            'max-login-attempts': { value: req.body.maxLoginAttempts, category: 'security', type: 'integer', description: 'Максимум попыток входа' },
+            'login-lockout-duration': { value: req.body.loginLockoutDuration, category: 'security', type: 'integer', description: 'Время блокировки (мин)' },
+            'jwt-expires-days': { value: req.body.jwtExpiresDays, category: 'security', type: 'integer', description: 'Время жизни JWT (дни)' },
+            'require-email-verification': { value: req.body.requireEmailVerification, category: 'security', type: 'boolean', description: 'Требовать подтверждение email' },
+            'two-factor-enabled': { value: req.body.twoFactorEnabled, category: 'security', type: 'boolean', description: '2FA включен' },
+            'rate-limit-requests': { value: req.body.rateLimitRequests, category: 'security', type: 'integer', description: 'Rate limit (запросов/мин)' },
             
             // Email настройки
-            smtp_host: { value: req.body.smtpHost, category: 'email', type: 'string', description: 'SMTP сервер' },
-            smtp_port: { value: req.body.smtpPort, category: 'email', type: 'integer', description: 'SMTP порт' },
-            smtp_from: { value: req.body.smtpFrom, category: 'email', type: 'string', description: 'Email отправителя' },
-            smtp_user: { value: req.body.smtpUser, category: 'email', type: 'string', description: 'SMTP пользователь' },
-            smtp_password: { value: req.body.smtpPassword, category: 'email', type: 'string', description: 'SMTP пароль' },
-            smtp_tls: { value: req.body.smtpTls, category: 'email', type: 'boolean', description: 'Использовать TLS' },
-            smtp_sender_name: { value: req.body.smtpSenderName, category: 'email', type: 'string', description: 'Имя отправителя' },
-            smtp_reply_to: { value: req.body.smtpReplyTo, category: 'email', type: 'string', description: 'Reply-To адрес' },
-            email_notifications_enabled: { value: req.body.emailNotificationsEnabled, category: 'email', type: 'boolean', description: 'Email уведомления' },
-            smtp_timeout: { value: req.body.smtpTimeout, category: 'email', type: 'integer', description: 'Тайм-аут SMTP (сек)' }
+            'smtp-host': { value: req.body.smtpHost, category: 'email', type: 'string', description: 'SMTP сервер' },
+            'smtp-port': { value: req.body.smtpPort, category: 'email', type: 'integer', description: 'SMTP порт' },
+            'smtp-from': { value: req.body.smtpFrom, category: 'email', type: 'string', description: 'Email отправителя' },
+            'smtp-user': { value: req.body.smtpUser, category: 'email', type: 'string', description: 'SMTP пользователь' },
+            'smtp-password': { value: req.body.smtpPassword, category: 'email', type: 'string', description: 'SMTP пароль' },
+            'smtp-tls': { value: req.body.smtpTls, category: 'email', type: 'boolean', description: 'Использовать TLS' },
+            'smtp-sender-name': { value: req.body.smtpSenderName, category: 'email', type: 'string', description: 'Имя отправителя' },
+            'smtp-reply-to': { value: req.body.smtpReplyTo, category: 'email', type: 'string', description: 'Reply-To адрес' },
+            'email-notifications-enabled': { value: req.body.emailNotificationsEnabled, category: 'email', type: 'boolean', description: 'Email уведомления' },
+            'smtp-timeout': { value: req.body.smtpTimeout, category: 'email', type: 'integer', description: 'Тайм-аут SMTP (сек)' }
         };
 
         let updatedCount = 0;
@@ -1334,7 +1340,7 @@ router.post('/test-email-template', [
         const settingsResult = await db.query(`
             SELECT setting_key, setting_value 
             FROM server_settings 
-            WHERE setting_key IN ('server_name', 'server_ip', 'discord_invite', 'telegram_invite')
+            WHERE setting_key IN ('server-name', 'server-ip', 'discord-invite', 'telegram-invite')
         `);
 
         const serverSettings = {};
@@ -1350,7 +1356,7 @@ router.post('/test-email-template', [
         const templateVars = {
             username: req.user.nickname || req.user.email.split('@')[0],
             email: recipientEmail,
-            serverName: serverSettings.server_name || 'Chiwawa Server',
+            serverName: serverSettings.server_name || 'ChiwawaMine',
             serverIP: serverSettings.server_ip || 'play.chiwawa.site',
             discordLink: serverSettings.discord_invite || 'https://discord.gg/chiwawa',
             telegramLink: serverSettings.telegram_invite || 'https://t.me/chiwawa',
@@ -1609,14 +1615,14 @@ router.post('/test-email-with-template', [
 
         // Переменные для замены в шаблоне (используем реальные данные)
         const templateVars = {
-            serverName: getSetting('server_name', 'ChiwawaMine'),
-            serverDescription: getSetting('server_description', 'Лучший Minecraft сервер'),
-            serverIp: getSetting('server_ip', 'play.chiwawa.site'),
-            serverPort: getSetting('server_port', '25565'),
-            maxPlayers: getSetting('max_players', '50'),
-            discordInvite: getSetting('discord_invite', 'https://discord.gg/chiwawa'),
-            telegramInvite: getSetting('telegram_invite', 'https://t.me/chiwawa'),
-            
+            serverName: getSetting('server-name', 'ChiwawaMine'),
+            serverDescription: getSetting('server-description', 'Лучший Minecraft сервер'),
+            serverIp: getSetting('server-ip', 'play.chiwawa.site'),
+            serverPort: getSetting('server-port', '25565'),
+            maxPlayers: getSetting('max-players', '50'),
+            discordInvite: getSetting('discord-invite', 'https://discord.gg/chiwawa'),
+            telegramInvite: getSetting('telegram-invite', 'https://t.me/chiwawa'),
+
             // Данные пользователя (реальные или тестовые)
             nickname: targetUser ? targetUser.nickname : 'Тестовый игрок',
             email: finalEmail,
@@ -1625,11 +1631,11 @@ router.post('/test-email-with-template', [
             joinDate: targetUser ? new Date(targetUser.registered_at).toLocaleDateString('ru-RU') : new Date().toLocaleDateString('ru-RU'),
             
             // Специальные переменные для разных типов писем
-            verificationLink: `https://${getSetting('server_ip', 'chiwawa.site')}/verify/${Math.random().toString(36).substring(7)}`,
-            resetLink: `https://${getSetting('server_ip', 'chiwawa.site')}/reset/${Math.random().toString(36).substring(7)}`,
-            unsubscribeLink: `https://${getSetting('server_ip', 'chiwawa.site')}/unsubscribe/${Math.random().toString(36).substring(7)}`,
-            serverLink: `https://${getSetting('server_ip', 'chiwawa.site')}`,
-            
+            verificationLink: `https://${getSetting('server-ip', 'chiwawa.site')}/verify/${Math.random().toString(36).substring(7)}`,
+            resetLink: `https://${getSetting('server-ip', 'chiwawa.site')}/reset/${Math.random().toString(36).substring(7)}`,
+            unsubscribeLink: `https://${getSetting('server-ip', 'chiwawa.site')}/unsubscribe/${Math.random().toString(36).substring(7)}`,
+            serverLink: `https://${getSetting('server-ip', 'chiwawa.site')}`,
+
             // Переменные для заявок
             rejectionReason: 'Пример причины отклонения для демонстрации',
             
@@ -2256,7 +2262,7 @@ router.post('/test-email', authenticateToken, requireRole(['admin']), async (req
                     const settingsResult = await db.query(`
                         SELECT setting_key, setting_value 
                         FROM server_settings 
-                        WHERE setting_key IN ('serverName', 'serverIp', 'serverPort', 'discordInvite', 'telegramInvite')
+                        WHERE setting_key IN ('server-name', 'server-ip', 'server-port', 'discord-invite', 'telegram-invite')
                     `);
                     
                     const serverSettings = {};
