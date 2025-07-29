@@ -82,12 +82,18 @@ const adminLimiter = rateLimit({
 
 app.use('/api/', limiter);
 app.use('/api/auth/login', strictLimiter);
-app.use('/api/applications', strictLimiter);
+// Убираем строгий лимит для applications, так как админы должны иметь доступ
+// app.use('/api/applications', strictLimiter);
 app.use('/api/admin', adminLimiter);
 app.use('/api/trust-level', adminLimiter);
 
 // Статические файлы
 app.use(express.static(path.join(__dirname, '../public'), {
+    maxAge: process.env.NODE_ENV === 'production' ? '1d' : '0'
+}));
+
+// Дополнительный маршрут для Tailwind CSS
+app.use('/tailwind_theme', express.static(path.join(__dirname, '../tailwind_theme'), {
     maxAge: process.env.NODE_ENV === 'production' ? '1d' : '0'
 }));
 

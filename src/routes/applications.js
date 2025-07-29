@@ -255,9 +255,13 @@ router.put('/:id/review', [
             WHERE id = $4
         `, [status, req.user.id, comment, id]);
 
-        // Если заявка одобрена, создаем пользователя
-        if (status === 'approved') {
+        // Если заявка одобрена и у неё нет связанного пользователя, создаем пользователя
+        console.log(`Проверка условий: status=${status}, application.user_id=${application.user_id}`);
+        if (status === 'approved' && !application.user_id) {
+            console.log(`Создаем пользователя для заявки ${application.id}`);
             await createUserFromApplication(application);
+        } else {
+            console.log(`Пропускаем создание пользователя: status=${status}, user_id=${application.user_id}`);
         }
 
         // Логируем действие
@@ -313,53 +317,91 @@ router.get('/stats', authenticateToken, requireRole(['admin', 'moderator']), asy
 // Функция создания пользователя из одобренной заявки
 async function createUserFromApplication(application) {
     try {
-        // Генерируем временный пароль
-        const tempPassword = Math.random().toString(36).slice(-8);
-        const hashedPassword = await bcrypt.hash(tempPassword, 12);
+        // Проверяем, что заявка еще не связана с пользователем
+        if (application.user_id) {
+            console.log(`Заявка ${application.id} уже связана с пользователем ${application.user_id}`);
+            return { userId: application.user_id };
+        }
 
-        // Создаем пользователя
-        const userResult = await db.query(`
-            INSERT INTO users (
-                nickname, email, discord_tag, password_hash, 
-                is_email_verified, trust_level
-            ) VALUES ($1, $2, $3, $4, false, 0)
-            RETURNING id
-        `, [
-            application.minecraft_nick,
-            application.email,
-            application.discord,
-            hashedPassword
-        ]);
+        // Проверяем, существует ли пользователь с таким никнеймом
+        const existingUser = await db.query(`
+            SELECT id FROM users WHERE nickname = $1 LIMIT 1
+        `, [application.minecraft_nick]);
 
-        const userId = userResult.rows[0].id;
+        let userId;
+        let tempPassword = null;
+
+        if (existingUser.rows.length > 0) {
+            // Пользователь уже существует, используем его ID
+            userId = existingUser.rows[0].id;
+            console.log(`Пользователь с никнеймом ${application.minecraft_nick} уже существует (ID: ${userId}), связываем с заявкой`);
+        } else {
+            // Создаем нового пользователя
+            tempPassword = Math.random().toString(36).slice(-8);
+            const hashedPassword = await bcrypt.hash(tempPassword, 12);
+
+            const userResult = await db.query(`
+                INSERT INTO users (
+                    nickname, email, discord_tag, password_hash, 
+                    is_email_verified, trust_level
+                ) VALUES ($1, $2, $3, $4, false, 0)
+                RETURNING id
+            `, [
+                application.minecraft_nick,
+                application.email,
+                application.discord,
+                hashedPassword
+            ]);
+
+            userId = userResult.rows[0].id;
+            console.log(`✅ Создан новый пользователь ${application.minecraft_nick} (ID: ${userId})`);
+        }
 
         // Связываем заявку с пользователем
         await db.query(`
             UPDATE applications SET user_id = $1 WHERE id = $2
         `, [userId, application.id]);
 
-        // Создаем записи в связанных таблицах
-        await db.query(`
-            INSERT INTO player_stats (
-                user_id, total_minutes, daily_limit_minutes, is_time_limited,
-                current_level, email_verified, discord_verified, 
-                minecraft_verified, reputation, total_logins, warnings_count
-            ) VALUES ($1, 0, 600, true, 0, false, false, false, 0, 0, 0)
-        `, [userId]);
+        // Создаем записи в связанных таблицах только для новых пользователей
+        if (tempPassword) {
+            // Проверяем, есть ли уже player_stats для этого пользователя
+            const existingStats = await db.query(`
+                SELECT id FROM player_stats WHERE user_id = $1 LIMIT 1
+            `, [userId]);
 
-        // Добавляем достижение "Первый вход"
-        const achievementResult = await db.query(`
-            SELECT id FROM achievements WHERE name = 'Первый вход' LIMIT 1
-        `);
+            if (existingStats.rows.length === 0) {
+                await db.query(`
+                    INSERT INTO player_stats (
+                        user_id, total_minutes, daily_limit_minutes, is_time_limited,
+                        current_level, email_verified, discord_verified, 
+                        minecraft_verified, reputation, total_logins, warnings_count
+                    ) VALUES ($1, 0, 600, true, 0, false, false, false, 0, 0, 0)
+                `, [userId]);
+            }
 
-        if (achievementResult.rows.length > 0) {
-            await db.query(`
-                INSERT INTO user_achievements (user_id, achievement_id)
-                VALUES ($1, $2)
-            `, [userId, achievementResult.rows[0].id]);
+            // Добавляем достижение "Первый вход" только если его еще нет
+            const achievementResult = await db.query(`
+                SELECT id FROM achievements WHERE name = 'Первый вход' LIMIT 1
+            `);
+
+            if (achievementResult.rows.length > 0) {
+                const existingAchievement = await db.query(`
+                    SELECT id FROM user_achievements 
+                    WHERE user_id = $1 AND achievement_id = $2 LIMIT 1
+                `, [userId, achievementResult.rows[0].id]);
+
+                if (existingAchievement.rows.length === 0) {
+                    await db.query(`
+                        INSERT INTO user_achievements (user_id, achievement_id)
+                        VALUES ($1, $2)
+                    `, [userId, achievementResult.rows[0].id]);
+                }
+            }
+
+            console.log(`✅ Создан новый пользователь для ${application.minecraft_nick}, временный пароль: ${tempPassword}`);
+        } else {
+            console.log(`✅ Заявка ${application.id} связана с существующим пользователем ${application.minecraft_nick} (ID: ${userId})`);
         }
-
-        console.log(`✅ Создан пользователь для ${application.minecraft_nick}, временный пароль: ${tempPassword}`);
 
         return { userId, tempPassword };
 
@@ -379,5 +421,200 @@ function getStatusText(status) {
     };
     return statusTexts[status] || 'Неизвестно';
 }
+
+// GET /api/applications/server-access - Получение информации о заявке на доступ к серверу
+router.get('/server-access', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        
+        // Ищем последнюю заявку пользователя
+        const applicationResult = await db.query(`
+            SELECT * FROM applications 
+            WHERE user_id = $1 
+            ORDER BY submitted_at DESC 
+            LIMIT 1
+        `, [userId]);
+        
+        const application = applicationResult.rows.length > 0 ? applicationResult.rows[0] : null;
+        
+        // Проверяем, есть ли у пользователя доступ к серверу (одобренная заявка)
+        const hasAccess = application !== null && application.status === 'approved';
+        
+        res.json({
+            hasAccess: hasAccess,
+            application: application
+        });
+        
+    } catch (error) {
+        console.error('Ошибка получения заявки на доступ:', error);
+        res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    }
+});
+
+// POST /api/applications/server-access - Подача заявки на доступ к серверу
+router.post('/server-access', [
+    authenticateToken,
+    body('age').isInt({ min: 10, max: 100 }),
+    body('source').isLength({ min: 1, max: 50 }),
+    body('experience').isLength({ min: 1, max: 50 }),
+    body('about').isLength({ min: 50, max: 1000 })
+], async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                error: 'Ошибка валидации',
+                details: errors.array()
+            });
+        }
+
+        const userId = req.user.id;
+        const { age, source, experience, about } = req.body;
+        
+        // Получаем данные пользователя
+        const userResult = await db.query(`
+            SELECT email, nickname, first_name, role, discord_tag FROM users WHERE id = $1
+        `, [userId]);
+        
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Пользователь не найден' });
+        }
+        
+        const user = userResult.rows[0];
+        
+        // Проверяем, нет ли уже одобренной заявки
+        const approvedApplication = await db.query(`
+            SELECT id FROM applications 
+            WHERE user_id = $1 AND status = 'approved'
+            LIMIT 1
+        `, [userId]);
+        
+        if (approvedApplication.rows.length > 0) {
+            return res.status(400).json({ error: 'У вас уже есть доступ к серверу' });
+        }
+        
+        // Проверяем, нет ли активной заявки
+        const existingApplication = await db.query(`
+            SELECT id, status FROM applications 
+            WHERE user_id = $1 AND status = 'pending'
+            ORDER BY submitted_at DESC LIMIT 1
+        `, [userId]);
+        
+        if (existingApplication.rows.length > 0) {
+            return res.status(400).json({ error: 'У вас уже есть активная заявка на рассмотрении' });
+        }
+        
+        const ip = req.ip || req.connection.remoteAddress;
+        const userAgent = req.get('User-Agent') || '';
+        
+        // Создаем заявку (адаптируем под структуру БД)
+        const result = await db.query(`
+            INSERT INTO applications 
+            (user_id, minecraft_nick, email, age, discord, experience, motivation, plans, ip_address, user_agent)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+            RETURNING id
+        `, [userId, user.nickname, user.email, age.toString(), user.discord_tag || 'Не указан', experience, about, `Планы: будут указаны в настройках профиля`, ip, userAgent]);
+        
+        res.json({
+            success: true,
+            message: 'Заявка на доступ к серверу успешно подана',
+            applicationId: result.rows[0].id
+        });
+        
+    } catch (error) {
+        console.error('Ошибка подачи заявки на доступ:', error);
+        res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    }
+});
+
+// GET /api/applications/trust-level - Получение информации о заявке на повышение уровня доверия  
+router.get('/trust-level', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        
+        // Ищем последнюю заявку пользователя на повышение уровня доверия
+        const applicationResult = await db.query(`
+            SELECT * FROM trust_level_applications 
+            WHERE user_id = $1 
+            ORDER BY created_at DESC 
+            LIMIT 1
+        `, [userId]);
+        
+        const application = applicationResult.rows.length > 0 ? applicationResult.rows[0] : null;
+        
+        res.json({
+            application: application
+        });
+        
+    } catch (error) {
+        console.error('Ошибка получения заявки на повышение:', error);
+        res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    }
+});
+
+// POST /api/applications/trust-level - Подача заявки на повышение уровня доверия
+router.post('/trust-level', [
+    authenticateToken,
+    body('motivation').isLength({ min: 50, max: 1000 }),
+    body('plans').isLength({ min: 30, max: 500 })
+], async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                error: 'Ошибка валидации',
+                details: errors.array()
+            });
+        }
+        
+        const userId = req.user.id;
+        const { motivation, plans } = req.body;
+        
+        // Получаем текущие данные пользователя
+        const userResult = await db.query(`
+            SELECT u.trust_level, ur.reputation_score, u.is_email_verified
+            FROM users u
+            LEFT JOIN user_reputation ur ON u.id = ur.user_id
+            WHERE u.id = $1
+        `, [userId]);
+        
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Пользователь не найден' });
+        }
+        
+        const user = userResult.rows[0];
+        const currentLevel = user.trust_level || 0;
+        const reputation = user.reputation_score || 0;
+        const requestedLevel = currentLevel + 1;
+        
+        // Проверяем, нет ли активной заявки
+        const existingApplication = await db.query(`
+            SELECT id FROM trust_level_applications 
+            WHERE user_id = $1 AND status = 'pending'
+        `, [userId]);
+        
+        if (existingApplication.rows.length > 0) {
+            return res.status(400).json({ error: 'У вас уже есть активная заявка на рассмотрении' });
+        }
+        
+        // Создаем заявку (объединяем motivation и plans в поле reason)
+        const result = await db.query(`
+            INSERT INTO trust_level_applications 
+            (user_id, current_level, requested_level, reason, reputation_score, hours_played, email_verified)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            RETURNING id
+        `, [userId, currentLevel, requestedLevel, `Мотивация: ${motivation}\n\nПланы: ${plans}`, reputation, 0, user.is_email_verified || false]);
+        
+        res.json({
+            success: true,
+            message: 'Заявка на повышение уровня доверия успешно подана',
+            applicationId: result.rows[0].id
+        });
+        
+    } catch (error) {
+        console.error('Ошибка подачи заявки на повышение:', error);
+        res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    }
+});
 
 module.exports = router;

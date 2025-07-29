@@ -5,7 +5,7 @@
 -- Dumped from database version 14.18 (Ubuntu 14.18-0ubuntu0.22.04.1)
 -- Dumped by pg_dump version 14.18 (Ubuntu 14.18-0ubuntu0.22.04.1)
 
--- Started on 2025-07-28 03:53:43 UTC
+-- Started on 2025-07-28 21:21:12 UTC
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -20,7 +20,7 @@ SET row_security = off;
 
 DROP DATABASE IF EXISTS chiwawa;
 --
--- TOC entry 3671 (class 1262 OID 16816)
+-- TOC entry 3667 (class 1262 OID 16816)
 -- Name: chiwawa; Type: DATABASE; Schema: -; Owner: chiwawa
 --
 
@@ -53,7 +53,7 @@ CREATE SCHEMA public;
 ALTER SCHEMA public OWNER TO postgres;
 
 --
--- TOC entry 3672 (class 0 OID 0)
+-- TOC entry 3668 (class 0 OID 0)
 -- Dependencies: 4
 -- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: postgres
 --
@@ -243,7 +243,7 @@ CREATE SEQUENCE public.achievements_id_seq
 ALTER TABLE public.achievements_id_seq OWNER TO root;
 
 --
--- TOC entry 3673 (class 0 OID 0)
+-- TOC entry 3669 (class 0 OID 0)
 -- Dependencies: 226
 -- Name: achievements_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: root
 --
@@ -286,7 +286,7 @@ CREATE SEQUENCE public.admin_logs_id_seq
 ALTER TABLE public.admin_logs_id_seq OWNER TO root;
 
 --
--- TOC entry 3674 (class 0 OID 0)
+-- TOC entry 3670 (class 0 OID 0)
 -- Dependencies: 224
 -- Name: admin_logs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: root
 --
@@ -339,7 +339,7 @@ CREATE SEQUENCE public.applications_id_seq
 ALTER TABLE public.applications_id_seq OWNER TO root;
 
 --
--- TOC entry 3675 (class 0 OID 0)
+-- TOC entry 3671 (class 0 OID 0)
 -- Dependencies: 212
 -- Name: applications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: root
 --
@@ -383,7 +383,7 @@ CREATE SEQUENCE public.discord_oauth_id_seq
 ALTER TABLE public.discord_oauth_id_seq OWNER TO root;
 
 --
--- TOC entry 3676 (class 0 OID 0)
+-- TOC entry 3672 (class 0 OID 0)
 -- Dependencies: 220
 -- Name: discord_oauth_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: root
 --
@@ -392,7 +392,7 @@ ALTER SEQUENCE public.discord_oauth_id_seq OWNED BY public.discord_oauth.id;
 
 
 --
--- TOC entry 243 (class 1259 OID 17311)
+-- TOC entry 241 (class 1259 OID 17311)
 -- Name: email_templates; Type: TABLE; Schema: public; Owner: root
 --
 
@@ -413,7 +413,7 @@ CREATE TABLE public.email_templates (
 ALTER TABLE public.email_templates OWNER TO root;
 
 --
--- TOC entry 242 (class 1259 OID 17310)
+-- TOC entry 240 (class 1259 OID 17310)
 -- Name: email_templates_id_seq; Type: SEQUENCE; Schema: public; Owner: root
 --
 
@@ -429,8 +429,8 @@ CREATE SEQUENCE public.email_templates_id_seq
 ALTER TABLE public.email_templates_id_seq OWNER TO root;
 
 --
--- TOC entry 3677 (class 0 OID 0)
--- Dependencies: 242
+-- TOC entry 3673 (class 0 OID 0)
+-- Dependencies: 240
 -- Name: email_templates_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: root
 --
 
@@ -471,7 +471,7 @@ CREATE SEQUENCE public.email_verification_tokens_id_seq
 ALTER TABLE public.email_verification_tokens_id_seq OWNER TO root;
 
 --
--- TOC entry 3678 (class 0 OID 0)
+-- TOC entry 3674 (class 0 OID 0)
 -- Dependencies: 218
 -- Name: email_verification_tokens_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: root
 --
@@ -513,7 +513,7 @@ CREATE SEQUENCE public.login_logs_id_seq
 ALTER TABLE public.login_logs_id_seq OWNER TO root;
 
 --
--- TOC entry 3679 (class 0 OID 0)
+-- TOC entry 3675 (class 0 OID 0)
 -- Dependencies: 215
 -- Name: login_logs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: root
 --
@@ -522,7 +522,7 @@ ALTER SEQUENCE public.login_logs_id_seq OWNED BY public.login_logs.id;
 
 
 --
--- TOC entry 245 (class 1259 OID 17357)
+-- TOC entry 243 (class 1259 OID 17357)
 -- Name: password_reset_tokens; Type: TABLE; Schema: public; Owner: chiwawa
 --
 
@@ -539,7 +539,7 @@ CREATE TABLE public.password_reset_tokens (
 ALTER TABLE public.password_reset_tokens OWNER TO chiwawa;
 
 --
--- TOC entry 244 (class 1259 OID 17356)
+-- TOC entry 242 (class 1259 OID 17356)
 -- Name: password_reset_tokens_id_seq; Type: SEQUENCE; Schema: public; Owner: chiwawa
 --
 
@@ -555,8 +555,8 @@ CREATE SEQUENCE public.password_reset_tokens_id_seq
 ALTER TABLE public.password_reset_tokens_id_seq OWNER TO chiwawa;
 
 --
--- TOC entry 3680 (class 0 OID 0)
--- Dependencies: 244
+-- TOC entry 3676 (class 0 OID 0)
+-- Dependencies: 242
 -- Name: password_reset_tokens_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: chiwawa
 --
 
@@ -624,7 +624,7 @@ CREATE SEQUENCE public.reputation_log_id_seq
 ALTER TABLE public.reputation_log_id_seq OWNER TO chiwawa;
 
 --
--- TOC entry 3681 (class 0 OID 0)
+-- TOC entry 3677 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: reputation_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: chiwawa
 --
@@ -668,7 +668,7 @@ CREATE SEQUENCE public.server_rules_id_seq
 ALTER TABLE public.server_rules_id_seq OWNER TO root;
 
 --
--- TOC entry 3682 (class 0 OID 0)
+-- TOC entry 3678 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: server_rules_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: root
 --
@@ -677,29 +677,28 @@ ALTER SEQUENCE public.server_rules_id_seq OWNED BY public.server_rules.id;
 
 
 --
--- TOC entry 241 (class 1259 OID 17290)
--- Name: server_settings; Type: TABLE; Schema: public; Owner: root
+-- TOC entry 245 (class 1259 OID 17381)
+-- Name: server_settings; Type: TABLE; Schema: public; Owner: chiwawa
 --
 
 CREATE TABLE public.server_settings (
     id integer NOT NULL,
     setting_key character varying(100) NOT NULL,
-    setting_value text NOT NULL,
-    setting_type character varying(50) DEFAULT 'text'::character varying NOT NULL,
-    category character varying(50) DEFAULT 'general'::character varying NOT NULL,
+    setting_value text,
+    setting_type character varying(20) DEFAULT 'string'::character varying,
+    category character varying(50) DEFAULT 'general'::character varying,
     description text,
-    is_required boolean DEFAULT false,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now(),
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     updated_by integer
 );
 
 
-ALTER TABLE public.server_settings OWNER TO root;
+ALTER TABLE public.server_settings OWNER TO chiwawa;
 
 --
--- TOC entry 240 (class 1259 OID 17289)
--- Name: server_settings_id_seq; Type: SEQUENCE; Schema: public; Owner: root
+-- TOC entry 244 (class 1259 OID 17380)
+-- Name: server_settings_id_seq; Type: SEQUENCE; Schema: public; Owner: chiwawa
 --
 
 CREATE SEQUENCE public.server_settings_id_seq
@@ -711,12 +710,12 @@ CREATE SEQUENCE public.server_settings_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.server_settings_id_seq OWNER TO root;
+ALTER TABLE public.server_settings_id_seq OWNER TO chiwawa;
 
 --
--- TOC entry 3683 (class 0 OID 0)
--- Dependencies: 240
--- Name: server_settings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: root
+-- TOC entry 3679 (class 0 OID 0)
+-- Dependencies: 244
+-- Name: server_settings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: chiwawa
 --
 
 ALTER SEQUENCE public.server_settings_id_seq OWNED BY public.server_settings.id;
@@ -757,7 +756,7 @@ CREATE SEQUENCE public.server_status_id_seq
 ALTER TABLE public.server_status_id_seq OWNER TO root;
 
 --
--- TOC entry 3684 (class 0 OID 0)
+-- TOC entry 3680 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: server_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: root
 --
@@ -808,7 +807,7 @@ CREATE SEQUENCE public.trust_level_applications_id_seq
 ALTER TABLE public.trust_level_applications_id_seq OWNER TO chiwawa;
 
 --
--- TOC entry 3685 (class 0 OID 0)
+-- TOC entry 3681 (class 0 OID 0)
 -- Dependencies: 234
 -- Name: trust_level_applications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: chiwawa
 --
@@ -848,7 +847,7 @@ CREATE SEQUENCE public.user_achievements_id_seq
 ALTER TABLE public.user_achievements_id_seq OWNER TO root;
 
 --
--- TOC entry 3686 (class 0 OID 0)
+-- TOC entry 3682 (class 0 OID 0)
 -- Dependencies: 228
 -- Name: user_achievements_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: root
 --
@@ -891,7 +890,7 @@ CREATE SEQUENCE public.user_activity_id_seq
 ALTER TABLE public.user_activity_id_seq OWNER TO root;
 
 --
--- TOC entry 3687 (class 0 OID 0)
+-- TOC entry 3683 (class 0 OID 0)
 -- Dependencies: 222
 -- Name: user_activity_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: root
 --
@@ -941,7 +940,7 @@ CREATE SEQUENCE public.user_reputation_id_seq
 ALTER TABLE public.user_reputation_id_seq OWNER TO chiwawa;
 
 --
--- TOC entry 3688 (class 0 OID 0)
+-- TOC entry 3684 (class 0 OID 0)
 -- Dependencies: 236
 -- Name: user_reputation_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: chiwawa
 --
@@ -1004,7 +1003,7 @@ CREATE TABLE public.users (
 ALTER TABLE public.users OWNER TO root;
 
 --
--- TOC entry 3689 (class 0 OID 0)
+-- TOC entry 3685 (class 0 OID 0)
 -- Dependencies: 211
 -- Name: COLUMN users.trust_level; Type: COMMENT; Schema: public; Owner: root
 --
@@ -1029,7 +1028,7 @@ CREATE SEQUENCE public.users_id_seq
 ALTER TABLE public.users_id_seq OWNER TO root;
 
 --
--- TOC entry 3690 (class 0 OID 0)
+-- TOC entry 3686 (class 0 OID 0)
 -- Dependencies: 210
 -- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: root
 --
@@ -1070,7 +1069,7 @@ ALTER TABLE ONLY public.discord_oauth ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- TOC entry 3364 (class 2604 OID 17314)
+-- TOC entry 3358 (class 2604 OID 17314)
 -- Name: email_templates id; Type: DEFAULT; Schema: public; Owner: root
 --
 
@@ -1094,7 +1093,7 @@ ALTER TABLE ONLY public.login_logs ALTER COLUMN id SET DEFAULT nextval('public.l
 
 
 --
--- TOC entry 3368 (class 2604 OID 17360)
+-- TOC entry 3362 (class 2604 OID 17360)
 -- Name: password_reset_tokens id; Type: DEFAULT; Schema: public; Owner: chiwawa
 --
 
@@ -1118,8 +1117,8 @@ ALTER TABLE ONLY public.server_rules ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- TOC entry 3358 (class 2604 OID 17293)
--- Name: server_settings id; Type: DEFAULT; Schema: public; Owner: root
+-- TOC entry 3365 (class 2604 OID 17384)
+-- Name: server_settings id; Type: DEFAULT; Schema: public; Owner: chiwawa
 --
 
 ALTER TABLE ONLY public.server_settings ALTER COLUMN id SET DEFAULT nextval('public.server_settings_id_seq'::regclass);
@@ -1174,7 +1173,7 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 
 
 --
--- TOC entry 3647 (class 0 OID 16993)
+-- TOC entry 3643 (class 0 OID 16993)
 -- Dependencies: 227
 -- Data for Name: achievements; Type: TABLE DATA; Schema: public; Owner: root
 --
@@ -1190,7 +1189,7 @@ INSERT INTO public.achievements VALUES (8, 'Исследователь', 'Про
 
 
 --
--- TOC entry 3645 (class 0 OID 16973)
+-- TOC entry 3641 (class 0 OID 16973)
 -- Dependencies: 225
 -- Data for Name: admin_logs; Type: TABLE DATA; Schema: public; Owner: root
 --
@@ -1204,19 +1203,6 @@ INSERT INTO public.admin_logs VALUES (6, 1, 'settings_updated', NULL, 'Наст�
 INSERT INTO public.admin_logs VALUES (7, 1, 'trust_level_changed', 1, 'Уровень доверия ebluffy изменен с 3 на 3: да', NULL, '2025-07-26 22:35:10.892645');
 INSERT INTO public.admin_logs VALUES (8, 1, 'settings_updated', NULL, 'Настройки сервера обновлены через админ-панель', NULL, '2025-07-26 23:21:14.171374');
 INSERT INTO public.admin_logs VALUES (9, 1, 'settings_updated', NULL, 'Настройки сервера обновлены: ', NULL, '2025-07-26 23:21:14.709568');
-INSERT INTO public.admin_logs VALUES (10, 1, 'trust_level_changed', 2, 'Уровень доверия KORESHon изменен с 0 на 1: 1', NULL, '2025-07-26 23:21:57.766367');
-INSERT INTO public.admin_logs VALUES (11, 1, 'role_changed', 2, 'Роль пользователя KORESHon изменена с user на moderator', NULL, '2025-07-26 23:22:10.326156');
-INSERT INTO public.admin_logs VALUES (12, 1, 'role_changed', 2, 'Роль пользователя KORESHon изменена с moderator на user', NULL, '2025-07-26 23:30:44.054452');
-INSERT INTO public.admin_logs VALUES (13, 1, 'role_changed', 2, 'Роль пользователя KORESHon изменена с user на moderator', NULL, '2025-07-26 23:30:46.910976');
-INSERT INTO public.admin_logs VALUES (14, 1, 'role_changed', 2, 'Роль пользователя KORESHon изменена с moderator на user', NULL, '2025-07-26 23:46:14.624788');
-INSERT INTO public.admin_logs VALUES (15, 1, 'role_changed', 2, 'Роль пользователя KORESHon изменена с user на moderator', NULL, '2025-07-26 23:46:18.411085');
-INSERT INTO public.admin_logs VALUES (16, 1, 'trust_level_changed', 2, 'Уровень доверия KORESHon изменен с 1 на 2: я такзахотел', NULL, '2025-07-26 23:46:29.251048');
-INSERT INTO public.admin_logs VALUES (17, 1, 'role_changed', 2, 'Роль пользователя KORESHon изменена с moderator на user', NULL, '2025-07-26 23:52:01.704844');
-INSERT INTO public.admin_logs VALUES (18, 1, 'trust_level_changed', 2, 'Уровень доверия KORESHon изменен с 2 на 1: да', NULL, '2025-07-26 23:52:07.049433');
-INSERT INTO public.admin_logs VALUES (19, 1, 'user_banned', 2, 'Пользователь KORESHon заблокирован на 1 days: влопадвоапдоваповапрапр', NULL, '2025-07-26 23:52:16.908842');
-INSERT INTO public.admin_logs VALUES (20, 1, 'user_unbanned', 2, 'Пользователь KORESHon разблокирован', NULL, '2025-07-26 23:56:03.910547');
-INSERT INTO public.admin_logs VALUES (21, 1, 'user_banned', 2, 'Пользователь KORESHon заблокирован на 1 days: 1', NULL, '2025-07-26 23:56:54.320628');
-INSERT INTO public.admin_logs VALUES (22, 1, 'user_unbanned', 2, 'Пользователь KORESHon разблокирован', NULL, '2025-07-26 23:56:59.326968');
 INSERT INTO public.admin_logs VALUES (23, 1, 'settings_updated', NULL, 'Настройки сервера обновлены через админ-панель', NULL, '2025-07-27 00:55:42.82768');
 INSERT INTO public.admin_logs VALUES (24, 1, 'settings_updated', NULL, 'Обновлено настроек: 0. Категории: ', NULL, '2025-07-27 00:55:42.926556');
 INSERT INTO public.admin_logs VALUES (25, 1, 'settings_updated', NULL, 'Обновлено настроек: 37. Категории: general, system, applications, trust, security, email', NULL, '2025-07-27 00:55:47.247204');
@@ -1302,10 +1288,44 @@ INSERT INTO public.admin_logs VALUES (104, 1, 'settings_updated', NULL, 'Обн�
 INSERT INTO public.admin_logs VALUES (105, 1, 'settings_updated', NULL, 'Обновлено настроек: 0. Категории: ', NULL, '2025-07-28 03:40:13.312135');
 INSERT INTO public.admin_logs VALUES (106, 1, 'settings_updated', NULL, 'Обновлено настроек: 28. Категории: general, applications, trust, security, email', NULL, '2025-07-28 03:40:16.231664');
 INSERT INTO public.admin_logs VALUES (107, 1, 'settings_updated', NULL, 'Обновлено настроек: 36. Категории: general, system, applications, trust, security, email', NULL, '2025-07-28 03:40:17.205223');
+INSERT INTO public.admin_logs VALUES (108, 1, 'settings_updated', NULL, 'Обновлено настроек: 0. Категории: ', NULL, '2025-07-28 04:02:02.454981');
+INSERT INTO public.admin_logs VALUES (109, 1, 'settings_updated', NULL, 'Обновлено настроек: 28. Категории: general, applications, trust, security, email', NULL, '2025-07-28 04:02:05.376076');
+INSERT INTO public.admin_logs VALUES (110, 1, 'settings_updated', NULL, 'Обновлено настроек: 36. Категории: general, system, applications, trust, security, email', NULL, '2025-07-28 04:02:06.278566');
+INSERT INTO public.admin_logs VALUES (111, 1, 'settings_updated', NULL, 'Обновлено настроек: 0. Категории: ', NULL, '2025-07-28 15:51:41.318811');
+INSERT INTO public.admin_logs VALUES (112, 1, 'settings_updated', NULL, 'Обновлено настроек: 28. Категории: general, applications, trust, security, email', NULL, '2025-07-28 15:51:44.247759');
+INSERT INTO public.admin_logs VALUES (113, 1, 'settings_updated', NULL, 'Обновлено настроек: 36. Категории: general, system, applications, trust, security, email', NULL, '2025-07-28 15:51:45.288004');
+INSERT INTO public.admin_logs VALUES (114, 1, 'settings_updated', NULL, 'Обновлено настроек: 0. Категории: ', NULL, '2025-07-28 15:52:07.261275');
+INSERT INTO public.admin_logs VALUES (115, 1, 'settings_updated', NULL, 'Обновлено настроек: 28. Категории: general, applications, trust, security, email', NULL, '2025-07-28 15:52:10.247147');
+INSERT INTO public.admin_logs VALUES (116, 1, 'settings_updated', NULL, 'Обновлено настроек: 36. Категории: general, system, applications, trust, security, email', NULL, '2025-07-28 15:52:11.059783');
+INSERT INTO public.admin_logs VALUES (117, 1, 'settings_updated', NULL, 'Обновлено настроек: 0. Категории: ', NULL, '2025-07-28 15:52:52.187563');
+INSERT INTO public.admin_logs VALUES (118, 1, 'settings_updated', NULL, 'Обновлено настроек: 28. Категории: general, applications, trust, security, email', NULL, '2025-07-28 15:52:55.212174');
+INSERT INTO public.admin_logs VALUES (119, 1, 'settings_updated', NULL, 'Обновлено настроек: 36. Категории: general, system, applications, trust, security, email', NULL, '2025-07-28 15:52:56.0385');
+INSERT INTO public.admin_logs VALUES (120, 1, 'settings_updated', NULL, 'Обновлено настроек: 0. Категории: ', NULL, '2025-07-28 16:01:53.705571');
+INSERT INTO public.admin_logs VALUES (121, 1, 'settings_updated', NULL, 'Обновлено настроек: 28. Категории: general, applications, trust, security, email', NULL, '2025-07-28 16:01:56.691762');
+INSERT INTO public.admin_logs VALUES (122, 1, 'settings_updated', NULL, 'Обновлено настроек: 36. Категории: general, system, applications, trust, security, email', NULL, '2025-07-28 16:01:58.045966');
+INSERT INTO public.admin_logs VALUES (123, 1, 'settings_updated', NULL, 'Обновлено настроек: 0. Категории: ', NULL, '2025-07-28 16:06:52.476497');
+INSERT INTO public.admin_logs VALUES (124, 1, 'settings_updated', NULL, 'Обновлено настроек: 28. Категории: general, applications, trust, security, email', NULL, '2025-07-28 16:06:55.420922');
+INSERT INTO public.admin_logs VALUES (125, 1, 'settings_updated', NULL, 'Обновлено настроек: 36. Категории: general, system, applications, trust, security, email', NULL, '2025-07-28 16:06:56.30249');
+INSERT INTO public.admin_logs VALUES (126, 1, 'profile_update', NULL, 'Обновлен профиль: имя', '::1', '2025-07-28 17:10:26.739994');
+INSERT INTO public.admin_logs VALUES (127, 1, 'profile_update', NULL, 'Обновлен профиль: имя', '::1', '2025-07-28 17:10:34.277155');
+INSERT INTO public.admin_logs VALUES (10, 1, 'trust_level_changed', NULL, 'Уровень доверия KORESHon изменен с 0 на 1: 1', NULL, '2025-07-26 23:21:57.766367');
+INSERT INTO public.admin_logs VALUES (11, 1, 'role_changed', NULL, 'Роль пользователя KORESHon изменена с user на moderator', NULL, '2025-07-26 23:22:10.326156');
+INSERT INTO public.admin_logs VALUES (12, 1, 'role_changed', NULL, 'Роль пользователя KORESHon изменена с moderator на user', NULL, '2025-07-26 23:30:44.054452');
+INSERT INTO public.admin_logs VALUES (13, 1, 'role_changed', NULL, 'Роль пользователя KORESHon изменена с user на moderator', NULL, '2025-07-26 23:30:46.910976');
+INSERT INTO public.admin_logs VALUES (14, 1, 'role_changed', NULL, 'Роль пользователя KORESHon изменена с moderator на user', NULL, '2025-07-26 23:46:14.624788');
+INSERT INTO public.admin_logs VALUES (15, 1, 'role_changed', NULL, 'Роль пользователя KORESHon изменена с user на moderator', NULL, '2025-07-26 23:46:18.411085');
+INSERT INTO public.admin_logs VALUES (16, 1, 'trust_level_changed', NULL, 'Уровень доверия KORESHon изменен с 1 на 2: я такзахотел', NULL, '2025-07-26 23:46:29.251048');
+INSERT INTO public.admin_logs VALUES (17, 1, 'role_changed', NULL, 'Роль пользователя KORESHon изменена с moderator на user', NULL, '2025-07-26 23:52:01.704844');
+INSERT INTO public.admin_logs VALUES (18, 1, 'trust_level_changed', NULL, 'Уровень доверия KORESHon изменен с 2 на 1: да', NULL, '2025-07-26 23:52:07.049433');
+INSERT INTO public.admin_logs VALUES (19, 1, 'user_banned', NULL, 'Пользователь KORESHon заблокирован на 1 days: влопадвоапдоваповапрапр', NULL, '2025-07-26 23:52:16.908842');
+INSERT INTO public.admin_logs VALUES (20, 1, 'user_unbanned', NULL, 'Пользователь KORESHon разблокирован', NULL, '2025-07-26 23:56:03.910547');
+INSERT INTO public.admin_logs VALUES (21, 1, 'user_banned', NULL, 'Пользователь KORESHon заблокирован на 1 days: 1', NULL, '2025-07-26 23:56:54.320628');
+INSERT INTO public.admin_logs VALUES (22, 1, 'user_unbanned', NULL, 'Пользователь KORESHon разблокирован', NULL, '2025-07-26 23:56:59.326968');
+INSERT INTO public.admin_logs VALUES (128, 1, 'trust_level_changed', NULL, 'Уровень доверия KORESHon изменен с 1 на 0: да', NULL, '2025-07-28 20:30:16.455146');
 
 
 --
--- TOC entry 3633 (class 0 OID 16852)
+-- TOC entry 3629 (class 0 OID 16852)
 -- Dependencies: 213
 -- Data for Name: applications; Type: TABLE DATA; Schema: public; Owner: root
 --
@@ -1313,7 +1333,7 @@ INSERT INTO public.admin_logs VALUES (107, 1, 'settings_updated', NULL, 'Обн�
 
 
 --
--- TOC entry 3641 (class 0 OID 16945)
+-- TOC entry 3637 (class 0 OID 16945)
 -- Dependencies: 221
 -- Data for Name: discord_oauth; Type: TABLE DATA; Schema: public; Owner: root
 --
@@ -1321,8 +1341,8 @@ INSERT INTO public.admin_logs VALUES (107, 1, 'settings_updated', NULL, 'Обн�
 
 
 --
--- TOC entry 3663 (class 0 OID 17311)
--- Dependencies: 243
+-- TOC entry 3657 (class 0 OID 17311)
+-- Dependencies: 241
 -- Data for Name: email_templates; Type: TABLE DATA; Schema: public; Owner: root
 --
 
@@ -1479,15 +1499,17 @@ INSERT INTO public.email_templates VALUES (7, 'Приветственное пи
 
 
 --
--- TOC entry 3639 (class 0 OID 16929)
+-- TOC entry 3635 (class 0 OID 16929)
 -- Dependencies: 219
 -- Data for Name: email_verification_tokens; Type: TABLE DATA; Schema: public; Owner: root
 --
 
+INSERT INTO public.email_verification_tokens VALUES (1, 2, 'c050850d-4b9b-47ca-b67b-503d4082c0a3', '2025-07-29 23:55:06.47', '2025-07-28 20:55:04.842343', false);
+INSERT INTO public.email_verification_tokens VALUES (2, 3, 'e200f4aa-4285-43e3-af7f-2c99146a8730', '2025-07-30 00:13:49.479', '2025-07-28 21:13:47.848298', false);
 
 
 --
--- TOC entry 3636 (class 0 OID 16898)
+-- TOC entry 3632 (class 0 OID 16898)
 -- Dependencies: 216
 -- Data for Name: login_logs; Type: TABLE DATA; Schema: public; Owner: root
 --
@@ -1495,29 +1517,34 @@ INSERT INTO public.email_templates VALUES (7, 'Приветственное пи
 INSERT INTO public.login_logs VALUES (1, 1, '2025-07-26 06:04:15.047951', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36', true);
 INSERT INTO public.login_logs VALUES (2, 1, '2025-07-26 16:17:54.54984', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36', true);
 INSERT INTO public.login_logs VALUES (3, 1, '2025-07-26 20:35:13.034697', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36', true);
-INSERT INTO public.login_logs VALUES (4, 2, '2025-07-26 23:20:40.909757', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36', true);
-INSERT INTO public.login_logs VALUES (5, 2, '2025-07-26 23:56:26.969315', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36', true);
+INSERT INTO public.login_logs VALUES (6, 1, '2025-07-28 16:35:52.47918', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36', true);
+INSERT INTO public.login_logs VALUES (9, NULL, '2025-07-28 20:55:04.735316', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36', true);
+INSERT INTO public.login_logs VALUES (10, 2, '2025-07-28 20:55:24.47596', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36', true);
+INSERT INTO public.login_logs VALUES (11, NULL, '2025-07-28 21:13:47.743094', '::1', 'Mozilla/5.0 (Windows NT; Windows NT 10.0; ru-RU) WindowsPowerShell/5.1.26100.4768', true);
+INSERT INTO public.login_logs VALUES (12, 3, '2025-07-28 21:13:57.418056', '::1', 'Mozilla/5.0 (Windows NT; Windows NT 10.0; ru-RU) WindowsPowerShell/5.1.26100.4768', true);
 
 
 --
--- TOC entry 3665 (class 0 OID 17357)
--- Dependencies: 245
+-- TOC entry 3659 (class 0 OID 17357)
+-- Dependencies: 243
 -- Data for Name: password_reset_tokens; Type: TABLE DATA; Schema: public; Owner: chiwawa
 --
 
 
 
 --
--- TOC entry 3634 (class 0 OID 16873)
+-- TOC entry 3630 (class 0 OID 16873)
 -- Dependencies: 214
 -- Data for Name: player_stats; Type: TABLE DATA; Schema: public; Owner: root
 --
 
 INSERT INTO public.player_stats VALUES (1, 0, 600, false, 3, 0, true, true, true, 1000, 0, 0, 0, '2025-07-26 05:12:51.073902', '2025-07-26 22:35:10.783374');
+INSERT INTO public.player_stats VALUES (2, 0, 600, true, 0, 0, false, false, false, 0, 0, 0, 0, '2025-07-28 20:55:04.625519', '2025-07-28 20:55:04.625519');
+INSERT INTO public.player_stats VALUES (3, 0, 600, true, 0, 0, false, false, false, 0, 0, 0, 0, '2025-07-28 21:13:47.637392', '2025-07-28 21:13:47.637392');
 
 
 --
--- TOC entry 3659 (class 0 OID 17154)
+-- TOC entry 3655 (class 0 OID 17154)
 -- Dependencies: 239
 -- Data for Name: reputation_log; Type: TABLE DATA; Schema: public; Owner: chiwawa
 --
@@ -1525,7 +1552,7 @@ INSERT INTO public.player_stats VALUES (1, 0, 600, false, 3, 0, true, true, true
 
 
 --
--- TOC entry 3653 (class 0 OID 17039)
+-- TOC entry 3649 (class 0 OID 17039)
 -- Dependencies: 233
 -- Data for Name: server_rules; Type: TABLE DATA; Schema: public; Owner: root
 --
@@ -1538,90 +1565,52 @@ INSERT INTO public.server_rules VALUES (5, 'Возрастные огранич�
 
 
 --
--- TOC entry 3661 (class 0 OID 17290)
--- Dependencies: 241
--- Data for Name: server_settings; Type: TABLE DATA; Schema: public; Owner: root
+-- TOC entry 3661 (class 0 OID 17381)
+-- Dependencies: 245
+-- Data for Name: server_settings; Type: TABLE DATA; Schema: public; Owner: chiwawa
 --
 
-INSERT INTO public.server_settings VALUES (4, 'color_scheme', 'orange', 'text', 'appearance', 'Цветовая схема сайта', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (7, 'email_notifications', 'true', 'text', 'notifications', 'Включены ли email уведомления', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (8, 'trust_level_system', 'true', 'text', 'gameplay', 'Включена ли система Trust Level', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (9, 'time_limit_for_newcomers', '600', 'text', 'gameplay', 'Лимит времени для новичков в минутах', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (14, 'server-name', 'Test', 'text', 'general', 'Название сервера', true, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (15, 'server-description', 'Приватный Minecraft сервер с дружелюбным сообществом', 'textarea', 'general', 'Описание сервера', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (16, 'server-ip', 'play.chiwawa.site', 'text', 'general', 'IP адрес сервера', true, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (17, 'server-port', '25565', 'number', 'general', 'Порт сервера', true, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (18, 'max-players', '100', 'number', 'general', 'Максимум игроков онлайн', true, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (19, 'discord-invite', 'https://discord.gg/chiwawa', 'url', 'general', 'Discord приглашение', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (20, 'telegram-invite', 'https://t.me/chiwawa', 'url', 'general', 'Telegram канал', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (21, 'maintenance-mode', 'false', 'boolean', 'general', 'Режим обслуживания', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (22, 'registration-enabled', 'true', 'boolean', 'general', 'Регистрация разрешена', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (23, 'auto-backup-enabled', 'true', 'boolean', 'general', 'Автоматические бэкапы', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (24, 'applications-enabled', 'true', 'boolean', 'applications', 'Прием заявок', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (25, 'min-motivation-length', '50', 'number', 'applications', 'Минимум символов в мотивации', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (26, 'min-plans-length', '30', 'number', 'applications', 'Минимум символов в планах', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (27, 'max-applications-per-day', '3', 'number', 'applications', 'Лимит заявок с одного IP в день', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (28, 'auto-approve-trust-level', '0', 'select', 'applications', 'Автоматическое одобрение по Trust Level', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (29, 'trust-points-email', '10', 'number', 'trust', 'Очки за подтверждение email', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (30, 'trust-points-discord', '15', 'number', 'trust', 'Очки за связку с Discord', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (31, 'trust-points-hour', '1', 'number', 'trust', 'Очки за час игры на сервере', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (32, 'trust-level-1-required', '25', 'number', 'trust', 'Trust Level 1 (очков)', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (33, 'trust-level-2-required', '100', 'number', 'trust', 'Trust Level 2 (очков)', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (34, 'trust-level-3-required', '500', 'number', 'trust', 'Trust Level 3 (очков)', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (35, 'max-login-attempts', '5', 'number', 'security', 'Максимум попыток входа', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (36, 'login-lockout-duration', '15', 'number', 'security', 'Время блокировки (минуты)', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (37, 'rate-limit-requests', '100', 'number', 'security', 'Rate Limiting (запросов в минуту)', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (38, 'jwt-expires-days', '7', 'number', 'security', 'Время жизни JWT токена (дни)', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (39, 'require-email-verification', 'true', 'boolean', 'security', 'Требовать подтверждение email', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (40, 'smtp-host', 'smtp.yandex.ru', 'text', 'email', 'SMTP хост', true, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (41, 'smtp-port', '465', 'number', 'email', 'SMTP порт', true, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (42, 'smtp-secure', 'true', 'boolean', 'email', 'Использовать SSL/TLS', true, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (43, 'smtp-from', 'chiwawa.helper@yandex.ru', 'email', 'email', 'Email отправителя', true, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (44, 'smtp-user', 'chiwawa.helper@yandex.ru', 'text', 'email', 'SMTP пользователь', true, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (45, 'smtp-password', '', 'password', 'email', 'SMTP пароль', true, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (46, 'email-from-name', 'Chiwawa Server', 'text', 'email', 'Имя отправителя', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (47, 'email-reply-to', 'chiwawa.helper@yandex.ru', 'email', 'email', 'Адрес для ответов', false, '2025-07-27 00:54:03.499029', '2025-07-27 00:54:03.499029', NULL);
-INSERT INTO public.server_settings VALUES (59, 'min_motivation_length', '10', 'integer', 'applications', 'Мин. символов в мотивации', false, '2025-07-27 00:55:44.511035', '2025-07-28 03:40:14.474983', 1);
-INSERT INTO public.server_settings VALUES (12, 'smtp_user', '"chiwawa.helper@yandex.ru"', 'string', 'email', 'SMTP пользователь', false, '2025-07-27 00:54:03.499029', '2025-07-28 03:40:16.54967', 1);
-INSERT INTO public.server_settings VALUES (50, 'server_ip', '"play.chiwawa.site"', 'string', 'general', 'IP адрес сервера', false, '2025-07-27 00:55:43.570238', '2025-07-28 03:40:13.523372', 1);
-INSERT INTO public.server_settings VALUES (54, 'telegram_invite', '"https://t.me/chiwawa"', 'string', 'general', 'Telegram канал', false, '2025-07-27 00:55:43.990804', '2025-07-28 03:40:13.945298', 1);
-INSERT INTO public.server_settings VALUES (10, 'smtp_host', '"smtp.yandex.ru"', 'string', 'email', 'SMTP сервер', false, '2025-07-27 00:54:03.499029', '2025-07-28 03:40:16.231604', 1);
-INSERT INTO public.server_settings VALUES (57, 'auto_backup_enabled', 'true', 'boolean', 'system', 'Автобэкапы', false, '2025-07-27 00:55:44.303632', '2025-07-28 03:40:14.262854', 1);
-INSERT INTO public.server_settings VALUES (51, 'server_port', '25164', 'integer', 'general', 'Порт сервера', false, '2025-07-27 00:55:43.675027', '2025-07-28 03:40:13.628279', 1);
-INSERT INTO public.server_settings VALUES (13, 'maintenance_mode', 'false', 'boolean', 'system', 'Режим обслуживания', false, '2025-07-27 00:54:03.499029', '2025-07-28 03:40:14.051084', 1);
-INSERT INTO public.server_settings VALUES (5, 'registration_enabled', 'true', 'boolean', 'system', 'Регистрация разрешена', false, '2025-07-27 00:54:03.499029', '2025-07-28 03:40:14.156987', 1);
-INSERT INTO public.server_settings VALUES (58, 'applications_enabled', 'false', 'boolean', 'applications', 'Прием заявок', false, '2025-07-27 00:55:44.407357', '2025-07-28 03:40:14.368887', 1);
-INSERT INTO public.server_settings VALUES (52, 'max_players', '100', 'integer', 'general', 'Максимум игроков', false, '2025-07-27 00:55:43.77941', '2025-07-28 03:40:13.733562', 1);
-INSERT INTO public.server_settings VALUES (60, 'min_plans_length', '10', 'integer', 'applications', 'Мин. символов в планах', false, '2025-07-27 00:55:44.629118', '2025-07-28 03:40:14.581215', 1);
-INSERT INTO public.server_settings VALUES (3, 'discord_invite', '"https://discord.gg/your-invite"', 'string', 'general', 'Discord приглашение', false, '2025-07-27 00:54:03.499029', '2025-07-28 03:40:13.839252', 1);
-INSERT INTO public.server_settings VALUES (6, 'max_applications_per_day', '5', 'integer', 'applications', 'Лимит заявок в день', false, '2025-07-27 00:54:03.499029', '2025-07-28 03:40:14.687228', 1);
-INSERT INTO public.server_settings VALUES (62, 'auto_approve_trust_level', '0', 'integer', 'applications', 'Автоодобрение по Trust Level', false, '2025-07-27 00:55:44.836793', '2025-07-28 03:40:14.792951', 1);
-INSERT INTO public.server_settings VALUES (11, 'smtp_port', '465', 'integer', 'email', 'SMTP порт', false, '2025-07-27 00:54:03.499029', '2025-07-28 03:40:16.338017', 1);
-INSERT INTO public.server_settings VALUES (1, 'server_name', '"ChiwawaMine"', 'string', 'general', 'Название сервера', false, '2025-07-27 00:54:03.499029', '2025-07-28 03:40:13.309843', 1);
-INSERT INTO public.server_settings VALUES (63, 'trust_points_email', '15', 'integer', 'trust', 'Очки за подтверждение email', false, '2025-07-27 00:55:44.940548', '2025-07-28 03:40:14.898733', 1);
-INSERT INTO public.server_settings VALUES (64, 'trust_points_discord', '30', 'integer', 'trust', 'Очки за Discord', false, '2025-07-27 00:55:45.045935', '2025-07-28 03:40:15.004237', 1);
-INSERT INTO public.server_settings VALUES (65, 'trust_points_hour', '2', 'integer', 'trust', 'Очки за час игры', false, '2025-07-27 00:55:45.150031', '2025-07-28 03:40:15.109961', 1);
-INSERT INTO public.server_settings VALUES (66, 'trust_level_1_required', '25', 'integer', 'trust', 'Очки для Trust Level 1', false, '2025-07-27 00:55:45.253917', '2025-07-28 03:40:15.215384', 1);
-INSERT INTO public.server_settings VALUES (67, 'trust_level_2_required', '100', 'integer', 'trust', 'Очки для Trust Level 2', false, '2025-07-27 00:55:45.357541', '2025-07-28 03:40:15.321858', 1);
-INSERT INTO public.server_settings VALUES (68, 'trust_level_3_required', '500', 'integer', 'trust', 'Очки для Trust Level 3', false, '2025-07-27 00:55:45.461308', '2025-07-28 03:40:15.427018', 1);
-INSERT INTO public.server_settings VALUES (69, 'max_login_attempts', '3', 'integer', 'security', 'Максимум попыток входа', false, '2025-07-27 00:55:45.56543', '2025-07-28 03:40:15.532858', 1);
-INSERT INTO public.server_settings VALUES (70, 'login_lockout_duration', '15', 'integer', 'security', 'Время блокировки (мин)', false, '2025-07-27 00:55:45.668948', '2025-07-28 03:40:15.638935', 1);
-INSERT INTO public.server_settings VALUES (71, 'jwt_expires_days', '7', 'integer', 'security', 'Время жизни JWT (дни)', false, '2025-07-27 00:55:45.77279', '2025-07-28 03:40:15.744467', 1);
-INSERT INTO public.server_settings VALUES (72, 'require_email_verification', 'true', 'boolean', 'security', 'Требовать подтверждение email', false, '2025-07-27 00:55:45.876528', '2025-07-28 03:40:15.850118', 1);
-INSERT INTO public.server_settings VALUES (73, 'two_factor_enabled', 'false', 'boolean', 'security', '2FA включен', false, '2025-07-27 00:55:45.980307', '2025-07-28 03:40:15.956505', 1);
-INSERT INTO public.server_settings VALUES (74, 'rate_limit_requests', '100', 'integer', 'security', 'Rate limit (запросов/мин)', false, '2025-07-27 00:55:46.084105', '2025-07-28 03:40:16.06229', 1);
-INSERT INTO public.server_settings VALUES (77, 'smtp_from', '"chiwawa.helper@yandex.ru"', 'string', 'email', 'Email отправителя', false, '2025-07-27 00:55:46.395265', '2025-07-28 03:40:16.443942', 1);
-INSERT INTO public.server_settings VALUES (79, 'smtp_password', '"hoiigazkhichljfz"', 'string', 'email', 'SMTP пароль', false, '2025-07-27 00:55:46.602619', '2025-07-28 03:40:16.655478', 1);
-INSERT INTO public.server_settings VALUES (81, 'smtp_sender_name', '"Chiwawa Helper"', 'string', 'email', 'Имя отправителя', false, '2025-07-27 00:55:46.819428', '2025-07-28 03:40:16.78095', 1);
-INSERT INTO public.server_settings VALUES (80, 'smtp_tls', 'true', 'boolean', 'email', 'Использовать TLS', false, '2025-07-27 00:55:46.706277', '2025-07-27 01:02:56.011144', 1);
-INSERT INTO public.server_settings VALUES (82, 'smtp_reply_to', '"chiwawa.helper@yandex.ru"', 'string', 'email', 'Reply-To адрес', false, '2025-07-27 00:55:46.935153', '2025-07-28 03:40:16.886651', 1);
-INSERT INTO public.server_settings VALUES (83, 'email_notifications_enabled', 'true', 'boolean', 'email', 'Email уведомления', false, '2025-07-27 00:55:47.03869', '2025-07-28 03:40:16.992686', 1);
-INSERT INTO public.server_settings VALUES (84, 'smtp_timeout', '30', 'integer', 'email', 'Тайм-аут SMTP (сек)', false, '2025-07-27 00:55:47.142926', '2025-07-28 03:40:17.099089', 1);
-INSERT INTO public.server_settings VALUES (2, 'server_description', '"Приватный Minecraft сервер для своих. Вход только по заявке."', 'string', 'general', 'Описание сервера', false, '2025-07-27 00:54:03.499029', '2025-07-28 03:40:13.418466', 1);
+INSERT INTO public.server_settings VALUES (3, 'server-ip', 'play.chiwawa.site', 'string', 'general', 'IP адрес сервера', '2025-07-28 16:16:03.933439', '2025-07-28 16:16:03.933439', NULL);
+INSERT INTO public.server_settings VALUES (4, 'server-port', '25565', 'integer', 'general', 'Порт сервера', '2025-07-28 16:16:04.041795', '2025-07-28 16:16:04.041795', NULL);
+INSERT INTO public.server_settings VALUES (6, 'discord-invite', 'https://discord.gg/chiwawa', 'string', 'general', 'Ссылка на Discord сервер', '2025-07-28 16:16:04.525735', '2025-07-28 16:16:04.525735', NULL);
+INSERT INTO public.server_settings VALUES (7, 'telegram-invite', 'https://t.me/chiwawa', 'string', 'general', 'Ссылка на Telegram канал', '2025-07-28 16:16:04.644731', '2025-07-28 16:16:04.644731', NULL);
+INSERT INTO public.server_settings VALUES (8, 'maintenance-mode', 'false', 'boolean', 'system', 'Режим технического обслуживания', '2025-07-28 16:16:04.753294', '2025-07-28 16:16:04.753294', NULL);
+INSERT INTO public.server_settings VALUES (9, 'registration-enabled', 'true', 'boolean', 'system', 'Разрешена ли регистрация новых пользователей', '2025-07-28 16:16:04.861966', '2025-07-28 16:16:04.861966', NULL);
+INSERT INTO public.server_settings VALUES (10, 'auto-backup-enabled', 'true', 'boolean', 'system', 'Автоматическое создание резервных копий', '2025-07-28 16:16:04.970939', '2025-07-28 16:16:04.970939', NULL);
+INSERT INTO public.server_settings VALUES (11, 'applications-enabled', 'true', 'boolean', 'applications', 'Прием заявок включен', '2025-07-28 16:16:05.079386', '2025-07-28 16:16:05.079386', NULL);
+INSERT INTO public.server_settings VALUES (12, 'min-motivation-length', '50', 'integer', 'applications', 'Минимальная длина мотивации', '2025-07-28 16:16:05.187225', '2025-07-28 16:16:05.187225', NULL);
+INSERT INTO public.server_settings VALUES (13, 'min-plans-length', '30', 'integer', 'applications', 'Минимальная длина планов', '2025-07-28 16:16:05.294691', '2025-07-28 16:16:05.294691', NULL);
+INSERT INTO public.server_settings VALUES (14, 'max-applications-per-day', '3', 'integer', 'applications', 'Максимум заявок в день с одного IP', '2025-07-28 16:16:05.402156', '2025-07-28 16:16:05.402156', NULL);
+INSERT INTO public.server_settings VALUES (15, 'auto-approve-trust-level', '2', 'integer', 'applications', 'Автоматическое одобрение при Trust Level', '2025-07-28 16:16:05.510408', '2025-07-28 16:16:05.510408', NULL);
+INSERT INTO public.server_settings VALUES (16, 'trust-points-email', '50', 'integer', 'trust', 'Очки за подтверждение email', '2025-07-28 16:16:05.618823', '2025-07-28 16:16:05.618823', NULL);
+INSERT INTO public.server_settings VALUES (17, 'trust-points-discord', '30', 'integer', 'trust', 'Очки за привязку Discord', '2025-07-28 16:16:05.72676', '2025-07-28 16:16:05.72676', NULL);
+INSERT INTO public.server_settings VALUES (18, 'trust-points-hour', '5', 'integer', 'trust', 'Очки за час игры', '2025-07-28 16:16:05.848726', '2025-07-28 16:16:05.848726', NULL);
+INSERT INTO public.server_settings VALUES (19, 'trust-level-1-required', '100', 'integer', 'trust', 'Очки для достижения Trust Level 1', '2025-07-28 16:16:05.956148', '2025-07-28 16:16:05.956148', NULL);
+INSERT INTO public.server_settings VALUES (20, 'trust-level-2-required', '500', 'integer', 'trust', 'Очки для достижения Trust Level 2', '2025-07-28 16:16:06.064961', '2025-07-28 16:16:06.064961', NULL);
+INSERT INTO public.server_settings VALUES (21, 'trust-level-3-required', '1500', 'integer', 'trust', 'Очки для достижения Trust Level 3', '2025-07-28 16:16:06.172535', '2025-07-28 16:16:06.172535', NULL);
+INSERT INTO public.server_settings VALUES (22, 'max-login-attempts', '5', 'integer', 'security', 'Максимум попыток входа', '2025-07-28 16:16:06.280106', '2025-07-28 16:16:06.280106', NULL);
+INSERT INTO public.server_settings VALUES (23, 'login-lockout-duration', '15', 'integer', 'security', 'Время блокировки в минутах', '2025-07-28 16:16:06.388661', '2025-07-28 16:16:06.388661', NULL);
+INSERT INTO public.server_settings VALUES (24, 'jwt-expires-days', '30', 'integer', 'security', 'Время жизни JWT токена в днях', '2025-07-28 16:16:06.496859', '2025-07-28 16:16:06.496859', NULL);
+INSERT INTO public.server_settings VALUES (25, 'require-email-verification', 'true', 'boolean', 'security', 'Требовать подтверждение email', '2025-07-28 16:16:06.615735', '2025-07-28 16:16:06.615735', NULL);
+INSERT INTO public.server_settings VALUES (26, 'two-factor-enabled', 'false', 'boolean', 'security', 'Двухфакторная аутентификация', '2025-07-28 16:16:06.72424', '2025-07-28 16:16:06.72424', NULL);
+INSERT INTO public.server_settings VALUES (27, 'rate-limit-requests', '100', 'integer', 'security', 'Лимит запросов в минуту', '2025-07-28 16:16:06.833711', '2025-07-28 16:16:06.833711', NULL);
+INSERT INTO public.server_settings VALUES (28, 'smtp-host', 'smtp.yandex.ru', 'string', 'email', 'SMTP сервер', '2025-07-28 16:16:06.943312', '2025-07-28 16:16:06.943312', NULL);
+INSERT INTO public.server_settings VALUES (29, 'smtp-port', '465', 'integer', 'email', 'SMTP порт', '2025-07-28 16:16:07.051303', '2025-07-28 16:16:07.051303', NULL);
+INSERT INTO public.server_settings VALUES (30, 'smtp-from', 'noreply@chiwawa.site', 'string', 'email', 'Email отправителя', '2025-07-28 16:16:07.161148', '2025-07-28 16:16:07.161148', NULL);
+INSERT INTO public.server_settings VALUES (31, 'smtp-user', '', 'string', 'email', 'SMTP пользователь', '2025-07-28 16:16:07.26863', '2025-07-28 16:16:07.26863', NULL);
+INSERT INTO public.server_settings VALUES (32, 'smtp-password', '', 'string', 'email', 'SMTP пароль', '2025-07-28 16:16:07.376868', '2025-07-28 16:16:07.376868', NULL);
+INSERT INTO public.server_settings VALUES (33, 'smtp-tls', 'true', 'boolean', 'email', 'Использовать TLS/SSL', '2025-07-28 16:16:07.484978', '2025-07-28 16:16:07.484978', NULL);
+INSERT INTO public.server_settings VALUES (34, 'smtp-sender-name', 'ChiwawaMine', 'string', 'email', 'Имя отправителя', '2025-07-28 16:16:07.593427', '2025-07-28 16:16:07.593427', NULL);
+INSERT INTO public.server_settings VALUES (35, 'smtp-reply-to', '', 'string', 'email', 'Reply-To адрес', '2025-07-28 16:16:07.701636', '2025-07-28 16:16:07.701636', NULL);
+INSERT INTO public.server_settings VALUES (36, 'email-notifications-enabled', 'true', 'boolean', 'email', 'Email уведомления включены', '2025-07-28 16:16:07.809582', '2025-07-28 16:16:07.809582', NULL);
+INSERT INTO public.server_settings VALUES (37, 'smtp-timeout', '30', 'integer', 'email', 'Тайм-аут SMTP в секундах', '2025-07-28 16:16:07.91732', '2025-07-28 16:16:07.91732', NULL);
+INSERT INTO public.server_settings VALUES (1, 'server-name', 'ChiwawaMine', 'string', 'general', 'Название сервера', '2025-07-28 16:16:03.682039', '2025-07-28 16:20:38.77883', NULL);
+INSERT INTO public.server_settings VALUES (2, 'server-description', 'Лучший Minecraft сервер с дружелюбным сообществом', 'string', 'general', 'Описание сервера', '2025-07-28 16:16:03.792825', '2025-07-28 16:20:38.885209', NULL);
+INSERT INTO public.server_settings VALUES (5, 'max-players', '100', 'integer', 'general', 'Максимальное количество игроков', '2025-07-28 16:16:04.416983', '2025-07-28 16:20:38.991868', NULL);
 
 
 --
--- TOC entry 3651 (class 0 OID 17026)
+-- TOC entry 3647 (class 0 OID 17026)
 -- Dependencies: 231
 -- Data for Name: server_status; Type: TABLE DATA; Schema: public; Owner: root
 --
@@ -1630,7 +1619,7 @@ INSERT INTO public.server_status VALUES (1, false, 0, 20, '1.20.4', 'Добро 
 
 
 --
--- TOC entry 3655 (class 0 OID 17102)
+-- TOC entry 3651 (class 0 OID 17102)
 -- Dependencies: 235
 -- Data for Name: trust_level_applications; Type: TABLE DATA; Schema: public; Owner: chiwawa
 --
@@ -1638,7 +1627,7 @@ INSERT INTO public.server_status VALUES (1, false, 0, 20, '1.20.4', 'Добро 
 
 
 --
--- TOC entry 3649 (class 0 OID 17006)
+-- TOC entry 3645 (class 0 OID 17006)
 -- Dependencies: 229
 -- Data for Name: user_achievements; Type: TABLE DATA; Schema: public; Owner: root
 --
@@ -1646,7 +1635,7 @@ INSERT INTO public.server_status VALUES (1, false, 0, 20, '1.20.4', 'Добро 
 
 
 --
--- TOC entry 3643 (class 0 OID 16958)
+-- TOC entry 3639 (class 0 OID 16958)
 -- Dependencies: 223
 -- Data for Name: user_activity; Type: TABLE DATA; Schema: public; Owner: root
 --
@@ -1654,12 +1643,15 @@ INSERT INTO public.server_status VALUES (1, false, 0, 20, '1.20.4', 'Добро 
 INSERT INTO public.user_activity VALUES (1, 1, 'login', 'Вход в систему', NULL, '::1', '2025-07-26 06:04:15.154537');
 INSERT INTO public.user_activity VALUES (2, 1, 'login', 'Вход в систему', NULL, '::1', '2025-07-26 16:17:54.568696');
 INSERT INTO public.user_activity VALUES (3, 1, 'login', 'Вход в систему', NULL, '::1', '2025-07-26 20:35:13.141596');
-INSERT INTO public.user_activity VALUES (4, 2, 'login', 'Вход в систему', NULL, '::1', '2025-07-26 23:20:41.017165');
-INSERT INTO public.user_activity VALUES (5, 2, 'login', 'Вход в систему', NULL, '::1', '2025-07-26 23:56:27.079611');
+INSERT INTO public.user_activity VALUES (6, 1, 'logout', 'Выход из системы', NULL, '::1', '2025-07-28 16:35:46.642749');
+INSERT INTO public.user_activity VALUES (7, 1, 'logout', 'Выход из системы', NULL, '::1', '2025-07-28 16:35:46.651292');
+INSERT INTO public.user_activity VALUES (8, 1, 'login', 'Вход в систему', NULL, '::1', '2025-07-28 16:35:52.588342');
+INSERT INTO public.user_activity VALUES (10, 2, 'login', 'Вход в систему', NULL, '::1', '2025-07-28 20:55:24.579807');
+INSERT INTO public.user_activity VALUES (11, 3, 'login', 'Вход в систему', NULL, '::1', '2025-07-28 21:13:57.529856');
 
 
 --
--- TOC entry 3657 (class 0 OID 17128)
+-- TOC entry 3653 (class 0 OID 17128)
 -- Dependencies: 237
 -- Data for Name: user_reputation; Type: TABLE DATA; Schema: public; Owner: chiwawa
 --
@@ -1668,30 +1660,32 @@ INSERT INTO public.user_reputation VALUES (1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '
 
 
 --
--- TOC entry 3637 (class 0 OID 16913)
+-- TOC entry 3633 (class 0 OID 16913)
 -- Dependencies: 217
 -- Data for Name: user_sessions; Type: TABLE DATA; Schema: public; Owner: root
 --
 
 INSERT INTO public.user_sessions VALUES ('413ed831-833e-481d-bad1-c125107f0989', 1, 'ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SjFjMlZ5U1dRaU9qRXNJbVZ0WVdsc0lqb2laR2x0WVRKZk1EVkFiV0ZwYkM1eWRTSXNJbkp2YkdVaU9pSmhaRzFwYmlJc0ltbGhkQ0k2TVRjMU16VXdPVGcxTkN3aVpYaHdJam94TnpVMk1UQXhPRFUwZlEuQmdfdUtObEFtc3ktak93M1hCVHFnaThzSzFuVVlBUUJTYlFhNnQ0WkVDaw==', '2025-08-25 09:04:14.253', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36', true, '2025-07-26 06:04:14.833344');
 INSERT INTO public.user_sessions VALUES ('a71000eb-fa83-424c-87b3-53ea1b0c8f5d', 1, 'ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SjFjMlZ5U1dRaU9qRXNJbVZ0WVdsc0lqb2laR2x0WVRKZk1EVkFiV0ZwYkM1eWRTSXNJbkp2YkdVaU9pSmhaRzFwYmlJc0ltbGhkQ0k2TVRjMU16VTBOalkzTXl3aVpYaHdJam94TnpVMk1UTTROamN6ZlEuVVYzbDFOcGdsY3hhSjAxVXdUNERIdEprN0hrcF9TSENwdktpek95Y2FtMA==', '2025-08-25 19:17:53.999', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36', true, '2025-07-26 16:17:54.509684');
-INSERT INTO public.user_sessions VALUES ('e2cdbc47-c757-4773-be9c-c75a5e05193b', 1, 'ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SjFjMlZ5U1dRaU9qRXNJbVZ0WVdsc0lqb2laR2x0WVRKZk1EVkFiV0ZwYkM1eWRTSXNJbkp2YkdVaU9pSmhaRzFwYmlJc0ltbGhkQ0k2TVRjMU16VTJNakV4TWl3aVpYaHdJam94TnpVMk1UVTBNVEV5ZlEucWhxRkdfYVpVZzl5TUVnSkhJemplRXNhSE4xaXFfMTJyZ2tuUVc4YzVZOA==', '2025-08-25 23:35:12.283', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36', true, '2025-07-26 20:35:12.819451');
-INSERT INTO public.user_sessions VALUES ('685fb0d7-e5d7-4e81-b575-3d925fcce49b', 2, 'ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SjFjMlZ5U1dRaU9qSXNJbVZ0WVdsc0lqb2ljMmhoWkc5M1oyRnRaWE5pYkdGamEzUjFZbVZBWjIxaGFXd3VZMjl0SWl3aWNtOXNaU0k2SW5WelpYSWlMQ0pwWVhRaU9qRTNOVE0xTnpJd05EQXNJbVY0Y0NJNk1UYzFNelkxT0RRME1IMC5JcXJxWjlKNUc1RV84dmFqaWdKTnd6Y2h5MXVqaUt6MkN3VzRlRWN0M184', '2025-07-28 02:20:40.177', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36', false, '2025-07-26 23:20:40.692808');
-INSERT INTO public.user_sessions VALUES ('673bd076-12c2-4247-bef2-36960295ff1d', 2, 'ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SjFjMlZ5U1dRaU9qSXNJbVZ0WVdsc0lqb2ljMmhoWkc5M1oyRnRaWE5pYkdGamEzUjFZbVZBWjIxaGFXd3VZMjl0SWl3aWNtOXNaU0k2SW5WelpYSWlMQ0pwWVhRaU9qRTNOVE0xTnpReE9EWXNJbVY0Y0NJNk1UYzFNelkyTURVNE5uMC5tM2pkYW1aWElMZ1ZqM3FzamZHd0pMNEFGV3g5M2JocTJFblV2dWZXSzlv', '2025-07-28 02:56:26.235', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36', false, '2025-07-26 23:56:26.749795');
+INSERT INTO public.user_sessions VALUES ('e2cdbc47-c757-4773-be9c-c75a5e05193b', 1, 'ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SjFjMlZ5U1dRaU9qRXNJbVZ0WVdsc0lqb2laR2x0WVRKZk1EVkFiV0ZwYkM1eWRTSXNJbkp2YkdVaU9pSmhaRzFwYmlJc0ltbGhkQ0k2TVRjMU16VTJNakV4TWl3aVpYaHdJam94TnpVMk1UVTBNVEV5ZlEucWhxRkdfYVpVZzl5TUVnSkhJemplRXNhSE4xaXFfMTJyZ2tuUVc4YzVZOA==', '2025-08-25 23:35:12.283', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36', false, '2025-07-26 20:35:12.819451');
+INSERT INTO public.user_sessions VALUES ('7f4dd2ee-43b0-492c-a359-92839bac38c7', 1, 'ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SjFjMlZ5U1dRaU9qRXNJbVZ0WVdsc0lqb2laR2x0WVRKZk1EVkFiV0ZwYkM1eWRTSXNJbkp2YkdVaU9pSmhaRzFwYmlJc0ltbGhkQ0k2TVRjMU16Y3lNRFUxTXl3aVpYaHdJam94TnpVMk16RXlOVFV6ZlEudUVxWjh0UERFd3RvcGpidTI5eFh2V1Z3a1ZVM0p5LVBDY3NMZ01SeGI3bw==', '2025-08-27 19:35:53.895', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36', true, '2025-07-28 16:35:52.257701');
+INSERT INTO public.user_sessions VALUES ('bcea3ef6-cc04-4ed2-9987-fd46dae516ce', 2, 'ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SjFjMlZ5U1dRaU9qSXNJbVZ0WVdsc0lqb2ljMmhoWkc5M1oyRnRaWE5pYkdGamEzUjFZbVZBWjIxaGFXd3VZMjl0SWl3aWNtOXNaU0k2SW5WelpYSWlMQ0pwWVhRaU9qRTNOVE0zTXpZeE1qVXNJbVY0Y0NJNk1UYzFNemd5TWpVeU5YMC5LRWpUQ29BdHE1VFRDdGZaRWd2SVpucE9xX3JZSnhYWGhtV29SSEIwc04w', '2025-07-29 23:55:25.892', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36', true, '2025-07-28 20:55:24.264178');
+INSERT INTO public.user_sessions VALUES ('ad97414e-0e4e-4164-8729-5b5b02184475', 3, 'ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SjFjMlZ5U1dRaU9qTXNJbVZ0WVdsc0lqb2lkR1Z6ZEVCbGVHRnRjR3hsTG1OdmJTSXNJbkp2YkdVaU9pSjFjMlZ5SWl3aWFXRjBJam94TnpVek56TTNNak00TENKbGVIQWlPakUzTlRNNE1qTTJNemg5LkVNS2g0VktUNnV2NDcyeldnS0pTdFdHOGVtbXN1RXNtc2o3ZjZXekQ2bEk=', '2025-07-30 00:13:58.838', '::1', 'Mozilla/5.0 (Windows NT; Windows NT 10.0; ru-RU) WindowsPowerShell/5.1.26100.4768', true, '2025-07-28 21:13:57.207429');
 
 
 --
--- TOC entry 3631 (class 0 OID 16829)
+-- TOC entry 3627 (class 0 OID 16829)
 -- Dependencies: 211
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: root
 --
 
-INSERT INTO public.users VALUES (1, 'ebluffy', 'dima2_05@mail.ru', '$2a$12$Wp8pSrr9R1tPyaT7BUW4RuIT2Kdt1YdEWdsrL.J3vvSs6p/am39o2', 'Дмитрий', NULL, NULL, 'Администратор', NULL, NULL, NULL, NULL, 'admin', 3, 'active', true, true, false, '2025-07-26 05:12:51.073902', '2025-07-26 20:35:12.926927', NULL);
-INSERT INTO public.users VALUES (2, 'KORESHon', 'shadowgamesblacktube@gmail.com', '$2a$12$Wp8pSrr9R1tPyaT7BUW4RuIT2Kdt1YdEWdsrL.J3vvSs6p/am39o2', 'Дмитрий', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'user', 1, 'active', true, false, false, '2025-07-26 05:12:51.073902', '2025-07-26 23:56:26.859651', NULL);
+INSERT INTO public.users VALUES (1, 'ebluffy', 'dima2_05@mail.ru', '$2a$12$Wp8pSrr9R1tPyaT7BUW4RuIT2Kdt1YdEWdsrL.J3vvSs6p/am39o2', 'Дмитрий', NULL, NULL, 'Администратор', NULL, NULL, NULL, NULL, 'admin', 3, 'active', true, true, false, '2025-07-26 05:12:51.073902', '2025-07-28 16:35:52.365992', NULL);
+INSERT INTO public.users VALUES (2, 'shadow', 'shadowgamesblacktube@gmail.com', '$2a$12$FHQHejBO/08A5AXpOQ1J0OUS6JAjfhBceefqAYKjD1IOX9.Ppj.ri', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'user', 0, 'active', true, false, false, '2025-07-28 20:55:04.515725', '2025-07-28 20:55:24.371281', NULL);
+INSERT INTO public.users VALUES (3, 'TestUser123', 'test@example.com', '$2a$12$Ed3Ua3mJ/eXXO.e6l/wHK.0ZH8/m4qQQMi4u81ED7M/SKKd5Rc0ZS', 'Test', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'user', 0, 'active', true, false, false, '2025-07-28 21:13:47.528758', '2025-07-28 21:13:57.313929', NULL);
 
 
 --
--- TOC entry 3691 (class 0 OID 0)
+-- TOC entry 3687 (class 0 OID 0)
 -- Dependencies: 226
 -- Name: achievements_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
 --
@@ -1700,16 +1694,16 @@ SELECT pg_catalog.setval('public.achievements_id_seq', 8, true);
 
 
 --
--- TOC entry 3692 (class 0 OID 0)
+-- TOC entry 3688 (class 0 OID 0)
 -- Dependencies: 224
 -- Name: admin_logs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
 --
 
-SELECT pg_catalog.setval('public.admin_logs_id_seq', 107, true);
+SELECT pg_catalog.setval('public.admin_logs_id_seq', 128, true);
 
 
 --
--- TOC entry 3693 (class 0 OID 0)
+-- TOC entry 3689 (class 0 OID 0)
 -- Dependencies: 212
 -- Name: applications_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
 --
@@ -1718,7 +1712,7 @@ SELECT pg_catalog.setval('public.applications_id_seq', 1, false);
 
 
 --
--- TOC entry 3694 (class 0 OID 0)
+-- TOC entry 3690 (class 0 OID 0)
 -- Dependencies: 220
 -- Name: discord_oauth_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
 --
@@ -1727,8 +1721,8 @@ SELECT pg_catalog.setval('public.discord_oauth_id_seq', 1, false);
 
 
 --
--- TOC entry 3695 (class 0 OID 0)
--- Dependencies: 242
+-- TOC entry 3691 (class 0 OID 0)
+-- Dependencies: 240
 -- Name: email_templates_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
 --
 
@@ -1736,26 +1730,26 @@ SELECT pg_catalog.setval('public.email_templates_id_seq', 12, true);
 
 
 --
--- TOC entry 3696 (class 0 OID 0)
+-- TOC entry 3692 (class 0 OID 0)
 -- Dependencies: 218
 -- Name: email_verification_tokens_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
 --
 
-SELECT pg_catalog.setval('public.email_verification_tokens_id_seq', 1, false);
+SELECT pg_catalog.setval('public.email_verification_tokens_id_seq', 2, true);
 
 
 --
--- TOC entry 3697 (class 0 OID 0)
+-- TOC entry 3693 (class 0 OID 0)
 -- Dependencies: 215
 -- Name: login_logs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
 --
 
-SELECT pg_catalog.setval('public.login_logs_id_seq', 5, true);
+SELECT pg_catalog.setval('public.login_logs_id_seq', 12, true);
 
 
 --
--- TOC entry 3698 (class 0 OID 0)
--- Dependencies: 244
+-- TOC entry 3694 (class 0 OID 0)
+-- Dependencies: 242
 -- Name: password_reset_tokens_id_seq; Type: SEQUENCE SET; Schema: public; Owner: chiwawa
 --
 
@@ -1763,7 +1757,7 @@ SELECT pg_catalog.setval('public.password_reset_tokens_id_seq', 1, false);
 
 
 --
--- TOC entry 3699 (class 0 OID 0)
+-- TOC entry 3695 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: reputation_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: chiwawa
 --
@@ -1772,7 +1766,7 @@ SELECT pg_catalog.setval('public.reputation_log_id_seq', 1, false);
 
 
 --
--- TOC entry 3700 (class 0 OID 0)
+-- TOC entry 3696 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: server_rules_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
 --
@@ -1781,16 +1775,16 @@ SELECT pg_catalog.setval('public.server_rules_id_seq', 5, true);
 
 
 --
--- TOC entry 3701 (class 0 OID 0)
--- Dependencies: 240
--- Name: server_settings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
+-- TOC entry 3697 (class 0 OID 0)
+-- Dependencies: 244
+-- Name: server_settings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: chiwawa
 --
 
-SELECT pg_catalog.setval('public.server_settings_id_seq', 621, true);
+SELECT pg_catalog.setval('public.server_settings_id_seq', 38, true);
 
 
 --
--- TOC entry 3702 (class 0 OID 0)
+-- TOC entry 3698 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: server_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
 --
@@ -1799,7 +1793,7 @@ SELECT pg_catalog.setval('public.server_status_id_seq', 1, true);
 
 
 --
--- TOC entry 3703 (class 0 OID 0)
+-- TOC entry 3699 (class 0 OID 0)
 -- Dependencies: 234
 -- Name: trust_level_applications_id_seq; Type: SEQUENCE SET; Schema: public; Owner: chiwawa
 --
@@ -1808,7 +1802,7 @@ SELECT pg_catalog.setval('public.trust_level_applications_id_seq', 1, false);
 
 
 --
--- TOC entry 3704 (class 0 OID 0)
+-- TOC entry 3700 (class 0 OID 0)
 -- Dependencies: 228
 -- Name: user_achievements_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
 --
@@ -1817,16 +1811,16 @@ SELECT pg_catalog.setval('public.user_achievements_id_seq', 1, false);
 
 
 --
--- TOC entry 3705 (class 0 OID 0)
+-- TOC entry 3701 (class 0 OID 0)
 -- Dependencies: 222
 -- Name: user_activity_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
 --
 
-SELECT pg_catalog.setval('public.user_activity_id_seq', 5, true);
+SELECT pg_catalog.setval('public.user_activity_id_seq', 11, true);
 
 
 --
--- TOC entry 3706 (class 0 OID 0)
+-- TOC entry 3702 (class 0 OID 0)
 -- Dependencies: 236
 -- Name: user_reputation_id_seq; Type: SEQUENCE SET; Schema: public; Owner: chiwawa
 --
@@ -1835,16 +1829,16 @@ SELECT pg_catalog.setval('public.user_reputation_id_seq', 1, true);
 
 
 --
--- TOC entry 3707 (class 0 OID 0)
+-- TOC entry 3703 (class 0 OID 0)
 -- Dependencies: 210
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 1, true);
+SELECT pg_catalog.setval('public.users_id_seq', 3, true);
 
 
 --
--- TOC entry 3423 (class 2606 OID 17004)
+-- TOC entry 3422 (class 2606 OID 17004)
 -- Name: achievements achievements_pkey; Type: CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -1853,7 +1847,7 @@ ALTER TABLE ONLY public.achievements
 
 
 --
--- TOC entry 3418 (class 2606 OID 16981)
+-- TOC entry 3417 (class 2606 OID 16981)
 -- Name: admin_logs admin_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -1862,7 +1856,7 @@ ALTER TABLE ONLY public.admin_logs
 
 
 --
--- TOC entry 3385 (class 2606 OID 16862)
+-- TOC entry 3384 (class 2606 OID 16862)
 -- Name: applications applications_pkey; Type: CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -1871,7 +1865,7 @@ ALTER TABLE ONLY public.applications
 
 
 --
--- TOC entry 3411 (class 2606 OID 16951)
+-- TOC entry 3410 (class 2606 OID 16951)
 -- Name: discord_oauth discord_oauth_pkey; Type: CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -1880,7 +1874,7 @@ ALTER TABLE ONLY public.discord_oauth
 
 
 --
--- TOC entry 3453 (class 2606 OID 17321)
+-- TOC entry 3446 (class 2606 OID 17321)
 -- Name: email_templates email_templates_pkey; Type: CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -1889,7 +1883,7 @@ ALTER TABLE ONLY public.email_templates
 
 
 --
--- TOC entry 3455 (class 2606 OID 17323)
+-- TOC entry 3448 (class 2606 OID 17323)
 -- Name: email_templates email_templates_template_name_key; Type: CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -1898,7 +1892,7 @@ ALTER TABLE ONLY public.email_templates
 
 
 --
--- TOC entry 3404 (class 2606 OID 16936)
+-- TOC entry 3403 (class 2606 OID 16936)
 -- Name: email_verification_tokens email_verification_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -1907,7 +1901,7 @@ ALTER TABLE ONLY public.email_verification_tokens
 
 
 --
--- TOC entry 3406 (class 2606 OID 16938)
+-- TOC entry 3405 (class 2606 OID 16938)
 -- Name: email_verification_tokens email_verification_tokens_token_key; Type: CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -1916,7 +1910,7 @@ ALTER TABLE ONLY public.email_verification_tokens
 
 
 --
--- TOC entry 3397 (class 2606 OID 16907)
+-- TOC entry 3396 (class 2606 OID 16907)
 -- Name: login_logs login_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -1925,7 +1919,7 @@ ALTER TABLE ONLY public.login_logs
 
 
 --
--- TOC entry 3462 (class 2606 OID 17364)
+-- TOC entry 3455 (class 2606 OID 17364)
 -- Name: password_reset_tokens password_reset_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: chiwawa
 --
 
@@ -1934,7 +1928,7 @@ ALTER TABLE ONLY public.password_reset_tokens
 
 
 --
--- TOC entry 3464 (class 2606 OID 17366)
+-- TOC entry 3457 (class 2606 OID 17366)
 -- Name: password_reset_tokens password_reset_tokens_token_key; Type: CONSTRAINT; Schema: public; Owner: chiwawa
 --
 
@@ -1943,7 +1937,7 @@ ALTER TABLE ONLY public.password_reset_tokens
 
 
 --
--- TOC entry 3392 (class 2606 OID 16891)
+-- TOC entry 3391 (class 2606 OID 16891)
 -- Name: player_stats player_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -1952,7 +1946,7 @@ ALTER TABLE ONLY public.player_stats
 
 
 --
--- TOC entry 3445 (class 2606 OID 17162)
+-- TOC entry 3444 (class 2606 OID 17162)
 -- Name: reputation_log reputation_log_pkey; Type: CONSTRAINT; Schema: public; Owner: chiwawa
 --
 
@@ -1961,7 +1955,7 @@ ALTER TABLE ONLY public.reputation_log
 
 
 --
--- TOC entry 3433 (class 2606 OID 17051)
+-- TOC entry 3432 (class 2606 OID 17051)
 -- Name: server_rules server_rules_pkey; Type: CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -1970,8 +1964,8 @@ ALTER TABLE ONLY public.server_rules
 
 
 --
--- TOC entry 3449 (class 2606 OID 17302)
--- Name: server_settings server_settings_pkey; Type: CONSTRAINT; Schema: public; Owner: root
+-- TOC entry 3459 (class 2606 OID 17392)
+-- Name: server_settings server_settings_pkey; Type: CONSTRAINT; Schema: public; Owner: chiwawa
 --
 
 ALTER TABLE ONLY public.server_settings
@@ -1979,8 +1973,8 @@ ALTER TABLE ONLY public.server_settings
 
 
 --
--- TOC entry 3451 (class 2606 OID 17304)
--- Name: server_settings server_settings_setting_key_key; Type: CONSTRAINT; Schema: public; Owner: root
+-- TOC entry 3461 (class 2606 OID 17394)
+-- Name: server_settings server_settings_setting_key_key; Type: CONSTRAINT; Schema: public; Owner: chiwawa
 --
 
 ALTER TABLE ONLY public.server_settings
@@ -1988,7 +1982,7 @@ ALTER TABLE ONLY public.server_settings
 
 
 --
--- TOC entry 3431 (class 2606 OID 17037)
+-- TOC entry 3430 (class 2606 OID 17037)
 -- Name: server_status server_status_pkey; Type: CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -1997,7 +1991,7 @@ ALTER TABLE ONLY public.server_status
 
 
 --
--- TOC entry 3437 (class 2606 OID 17116)
+-- TOC entry 3436 (class 2606 OID 17116)
 -- Name: trust_level_applications trust_level_applications_pkey; Type: CONSTRAINT; Schema: public; Owner: chiwawa
 --
 
@@ -2006,7 +2000,7 @@ ALTER TABLE ONLY public.trust_level_applications
 
 
 --
--- TOC entry 3427 (class 2606 OID 17012)
+-- TOC entry 3426 (class 2606 OID 17012)
 -- Name: user_achievements user_achievements_pkey; Type: CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -2015,7 +2009,7 @@ ALTER TABLE ONLY public.user_achievements
 
 
 --
--- TOC entry 3429 (class 2606 OID 17014)
+-- TOC entry 3428 (class 2606 OID 17014)
 -- Name: user_achievements user_achievements_user_id_achievement_id_key; Type: CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -2024,7 +2018,7 @@ ALTER TABLE ONLY public.user_achievements
 
 
 --
--- TOC entry 3416 (class 2606 OID 16966)
+-- TOC entry 3415 (class 2606 OID 16966)
 -- Name: user_activity user_activity_pkey; Type: CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -2033,7 +2027,7 @@ ALTER TABLE ONLY public.user_activity
 
 
 --
--- TOC entry 3440 (class 2606 OID 17145)
+-- TOC entry 3439 (class 2606 OID 17145)
 -- Name: user_reputation user_reputation_pkey; Type: CONSTRAINT; Schema: public; Owner: chiwawa
 --
 
@@ -2042,7 +2036,7 @@ ALTER TABLE ONLY public.user_reputation
 
 
 --
--- TOC entry 3442 (class 2606 OID 17147)
+-- TOC entry 3441 (class 2606 OID 17147)
 -- Name: user_reputation user_reputation_user_id_key; Type: CONSTRAINT; Schema: public; Owner: chiwawa
 --
 
@@ -2051,7 +2045,7 @@ ALTER TABLE ONLY public.user_reputation
 
 
 --
--- TOC entry 3402 (class 2606 OID 16922)
+-- TOC entry 3401 (class 2606 OID 16922)
 -- Name: user_sessions user_sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -2060,7 +2054,7 @@ ALTER TABLE ONLY public.user_sessions
 
 
 --
--- TOC entry 3379 (class 2606 OID 16850)
+-- TOC entry 3378 (class 2606 OID 16850)
 -- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -2069,7 +2063,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 3381 (class 2606 OID 16848)
+-- TOC entry 3380 (class 2606 OID 16848)
 -- Name: users users_nickname_key; Type: CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -2078,7 +2072,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 3383 (class 2606 OID 16846)
+-- TOC entry 3382 (class 2606 OID 16846)
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -2087,7 +2081,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 3419 (class 1259 OID 17090)
+-- TOC entry 3418 (class 1259 OID 17090)
 -- Name: idx_admin_logs_admin_id; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2095,7 +2089,7 @@ CREATE INDEX idx_admin_logs_admin_id ON public.admin_logs USING btree (admin_id)
 
 
 --
--- TOC entry 3420 (class 1259 OID 17092)
+-- TOC entry 3419 (class 1259 OID 17092)
 -- Name: idx_admin_logs_created_at; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2103,7 +2097,7 @@ CREATE INDEX idx_admin_logs_created_at ON public.admin_logs USING btree (created
 
 
 --
--- TOC entry 3421 (class 1259 OID 17091)
+-- TOC entry 3420 (class 1259 OID 17091)
 -- Name: idx_admin_logs_target_user_id; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2111,7 +2105,7 @@ CREATE INDEX idx_admin_logs_target_user_id ON public.admin_logs USING btree (tar
 
 
 --
--- TOC entry 3386 (class 1259 OID 17073)
+-- TOC entry 3385 (class 1259 OID 17073)
 -- Name: idx_applications_status; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2119,7 +2113,7 @@ CREATE INDEX idx_applications_status ON public.applications USING btree (status)
 
 
 --
--- TOC entry 3387 (class 1259 OID 17074)
+-- TOC entry 3386 (class 1259 OID 17074)
 -- Name: idx_applications_submitted_at; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2127,7 +2121,7 @@ CREATE INDEX idx_applications_submitted_at ON public.applications USING btree (s
 
 
 --
--- TOC entry 3388 (class 1259 OID 17075)
+-- TOC entry 3387 (class 1259 OID 17075)
 -- Name: idx_applications_user_id; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2135,7 +2129,7 @@ CREATE INDEX idx_applications_user_id ON public.applications USING btree (user_i
 
 
 --
--- TOC entry 3456 (class 1259 OID 17332)
+-- TOC entry 3449 (class 1259 OID 17332)
 -- Name: idx_email_templates_active; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2143,7 +2137,7 @@ CREATE INDEX idx_email_templates_active ON public.email_templates USING btree (i
 
 
 --
--- TOC entry 3457 (class 1259 OID 17331)
+-- TOC entry 3450 (class 1259 OID 17331)
 -- Name: idx_email_templates_name; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2151,7 +2145,7 @@ CREATE INDEX idx_email_templates_name ON public.email_templates USING btree (tem
 
 
 --
--- TOC entry 3407 (class 1259 OID 17086)
+-- TOC entry 3406 (class 1259 OID 17086)
 -- Name: idx_email_verification_tokens_expires_at; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2159,7 +2153,7 @@ CREATE INDEX idx_email_verification_tokens_expires_at ON public.email_verificati
 
 
 --
--- TOC entry 3408 (class 1259 OID 17085)
+-- TOC entry 3407 (class 1259 OID 17085)
 -- Name: idx_email_verification_tokens_token; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2167,7 +2161,7 @@ CREATE INDEX idx_email_verification_tokens_token ON public.email_verification_to
 
 
 --
--- TOC entry 3409 (class 1259 OID 17084)
+-- TOC entry 3408 (class 1259 OID 17084)
 -- Name: idx_email_verification_tokens_user_id; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2175,7 +2169,7 @@ CREATE INDEX idx_email_verification_tokens_user_id ON public.email_verification_
 
 
 --
--- TOC entry 3393 (class 1259 OID 17080)
+-- TOC entry 3392 (class 1259 OID 17080)
 -- Name: idx_login_logs_ip_address; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2183,7 +2177,7 @@ CREATE INDEX idx_login_logs_ip_address ON public.login_logs USING btree (ip_addr
 
 
 --
--- TOC entry 3394 (class 1259 OID 17079)
+-- TOC entry 3393 (class 1259 OID 17079)
 -- Name: idx_login_logs_login_time; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2191,7 +2185,7 @@ CREATE INDEX idx_login_logs_login_time ON public.login_logs USING btree (login_t
 
 
 --
--- TOC entry 3395 (class 1259 OID 17078)
+-- TOC entry 3394 (class 1259 OID 17078)
 -- Name: idx_login_logs_user_id; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2199,7 +2193,7 @@ CREATE INDEX idx_login_logs_user_id ON public.login_logs USING btree (user_id);
 
 
 --
--- TOC entry 3458 (class 1259 OID 17374)
+-- TOC entry 3451 (class 1259 OID 17374)
 -- Name: idx_password_reset_tokens_expires_at; Type: INDEX; Schema: public; Owner: chiwawa
 --
 
@@ -2207,7 +2201,7 @@ CREATE INDEX idx_password_reset_tokens_expires_at ON public.password_reset_token
 
 
 --
--- TOC entry 3459 (class 1259 OID 17373)
+-- TOC entry 3452 (class 1259 OID 17373)
 -- Name: idx_password_reset_tokens_token; Type: INDEX; Schema: public; Owner: chiwawa
 --
 
@@ -2215,7 +2209,7 @@ CREATE INDEX idx_password_reset_tokens_token ON public.password_reset_tokens USI
 
 
 --
--- TOC entry 3460 (class 1259 OID 17372)
+-- TOC entry 3453 (class 1259 OID 17372)
 -- Name: idx_password_reset_tokens_user_id; Type: INDEX; Schema: public; Owner: chiwawa
 --
 
@@ -2223,7 +2217,7 @@ CREATE INDEX idx_password_reset_tokens_user_id ON public.password_reset_tokens U
 
 
 --
--- TOC entry 3389 (class 1259 OID 17077)
+-- TOC entry 3388 (class 1259 OID 17077)
 -- Name: idx_player_stats_current_level; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2231,7 +2225,7 @@ CREATE INDEX idx_player_stats_current_level ON public.player_stats USING btree (
 
 
 --
--- TOC entry 3390 (class 1259 OID 17076)
+-- TOC entry 3389 (class 1259 OID 17076)
 -- Name: idx_player_stats_user_id; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2239,7 +2233,7 @@ CREATE INDEX idx_player_stats_user_id ON public.player_stats USING btree (user_i
 
 
 --
--- TOC entry 3443 (class 1259 OID 17178)
+-- TOC entry 3442 (class 1259 OID 17178)
 -- Name: idx_reputation_log_user_id; Type: INDEX; Schema: public; Owner: chiwawa
 --
 
@@ -2247,23 +2241,7 @@ CREATE INDEX idx_reputation_log_user_id ON public.reputation_log USING btree (us
 
 
 --
--- TOC entry 3446 (class 1259 OID 17329)
--- Name: idx_server_settings_category; Type: INDEX; Schema: public; Owner: root
---
-
-CREATE INDEX idx_server_settings_category ON public.server_settings USING btree (category);
-
-
---
--- TOC entry 3447 (class 1259 OID 17330)
--- Name: idx_server_settings_key; Type: INDEX; Schema: public; Owner: root
---
-
-CREATE INDEX idx_server_settings_key ON public.server_settings USING btree (setting_key);
-
-
---
--- TOC entry 3434 (class 1259 OID 17176)
+-- TOC entry 3433 (class 1259 OID 17176)
 -- Name: idx_trust_level_applications_status; Type: INDEX; Schema: public; Owner: chiwawa
 --
 
@@ -2271,7 +2249,7 @@ CREATE INDEX idx_trust_level_applications_status ON public.trust_level_applicati
 
 
 --
--- TOC entry 3435 (class 1259 OID 17175)
+-- TOC entry 3434 (class 1259 OID 17175)
 -- Name: idx_trust_level_applications_user_id; Type: INDEX; Schema: public; Owner: chiwawa
 --
 
@@ -2279,7 +2257,7 @@ CREATE INDEX idx_trust_level_applications_user_id ON public.trust_level_applicat
 
 
 --
--- TOC entry 3424 (class 1259 OID 17094)
+-- TOC entry 3423 (class 1259 OID 17094)
 -- Name: idx_user_achievements_achievement_id; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2287,7 +2265,7 @@ CREATE INDEX idx_user_achievements_achievement_id ON public.user_achievements US
 
 
 --
--- TOC entry 3425 (class 1259 OID 17093)
+-- TOC entry 3424 (class 1259 OID 17093)
 -- Name: idx_user_achievements_user_id; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2295,7 +2273,7 @@ CREATE INDEX idx_user_achievements_user_id ON public.user_achievements USING btr
 
 
 --
--- TOC entry 3412 (class 1259 OID 17088)
+-- TOC entry 3411 (class 1259 OID 17088)
 -- Name: idx_user_activity_created_at; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2303,7 +2281,7 @@ CREATE INDEX idx_user_activity_created_at ON public.user_activity USING btree (c
 
 
 --
--- TOC entry 3413 (class 1259 OID 17089)
+-- TOC entry 3412 (class 1259 OID 17089)
 -- Name: idx_user_activity_type; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2311,7 +2289,7 @@ CREATE INDEX idx_user_activity_type ON public.user_activity USING btree (activit
 
 
 --
--- TOC entry 3414 (class 1259 OID 17087)
+-- TOC entry 3413 (class 1259 OID 17087)
 -- Name: idx_user_activity_user_id; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2319,7 +2297,7 @@ CREATE INDEX idx_user_activity_user_id ON public.user_activity USING btree (user
 
 
 --
--- TOC entry 3438 (class 1259 OID 17177)
+-- TOC entry 3437 (class 1259 OID 17177)
 -- Name: idx_user_reputation_user_id; Type: INDEX; Schema: public; Owner: chiwawa
 --
 
@@ -2327,7 +2305,7 @@ CREATE INDEX idx_user_reputation_user_id ON public.user_reputation USING btree (
 
 
 --
--- TOC entry 3398 (class 1259 OID 17083)
+-- TOC entry 3397 (class 1259 OID 17083)
 -- Name: idx_user_sessions_expires_at; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2335,7 +2313,7 @@ CREATE INDEX idx_user_sessions_expires_at ON public.user_sessions USING btree (e
 
 
 --
--- TOC entry 3399 (class 1259 OID 17100)
+-- TOC entry 3398 (class 1259 OID 17100)
 -- Name: idx_user_sessions_token_hash; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2343,7 +2321,7 @@ CREATE INDEX idx_user_sessions_token_hash ON public.user_sessions USING btree (t
 
 
 --
--- TOC entry 3400 (class 1259 OID 17081)
+-- TOC entry 3399 (class 1259 OID 17081)
 -- Name: idx_user_sessions_user_id; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2351,7 +2329,7 @@ CREATE INDEX idx_user_sessions_user_id ON public.user_sessions USING btree (user
 
 
 --
--- TOC entry 3371 (class 1259 OID 17072)
+-- TOC entry 3370 (class 1259 OID 17072)
 -- Name: idx_users_discord_id; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2359,7 +2337,7 @@ CREATE INDEX idx_users_discord_id ON public.users USING btree (discord_id);
 
 
 --
--- TOC entry 3372 (class 1259 OID 17066)
+-- TOC entry 3371 (class 1259 OID 17066)
 -- Name: idx_users_email; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2367,7 +2345,7 @@ CREATE INDEX idx_users_email ON public.users USING btree (email);
 
 
 --
--- TOC entry 3373 (class 1259 OID 17067)
+-- TOC entry 3372 (class 1259 OID 17067)
 -- Name: idx_users_nickname; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2375,7 +2353,7 @@ CREATE INDEX idx_users_nickname ON public.users USING btree (nickname);
 
 
 --
--- TOC entry 3374 (class 1259 OID 17071)
+-- TOC entry 3373 (class 1259 OID 17071)
 -- Name: idx_users_registered_at; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2383,7 +2361,7 @@ CREATE INDEX idx_users_registered_at ON public.users USING btree (registered_at)
 
 
 --
--- TOC entry 3375 (class 1259 OID 17068)
+-- TOC entry 3374 (class 1259 OID 17068)
 -- Name: idx_users_role; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2391,7 +2369,7 @@ CREATE INDEX idx_users_role ON public.users USING btree (role);
 
 
 --
--- TOC entry 3376 (class 1259 OID 17070)
+-- TOC entry 3375 (class 1259 OID 17070)
 -- Name: idx_users_status; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2399,7 +2377,7 @@ CREATE INDEX idx_users_status ON public.users USING btree (status);
 
 
 --
--- TOC entry 3377 (class 1259 OID 17069)
+-- TOC entry 3376 (class 1259 OID 17069)
 -- Name: idx_users_trust_level; Type: INDEX; Schema: public; Owner: root
 --
 
@@ -2407,7 +2385,7 @@ CREATE INDEX idx_users_trust_level ON public.users USING btree (trust_level);
 
 
 --
--- TOC entry 3490 (class 2620 OID 17334)
+-- TOC entry 3486 (class 2620 OID 17334)
 -- Name: email_templates update_email_templates_updated_at; Type: TRIGGER; Schema: public; Owner: root
 --
 
@@ -2415,7 +2393,7 @@ CREATE TRIGGER update_email_templates_updated_at BEFORE UPDATE ON public.email_t
 
 
 --
--- TOC entry 3486 (class 2620 OID 17097)
+-- TOC entry 3483 (class 2620 OID 17097)
 -- Name: player_stats update_player_stats_updated_at; Type: TRIGGER; Schema: public; Owner: root
 --
 
@@ -2423,7 +2401,7 @@ CREATE TRIGGER update_player_stats_updated_at BEFORE UPDATE ON public.player_sta
 
 
 --
--- TOC entry 3488 (class 2620 OID 17096)
+-- TOC entry 3485 (class 2620 OID 17096)
 -- Name: server_rules update_server_rules_updated_at; Type: TRIGGER; Schema: public; Owner: root
 --
 
@@ -2431,15 +2409,7 @@ CREATE TRIGGER update_server_rules_updated_at BEFORE UPDATE ON public.server_rul
 
 
 --
--- TOC entry 3489 (class 2620 OID 17333)
--- Name: server_settings update_server_settings_updated_at; Type: TRIGGER; Schema: public; Owner: root
---
-
-CREATE TRIGGER update_server_settings_updated_at BEFORE UPDATE ON public.server_settings FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-
-
---
--- TOC entry 3487 (class 2620 OID 17098)
+-- TOC entry 3484 (class 2620 OID 17098)
 -- Name: server_status update_server_status_updated_at; Type: TRIGGER; Schema: public; Owner: root
 --
 
@@ -2447,7 +2417,7 @@ CREATE TRIGGER update_server_status_updated_at BEFORE UPDATE ON public.server_st
 
 
 --
--- TOC entry 3473 (class 2606 OID 16982)
+-- TOC entry 3470 (class 2606 OID 16982)
 -- Name: admin_logs admin_logs_admin_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -2456,7 +2426,7 @@ ALTER TABLE ONLY public.admin_logs
 
 
 --
--- TOC entry 3474 (class 2606 OID 16987)
+-- TOC entry 3471 (class 2606 OID 16987)
 -- Name: admin_logs admin_logs_target_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -2465,7 +2435,7 @@ ALTER TABLE ONLY public.admin_logs
 
 
 --
--- TOC entry 3466 (class 2606 OID 16868)
+-- TOC entry 3463 (class 2606 OID 16868)
 -- Name: applications applications_reviewed_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -2474,7 +2444,7 @@ ALTER TABLE ONLY public.applications
 
 
 --
--- TOC entry 3465 (class 2606 OID 16863)
+-- TOC entry 3462 (class 2606 OID 16863)
 -- Name: applications applications_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -2483,7 +2453,7 @@ ALTER TABLE ONLY public.applications
 
 
 --
--- TOC entry 3471 (class 2606 OID 16952)
+-- TOC entry 3468 (class 2606 OID 16952)
 -- Name: discord_oauth discord_oauth_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -2492,7 +2462,7 @@ ALTER TABLE ONLY public.discord_oauth
 
 
 --
--- TOC entry 3483 (class 2606 OID 17335)
+-- TOC entry 3479 (class 2606 OID 17335)
 -- Name: email_templates email_templates_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -2501,7 +2471,7 @@ ALTER TABLE ONLY public.email_templates
 
 
 --
--- TOC entry 3484 (class 2606 OID 17324)
+-- TOC entry 3480 (class 2606 OID 17324)
 -- Name: email_templates email_templates_updated_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -2510,7 +2480,7 @@ ALTER TABLE ONLY public.email_templates
 
 
 --
--- TOC entry 3470 (class 2606 OID 16939)
+-- TOC entry 3467 (class 2606 OID 16939)
 -- Name: email_verification_tokens email_verification_tokens_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -2519,7 +2489,7 @@ ALTER TABLE ONLY public.email_verification_tokens
 
 
 --
--- TOC entry 3468 (class 2606 OID 16908)
+-- TOC entry 3465 (class 2606 OID 16908)
 -- Name: login_logs login_logs_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -2528,7 +2498,7 @@ ALTER TABLE ONLY public.login_logs
 
 
 --
--- TOC entry 3485 (class 2606 OID 17367)
+-- TOC entry 3481 (class 2606 OID 17367)
 -- Name: password_reset_tokens password_reset_tokens_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: chiwawa
 --
 
@@ -2537,7 +2507,7 @@ ALTER TABLE ONLY public.password_reset_tokens
 
 
 --
--- TOC entry 3467 (class 2606 OID 16892)
+-- TOC entry 3464 (class 2606 OID 16892)
 -- Name: player_stats player_stats_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -2546,7 +2516,7 @@ ALTER TABLE ONLY public.player_stats
 
 
 --
--- TOC entry 3481 (class 2606 OID 17168)
+-- TOC entry 3478 (class 2606 OID 17168)
 -- Name: reputation_log reputation_log_admin_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: chiwawa
 --
 
@@ -2555,7 +2525,7 @@ ALTER TABLE ONLY public.reputation_log
 
 
 --
--- TOC entry 3480 (class 2606 OID 17163)
+-- TOC entry 3477 (class 2606 OID 17163)
 -- Name: reputation_log reputation_log_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: chiwawa
 --
 
@@ -2564,8 +2534,8 @@ ALTER TABLE ONLY public.reputation_log
 
 
 --
--- TOC entry 3482 (class 2606 OID 17305)
--- Name: server_settings server_settings_updated_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: root
+-- TOC entry 3482 (class 2606 OID 17395)
+-- Name: server_settings server_settings_updated_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: chiwawa
 --
 
 ALTER TABLE ONLY public.server_settings
@@ -2573,7 +2543,7 @@ ALTER TABLE ONLY public.server_settings
 
 
 --
--- TOC entry 3478 (class 2606 OID 17122)
+-- TOC entry 3475 (class 2606 OID 17122)
 -- Name: trust_level_applications trust_level_applications_reviewed_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: chiwawa
 --
 
@@ -2582,7 +2552,7 @@ ALTER TABLE ONLY public.trust_level_applications
 
 
 --
--- TOC entry 3477 (class 2606 OID 17117)
+-- TOC entry 3474 (class 2606 OID 17117)
 -- Name: trust_level_applications trust_level_applications_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: chiwawa
 --
 
@@ -2591,7 +2561,7 @@ ALTER TABLE ONLY public.trust_level_applications
 
 
 --
--- TOC entry 3476 (class 2606 OID 17020)
+-- TOC entry 3473 (class 2606 OID 17020)
 -- Name: user_achievements user_achievements_achievement_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -2600,7 +2570,7 @@ ALTER TABLE ONLY public.user_achievements
 
 
 --
--- TOC entry 3475 (class 2606 OID 17015)
+-- TOC entry 3472 (class 2606 OID 17015)
 -- Name: user_achievements user_achievements_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -2609,7 +2579,7 @@ ALTER TABLE ONLY public.user_achievements
 
 
 --
--- TOC entry 3472 (class 2606 OID 16967)
+-- TOC entry 3469 (class 2606 OID 16967)
 -- Name: user_activity user_activity_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -2618,7 +2588,7 @@ ALTER TABLE ONLY public.user_activity
 
 
 --
--- TOC entry 3479 (class 2606 OID 17148)
+-- TOC entry 3476 (class 2606 OID 17148)
 -- Name: user_reputation user_reputation_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: chiwawa
 --
 
@@ -2627,7 +2597,7 @@ ALTER TABLE ONLY public.user_reputation
 
 
 --
--- TOC entry 3469 (class 2606 OID 16923)
+-- TOC entry 3466 (class 2606 OID 16923)
 -- Name: user_sessions user_sessions_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -2635,7 +2605,7 @@ ALTER TABLE ONLY public.user_sessions
     ADD CONSTRAINT user_sessions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
 
--- Completed on 2025-07-28 03:53:44 UTC
+-- Completed on 2025-07-28 21:21:13 UTC
 
 --
 -- PostgreSQL database dump complete

@@ -234,4 +234,106 @@ router.get('/stats', authenticateToken, requireRole(['admin', 'moderator']), asy
     }
 });
 
+// GET /api/trust-level/requirements - Проверка требований для повышения уровня доверия
+router.get('/requirements', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        
+        // Получаем текущие данные пользователя
+        const userResult = await db.query(`
+            SELECT u.trust_level, ur.reputation_score, u.is_email_verified
+            FROM users u
+            LEFT JOIN user_reputation ur ON u.id = ur.user_id
+            WHERE u.id = $1
+        `, [userId]);
+        
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Пользователь не найден' });
+        }
+        
+        const user = userResult.rows[0];
+        const currentLevel = user.trust_level || 0;
+        const reputation = user.reputation_score || 0;
+        const playtime = 0; // Пока нет данных о времени игры, используем 0
+        const nextLevel = currentLevel + 1;
+        
+        // Максимальный уровень доверия
+        if (currentLevel >= 4) {
+            return res.json({
+                canApply: false,
+                nextLevel: currentLevel,
+                reason: 'Достигнут максимальный уровень доверия',
+                requirements: [
+                    { description: 'Максимальный уровень', met: true }
+                ]
+            });
+        }
+        
+        // Требования для каждого уровня
+        const requirements = {
+            1: { playtime: 0, reputation: 0, emailRequired: true },
+            2: { playtime: 25, reputation: 10, emailRequired: true },
+            3: { playtime: 50, reputation: 20, emailRequired: true },
+            4: { playtime: 100, reputation: 50, emailRequired: true }
+        };
+        
+        const req_level = requirements[nextLevel];
+        if (!req_level) {
+            return res.json({
+                canApply: false,
+                nextLevel: nextLevel,
+                reason: 'Неверный уровень доверия',
+                requirements: []
+            });
+        }
+        
+        // Проверяем, нет ли активной заявки
+        const existingApplication = await db.query(`
+            SELECT id FROM trust_level_applications 
+            WHERE user_id = $1 AND status = 'pending'
+        `, [userId]);
+        
+        if (existingApplication.rows.length > 0) {
+            return res.json({
+                canApply: false,
+                nextLevel: nextLevel,
+                reason: 'У вас уже есть активная заявка на рассмотрении',
+                requirements: []
+            });
+        }
+        
+        // Формируем список требований с проверкой
+        const reqList = [
+            {
+                description: 'Подтвержденный email',
+                met: user.is_email_verified || false,
+                progress: user.is_email_verified ? 'Выполнено' : 'Не выполнено'
+            },
+            {
+                description: `Время игры: ${req_level.playtime}+ часов`,
+                met: playtime >= req_level.playtime,
+                progress: `${playtime}/${req_level.playtime} часов`
+            },
+            {
+                description: `Репутация: ${req_level.reputation}+`,
+                met: reputation >= req_level.reputation,
+                progress: `${reputation}/${req_level.reputation}`
+            }
+        ];
+        
+        const canApply = reqList.every(req => req.met);
+        
+        res.json({
+            canApply: canApply,
+            nextLevel: nextLevel,
+            reason: canApply ? null : 'Не выполнены все требования',
+            requirements: reqList
+        });
+        
+    } catch (error) {
+        console.error('Ошибка проверки требований:', error);
+        res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    }
+});
+
 module.exports = router;

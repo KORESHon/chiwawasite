@@ -97,9 +97,7 @@ router.post('/register', [
     body('email').isEmail().normalizeEmail().withMessage('Некорректный email'),
     body('password')
         .isLength({ min: 8 })
-        .withMessage('Пароль должен быть минимум 8 символов')
-        .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-        .withMessage('Пароль должен содержать строчные, заглавные буквы и цифры'),
+        .withMessage('Пароль должен быть минимум 8 символов'),
     body('first_name').optional().isLength({ max: 50 }).withMessage('Имя не должно превышать 50 символов')
 ], async (req, res) => {
     const errors = validationResult(req);
@@ -399,20 +397,30 @@ router.post('/send-verification', authenticateToken, async (req, res) => {
         const verificationToken = uuidv4();
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 часа
 
-        // Сохраняем токен в базе данных
+        // Удаляем старые токены пользователя
         await db.query(`
-            INSERT INTO email_verification_tokens (user_id, token, expires_at)
-            VALUES ($1, $2, $3)
-            ON CONFLICT (user_id) 
-            DO UPDATE SET token = $2, expires_at = $3, created_at = NOW()
+            DELETE FROM email_verification_tokens WHERE user_id = $1
+        `, [user.id]);
+
+        // Сохраняем новый токен в базе данных
+        await db.query(`
+            INSERT INTO email_verification_tokens (user_id, token, expires_at, created_at, used)
+            VALUES ($1, $2, $3, NOW(), false)
         `, [user.id, verificationToken, expiresAt]);
 
-        // Здесь будет отправка email через SMTP
-        // Пока просто возвращаем успех
-        res.json({ 
-            message: 'Письмо с подтверждением отправлено',
-            verification_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify-email?token=${verificationToken}`
-        });
+        // Отправляем письмо через emailService
+        const emailService = require('../utils/emailService');
+        const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify-email?token=${verificationToken}`;
+        try {
+            await emailService.sendVerificationEmail(user.email, user.nickname || user.minecraft_nick, verificationUrl);
+            res.json({
+                message: 'Письмо с подтверждением отправлено',
+                verification_url: verificationUrl
+            });
+        } catch (mailError) {
+            console.error('Ошибка отправки письма через SMTP:', mailError);
+            res.status(500).json({ error: 'Ошибка отправки письма (SMTP)' });
+        }
 
     } catch (error) {
         console.error('Ошибка отправки письма верификации:', error);
@@ -446,7 +454,7 @@ router.get('/verify-email', async (req, res) => {
         // Обновляем статус подтверждения email
         await db.query(`
             UPDATE player_stats 
-            SET email_verified = true
+            SET is_email_verified = true
             WHERE user_id = $1
         `, [tokenData.user_id]);
 
@@ -710,7 +718,7 @@ router.get('/verify-email-token', async (req, res) => {
 
         // Активируем пользователя
         await db.query(
-            'UPDATE users SET email_verified = true WHERE id = $1',
+            'UPDATE users SET is_email_verified = true WHERE id = $1',
             [userId]
         );
 
