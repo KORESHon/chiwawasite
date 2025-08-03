@@ -24,14 +24,14 @@ module.exports = {
                 "hoursRequired": 0,
                 "reputationRequired": 0,
                 "emailVerified": false,
-                "description": "Ограничение в 10 часов игры до подтверждения почты"
+                "description": "Лимит 10 часов ВСЕГО до подтверждения email"
             },
             "1": {
                 "name": "👤 Новичок",
                 "hoursRequired": 0,
                 "reputationRequired": 0,
                 "emailVerified": true,
-                "description": "Стандартная группа после подтверждения почты"
+                "description": "Стандартная группа после подтверждения email, без лимитов"
             },
             "2": {
                 "name": "✅ Проверенный",
@@ -45,7 +45,7 @@ module.exports = {
                 "hoursRequired": 50,
                 "reputationRequired": 20,
                 "emailVerified": true,
-                "description": "Высший уровень доверия"
+                "description": "Высший уровень доверия для игроков"
             }
         },
         "maxPlayTimeForNovice": 10,

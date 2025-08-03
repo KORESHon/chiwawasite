@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игровой токен - ChiwawaMine</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .game-token-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            color: white;
+            margin-bottom: 2rem;
+        }
+        
+        .token-display {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            word-break: break-all;
+            margin: 1rem 0;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .token-container {
+            position: relative;
+        }
+        
+        .instructions {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .step-number {
+            background: #007bff;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-cube me-2"></i>ChiwawaMine
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/auth/logout">
+                    <i class="fas fa-sign-out-alt me-1"></i>Выйти
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="game-token-card text-center">
+                    <h2><i class="fas fa-key me-2"></i>Игровой токен</h2>
+                    <p>Токен для авторизации на игровом сервере</p>
+                    
+                    <div id="tokenSection" style="display: none;">
+                        <div class="token-container">
+                            <div class="token-display" id="tokenDisplay"></div>
+                            <button class="btn btn-light copy-btn" onclick="copyToken()">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <small><i class="fas fa-clock me-1"></i>Истекает через: <span id="expiresIn"></span></small>
+                            </div>
+                            <div class="col-md-6">
+                                <small><i class="fas fa-calendar me-1"></i>Время истечения: <span id="expiresAt"></span></small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button id="generateBtn" class="btn btn-light btn-lg mt-3" onclick="generateToken()">
+                        <i class="fas fa-magic me-2"></i>Сгенерировать токен
+                    </button>
+                    
+                    <div id="loading" class="d-none">
+                        <div class="spinner-border text-light" role="status"></div>
+                        <p class="mt-2">Генерация токена...</p>
+                    </div>
+                </div>
+
+                <div class="instructions">
+                    <h4><i class="fas fa-info-circle me-2"></i>Как использовать токен</h4>
+                    
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div>Нажмите кнопку "Сгенерировать токен" выше</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div>Скопируйте полученный токен (нажмите на значок копирования)</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div>Зайдите на игровой сервер Minecraft</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div>Введите команду: <code>/login &lt;ваш_токен&gt;</code></div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div>Вы авторизованы! Можете играть на сервере</div>
+                    </div>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Важно:</strong> Токен действителен только 15 минут и может быть использован только один раз.
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        <strong>Безопасность:</strong> Никому не передавайте свой токен. Каждый токен привязан к вашему аккаунту.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        async function generateToken() {
+            const generateBtn = document.getElementById('generateBtn');
+            const loading = document.getElementById('loading');
+            const tokenSection = document.getElementById('tokenSection');
+            
+            generateBtn.style.display = 'none';
+            loading.classList.remove('d-none');
+            
+            try {
+                const response = await fetch('/api/auth/generate-game-token', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('auth_token'),
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('tokenDisplay').textContent = data.token;
+                    document.getElementById('expiresIn').textContent = formatTime(data.expires_in);
+                    document.getElementById('expiresAt').textContent = new Date(data.expires_at).toLocaleString('ru-RU');
+                    
+                    tokenSection.style.display = 'block';
+                    
+                    // Обновляем время каждую секунду
+                    let remainingTime = data.expires_in;
+                    const timer = setInterval(() => {
+                        remainingTime--;
+                        if (remainingTime <= 0) {
+                            clearInterval(timer);
+                            document.getElementById('expiresIn').textContent = 'Истек';
+                            return;
+                        }
+                        document.getElementById('expiresIn').textContent = formatTime(remainingTime);
+                    }, 1000);
+                } else {
+                    alert('Ошибка: ' + data.error);
+                    generateBtn.style.display = 'block';
+                }
+            } catch (error) {
+                alert('Ошибка соединения с сервером');
+                generateBtn.style.display = 'block';
+            }
+            
+            loading.classList.add('d-none');
+        }
+        
+        function copyToken() {
+            const tokenDisplay = document.getElementById('tokenDisplay');
+            navigator.clipboard.writeText(tokenDisplay.textContent).then(() => {
+                const copyBtn = document.querySelector('.copy-btn');
+                const originalHtml = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHtml;
+                }, 2000);
+            });
+        }
+        
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+        
+        // Проверяем авторизацию
+        window.onload = function() {
+            const token = localStorage.getItem('auth_token');
+            if (!token) {
+                window.location.href = '/login';
+            }
+        };
+    </script>
+</body>
+</html>

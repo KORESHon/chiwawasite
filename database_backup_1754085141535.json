@@ -1,0 +1,1490 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "nickname": "ebluffy",
+      "email": "dima2_05@mail.ru",
+      "password_hash": "$2a$12$Wp8pSrr9R1tPyaT7BUW4RuIT2Kdt1YdEWdsrL.J3vvSs6p/am39o2",
+      "first_name": "Дмитрий",
+      "last_name": null,
+      "age": null,
+      "display_name": "Администратор",
+      "bio": null,
+      "avatar_url": null,
+      "discord_id": null,
+      "discord_tag": null,
+      "role": "admin",
+      "trust_level": 3,
+      "status": "active",
+      "is_active": true,
+      "is_email_verified": true,
+      "is_banned": false,
+      "registered_at": "2025-07-26T02:12:51.073Z",
+      "last_login": "2025-07-29T00:04:44.660Z",
+      "ban_reason": null
+    },
+    {
+      "id": 20,
+      "nickname": "shadow",
+      "email": "shadowgamesblacktube@gmail.com",
+      "password_hash": "$2a$12$LfB/272.Ty/wvai3XxdVyuD9FC0MOLnVrvchw1aZfP0S.BMaVDaJO",
+      "first_name": null,
+      "last_name": null,
+      "age": null,
+      "display_name": null,
+      "bio": null,
+      "avatar_url": null,
+      "discord_id": null,
+      "discord_tag": null,
+      "role": "user",
+      "trust_level": 0,
+      "status": "active",
+      "is_active": true,
+      "is_email_verified": true,
+      "is_banned": false,
+      "registered_at": "2025-08-01T17:19:19.833Z",
+      "last_login": "2025-08-01T17:19:29.594Z",
+      "ban_reason": null
+    }
+  ],
+  "settings": [
+    {
+      "id": 11,
+      "setting_key": "applications-enabled",
+      "setting_value": "true",
+      "setting_type": "boolean",
+      "category": "applications",
+      "description": "Прием заявок",
+      "created_at": "2025-07-28T13:16:05.079Z",
+      "updated_at": "2025-08-01T18:47:45.311Z",
+      "updated_by": 1
+    },
+    {
+      "id": 15,
+      "setting_key": "auto-approve-trust-level",
+      "setting_value": "1",
+      "setting_type": "integer",
+      "category": "applications",
+      "description": "Автоодобрение по Trust Level",
+      "created_at": "2025-07-28T13:16:05.510Z",
+      "updated_at": "2025-08-01T18:47:45.734Z",
+      "updated_by": 1
+    },
+    {
+      "id": 14,
+      "setting_key": "max-applications-per-day",
+      "setting_value": "3",
+      "setting_type": "integer",
+      "category": "applications",
+      "description": "Лимит заявок в день",
+      "created_at": "2025-07-28T13:16:05.402Z",
+      "updated_at": "2025-08-01T18:47:45.629Z",
+      "updated_by": 1
+    },
+    {
+      "id": 12,
+      "setting_key": "min-motivation-length",
+      "setting_value": "50",
+      "setting_type": "integer",
+      "category": "applications",
+      "description": "Мин. символов в мотивации",
+      "created_at": "2025-07-28T13:16:05.187Z",
+      "updated_at": "2025-08-01T18:47:45.416Z",
+      "updated_by": 1
+    },
+    {
+      "id": 13,
+      "setting_key": "min-plans-length",
+      "setting_value": "30",
+      "setting_type": "integer",
+      "category": "applications",
+      "description": "Мин. символов в планах",
+      "created_at": "2025-07-28T13:16:05.294Z",
+      "updated_at": "2025-08-01T18:47:45.523Z",
+      "updated_by": 1
+    },
+    {
+      "id": 36,
+      "setting_key": "email-notifications-enabled",
+      "setting_value": "true",
+      "setting_type": "boolean",
+      "category": "email",
+      "description": "Email уведомления",
+      "created_at": "2025-07-28T13:16:07.809Z",
+      "updated_at": "2025-08-01T17:45:35.180Z",
+      "updated_by": 1
+    },
+    {
+      "id": 30,
+      "setting_key": "smtp-from",
+      "setting_value": "\"noreply@chiwawa.site\"",
+      "setting_type": "string",
+      "category": "email",
+      "description": "Email отправителя",
+      "created_at": "2025-07-28T13:16:07.161Z",
+      "updated_at": "2025-08-01T17:45:34.663Z",
+      "updated_by": 1
+    },
+    {
+      "id": 28,
+      "setting_key": "smtp-host",
+      "setting_value": "\"smtp.yandex.ru\"",
+      "setting_type": "string",
+      "category": "email",
+      "description": "SMTP сервер",
+      "created_at": "2025-07-28T13:16:06.943Z",
+      "updated_at": "2025-08-01T17:45:34.457Z",
+      "updated_by": 1
+    },
+    {
+      "id": 32,
+      "setting_key": "smtp-password",
+      "setting_value": "\"hoiigazkhichljfz\"",
+      "setting_type": "string",
+      "category": "email",
+      "description": "SMTP пароль",
+      "created_at": "2025-07-28T13:16:07.376Z",
+      "updated_at": "2025-08-01T17:45:34.871Z",
+      "updated_by": 1
+    },
+    {
+      "id": 29,
+      "setting_key": "smtp-port",
+      "setting_value": "465",
+      "setting_type": "integer",
+      "category": "email",
+      "description": "SMTP порт",
+      "created_at": "2025-07-28T13:16:07.051Z",
+      "updated_at": "2025-08-01T17:45:34.560Z",
+      "updated_by": 1
+    },
+    {
+      "id": 35,
+      "setting_key": "smtp-reply-to",
+      "setting_value": "\"chiwawa.helper@yandex.ru\"",
+      "setting_type": "string",
+      "category": "email",
+      "description": "Reply-To адрес",
+      "created_at": "2025-07-28T13:16:07.701Z",
+      "updated_at": "2025-08-01T17:45:35.077Z",
+      "updated_by": 1
+    },
+    {
+      "id": 34,
+      "setting_key": "smtp-sender-name",
+      "setting_value": "\"ChiwawaMine\"",
+      "setting_type": "string",
+      "category": "email",
+      "description": "Имя отправителя",
+      "created_at": "2025-07-28T13:16:07.593Z",
+      "updated_at": "2025-08-01T17:45:34.973Z",
+      "updated_by": 1
+    },
+    {
+      "id": 37,
+      "setting_key": "smtp-timeout",
+      "setting_value": "30",
+      "setting_type": "integer",
+      "category": "email",
+      "description": "Тайм-аут SMTP (сек)",
+      "created_at": "2025-07-28T13:16:07.917Z",
+      "updated_at": "2025-08-01T17:45:35.282Z",
+      "updated_by": 1
+    },
+    {
+      "id": 33,
+      "setting_key": "smtp-tls",
+      "setting_value": "true",
+      "setting_type": "boolean",
+      "category": "email",
+      "description": "Использовать TLS/SSL",
+      "created_at": "2025-07-28T13:16:07.484Z",
+      "updated_at": "2025-07-28T13:16:07.484Z",
+      "updated_by": null
+    },
+    {
+      "id": 31,
+      "setting_key": "smtp-user",
+      "setting_value": "\"chiwawa.helper@yandex.ru\"",
+      "setting_type": "string",
+      "category": "email",
+      "description": "SMTP пользователь",
+      "created_at": "2025-07-28T13:16:07.268Z",
+      "updated_at": "2025-08-01T17:45:34.768Z",
+      "updated_by": 1
+    },
+    {
+      "id": 6,
+      "setting_key": "discord-invite",
+      "setting_value": "\"https://discord.gg/chiwawa\"",
+      "setting_type": "string",
+      "category": "general",
+      "description": "Discord приглашение",
+      "created_at": "2025-07-28T13:16:04.525Z",
+      "updated_at": "2025-08-01T17:45:31.111Z",
+      "updated_by": 1
+    },
+    {
+      "id": 5,
+      "setting_key": "max-players",
+      "setting_value": "100",
+      "setting_type": "integer",
+      "category": "general",
+      "description": "Максимум игроков",
+      "created_at": "2025-07-28T13:16:04.416Z",
+      "updated_at": "2025-08-01T17:45:31.008Z",
+      "updated_by": 1
+    },
+    {
+      "id": 2,
+      "setting_key": "server-description",
+      "setting_value": "\"Minecraft сервер\"",
+      "setting_type": "string",
+      "category": "general",
+      "description": "Описание сервера",
+      "created_at": "2025-07-28T13:16:03.792Z",
+      "updated_at": "2025-08-01T18:47:44.995Z",
+      "updated_by": 1
+    },
+    {
+      "id": 3,
+      "setting_key": "server-ip",
+      "setting_value": "\"play.chiwawa.site\"",
+      "setting_type": "string",
+      "category": "general",
+      "description": "IP адрес сервера",
+      "created_at": "2025-07-28T13:16:03.933Z",
+      "updated_at": "2025-08-01T18:47:45.101Z",
+      "updated_by": 1
+    },
+    {
+      "id": 1,
+      "setting_key": "server-name",
+      "setting_value": "\"ChiwawaMine\"",
+      "setting_type": "string",
+      "category": "general",
+      "description": "Название сервера",
+      "created_at": "2025-07-28T13:16:03.682Z",
+      "updated_at": "2025-08-01T18:47:44.888Z",
+      "updated_by": 1
+    },
+    {
+      "id": 4,
+      "setting_key": "server-port",
+      "setting_value": "25565",
+      "setting_type": "integer",
+      "category": "general",
+      "description": "Порт сервера",
+      "created_at": "2025-07-28T13:16:04.041Z",
+      "updated_at": "2025-08-01T18:47:45.206Z",
+      "updated_by": 1
+    },
+    {
+      "id": 7,
+      "setting_key": "telegram-invite",
+      "setting_value": "\"https://t.me/chiwawa\"",
+      "setting_type": "string",
+      "category": "general",
+      "description": "Telegram канал",
+      "created_at": "2025-07-28T13:16:04.644Z",
+      "updated_at": "2025-08-01T17:45:31.213Z",
+      "updated_by": 1
+    },
+    {
+      "id": 24,
+      "setting_key": "jwt-expires-days",
+      "setting_value": "30",
+      "setting_type": "integer",
+      "category": "security",
+      "description": "Время жизни JWT (дни)",
+      "created_at": "2025-07-28T13:16:06.496Z",
+      "updated_at": "2025-08-01T18:47:46.996Z",
+      "updated_by": 1
+    },
+    {
+      "id": 23,
+      "setting_key": "login-lockout-duration",
+      "setting_value": "15",
+      "setting_type": "integer",
+      "category": "security",
+      "description": "Время блокировки (мин)",
+      "created_at": "2025-07-28T13:16:06.388Z",
+      "updated_at": "2025-08-01T18:47:46.891Z",
+      "updated_by": 1
+    },
+    {
+      "id": 22,
+      "setting_key": "max-login-attempts",
+      "setting_value": "5",
+      "setting_type": "integer",
+      "category": "security",
+      "description": "Максимум попыток входа",
+      "created_at": "2025-07-28T13:16:06.280Z",
+      "updated_at": "2025-08-01T18:47:46.786Z",
+      "updated_by": 1
+    },
+    {
+      "id": 27,
+      "setting_key": "rate-limit-requests",
+      "setting_value": "100",
+      "setting_type": "integer",
+      "category": "security",
+      "description": "Rate limit (запросов/мин)",
+      "created_at": "2025-07-28T13:16:06.833Z",
+      "updated_at": "2025-08-01T18:47:47.313Z",
+      "updated_by": 1
+    },
+    {
+      "id": 25,
+      "setting_key": "require-email-verification",
+      "setting_value": "true",
+      "setting_type": "boolean",
+      "category": "security",
+      "description": "Требовать подтверждение email",
+      "created_at": "2025-07-28T13:16:06.615Z",
+      "updated_at": "2025-08-01T18:47:47.102Z",
+      "updated_by": 1
+    },
+    {
+      "id": 26,
+      "setting_key": "two-factor-enabled",
+      "setting_value": "false",
+      "setting_type": "boolean",
+      "category": "security",
+      "description": "2FA включен",
+      "created_at": "2025-07-28T13:16:06.724Z",
+      "updated_at": "2025-08-01T18:47:47.208Z",
+      "updated_by": 1
+    },
+    {
+      "id": 10,
+      "setting_key": "auto-backup-enabled",
+      "setting_value": "true",
+      "setting_type": "boolean",
+      "category": "system",
+      "description": "Автобэкапы",
+      "created_at": "2025-07-28T13:16:04.970Z",
+      "updated_at": "2025-08-01T17:45:32.030Z",
+      "updated_by": 1
+    },
+    {
+      "id": 8,
+      "setting_key": "maintenance-mode",
+      "setting_value": "false",
+      "setting_type": "boolean",
+      "category": "system",
+      "description": "Режим обслуживания",
+      "created_at": "2025-07-28T13:16:04.753Z",
+      "updated_at": "2025-08-01T17:45:31.570Z",
+      "updated_by": 1
+    },
+    {
+      "id": 9,
+      "setting_key": "registration-enabled",
+      "setting_value": "true",
+      "setting_type": "boolean",
+      "category": "system",
+      "description": "Регистрация разрешена",
+      "created_at": "2025-07-28T13:16:04.861Z",
+      "updated_at": "2025-08-01T17:45:31.927Z",
+      "updated_by": 1
+    },
+    {
+      "id": 19,
+      "setting_key": "trust-level-1-required",
+      "setting_value": "25",
+      "setting_type": "integer",
+      "category": "trust",
+      "description": "Очки для Trust Level 1",
+      "created_at": "2025-07-28T13:16:05.956Z",
+      "updated_at": "2025-08-01T18:47:46.471Z",
+      "updated_by": 1
+    },
+    {
+      "id": 20,
+      "setting_key": "trust-level-2-required",
+      "setting_value": "100",
+      "setting_type": "integer",
+      "category": "trust",
+      "description": "Очки для Trust Level 2",
+      "created_at": "2025-07-28T13:16:06.064Z",
+      "updated_at": "2025-08-01T18:47:46.575Z",
+      "updated_by": 1
+    },
+    {
+      "id": 21,
+      "setting_key": "trust-level-3-required",
+      "setting_value": "500",
+      "setting_type": "integer",
+      "category": "trust",
+      "description": "Очки для Trust Level 3",
+      "created_at": "2025-07-28T13:16:06.172Z",
+      "updated_at": "2025-08-01T18:47:46.681Z",
+      "updated_by": 1
+    },
+    {
+      "id": 126,
+      "setting_key": "trust-minimum-hours",
+      "setting_value": "10",
+      "setting_type": "integer",
+      "category": "trust",
+      "description": "Минимум часов игры для повышения",
+      "created_at": "2025-08-01T17:45:31.731Z",
+      "updated_at": "2025-08-01T18:47:46.261Z",
+      "updated_by": 1
+    },
+    {
+      "id": 127,
+      "setting_key": "trust-minimum-reputation",
+      "setting_value": "1",
+      "setting_type": "integer",
+      "category": "trust",
+      "description": "Минимум репутации для повышения",
+      "created_at": "2025-08-01T17:45:31.835Z",
+      "updated_at": "2025-08-01T18:47:46.366Z",
+      "updated_by": 1
+    },
+    {
+      "id": 17,
+      "setting_key": "trust-points-discord",
+      "setting_value": "20",
+      "setting_type": "integer",
+      "category": "trust",
+      "description": "Очки за Discord",
+      "created_at": "2025-07-28T13:16:05.726Z",
+      "updated_at": "2025-08-01T18:47:45.944Z",
+      "updated_by": 1
+    },
+    {
+      "id": 16,
+      "setting_key": "trust-points-email",
+      "setting_value": "10",
+      "setting_type": "integer",
+      "category": "trust",
+      "description": "Очки за подтверждение email",
+      "created_at": "2025-07-28T13:16:05.618Z",
+      "updated_at": "2025-08-01T18:47:45.839Z",
+      "updated_by": 1
+    },
+    {
+      "id": 18,
+      "setting_key": "trust-points-hour",
+      "setting_value": "1",
+      "setting_type": "integer",
+      "category": "trust",
+      "description": "Очки за час игры",
+      "created_at": "2025-07-28T13:16:05.848Z",
+      "updated_at": "2025-08-01T18:47:46.050Z",
+      "updated_by": 1
+    },
+    {
+      "id": 125,
+      "setting_key": "trust-points-reputation",
+      "setting_value": "2",
+      "setting_type": "integer",
+      "category": "trust",
+      "description": "Очки за единицу репутации",
+      "created_at": "2025-08-01T17:45:31.627Z",
+      "updated_at": "2025-08-01T18:47:46.155Z",
+      "updated_by": 1
+    }
+  ],
+  "applications": [
+    {
+      "id": 7,
+      "user_id": 20,
+      "minecraft_nick": "shadow",
+      "age": "20",
+      "discord": "Не указан",
+      "email": "shadowgamesblacktube@gmail.com",
+      "experience": "intermediate",
+      "motivation": "Да я тут играть хочу больше 10 часов а то мало зачем-то пиздец вапвап",
+      "plans": "Планы: будут указаны в настройках профиля",
+      "status": "pending",
+      "submitted_at": "2025-08-01T17:27:13.972Z",
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "review_comment": null,
+      "ip_address": "::1",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+    }
+  ],
+  "adminLogs": [
+    {
+      "id": 150,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 24. Категории: general, applications, trust, security",
+      "ip_address": null,
+      "created_at": "2025-08-01T18:47:47.418Z"
+    },
+    {
+      "id": 149,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 24. Категории: general, applications, trust, security",
+      "ip_address": null,
+      "created_at": "2025-08-01T18:35:25.510Z"
+    },
+    {
+      "id": 148,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 24. Категории: general, applications, trust, security",
+      "ip_address": null,
+      "created_at": "2025-08-01T18:04:18.734Z"
+    },
+    {
+      "id": 147,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 0. Категории: ",
+      "ip_address": null,
+      "created_at": "2025-08-01T17:46:57.032Z"
+    },
+    {
+      "id": 146,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 39. Категории: general, system, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-08-01T17:45:35.385Z"
+    },
+    {
+      "id": 145,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 31. Категории: general, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-08-01T17:45:33.668Z"
+    },
+    {
+      "id": 144,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 0. Категории: ",
+      "ip_address": null,
+      "created_at": "2025-08-01T17:45:30.601Z"
+    },
+    {
+      "id": 143,
+      "admin_id": 1,
+      "action": "user_deleted",
+      "target_user_id": null,
+      "details": "Аккаунт пользователя TestUser456 полностью удален: delete",
+      "ip_address": null,
+      "created_at": "2025-08-01T17:18:53.877Z"
+    },
+    {
+      "id": 142,
+      "admin_id": 1,
+      "action": "user_deleted",
+      "target_user_id": null,
+      "details": "Аккаунт пользователя TestUser789 полностью удален: delete",
+      "ip_address": null,
+      "created_at": "2025-08-01T17:18:46.899Z"
+    },
+    {
+      "id": 141,
+      "admin_id": 1,
+      "action": "user_deleted",
+      "target_user_id": null,
+      "details": "Аккаунт пользователя TestUser999 полностью удален: delete",
+      "ip_address": null,
+      "created_at": "2025-08-01T17:18:41.941Z"
+    },
+    {
+      "id": 140,
+      "admin_id": 1,
+      "action": "user_deleted",
+      "target_user_id": null,
+      "details": "Аккаунт пользователя TestUser123 полностью удален: delete",
+      "ip_address": null,
+      "created_at": "2025-08-01T17:18:37.066Z"
+    },
+    {
+      "id": 139,
+      "admin_id": 1,
+      "action": "user_deleted",
+      "target_user_id": null,
+      "details": "Аккаунт пользователя shadow полностью удален: delete",
+      "ip_address": null,
+      "created_at": "2025-08-01T17:18:24.546Z"
+    },
+    {
+      "id": 138,
+      "admin_id": 1,
+      "action": "user_deleted",
+      "target_user_id": null,
+      "details": "Аккаунт пользователя NewUser555 полностью удален: delete",
+      "ip_address": null,
+      "created_at": "2025-08-01T17:18:01.009Z"
+    },
+    {
+      "id": 137,
+      "admin_id": null,
+      "action": "profile_update",
+      "target_user_id": null,
+      "details": "Обновлен профиль: имя",
+      "ip_address": "::1",
+      "created_at": "2025-07-29T01:02:21.228Z"
+    },
+    {
+      "id": 136,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 0. Категории: ",
+      "ip_address": null,
+      "created_at": "2025-07-29T00:53:29.324Z"
+    },
+    {
+      "id": 135,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 0. Категории: ",
+      "ip_address": null,
+      "created_at": "2025-07-29T00:52:11.295Z"
+    },
+    {
+      "id": 134,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 0. Категории: ",
+      "ip_address": null,
+      "created_at": "2025-07-29T00:39:53.696Z"
+    },
+    {
+      "id": 133,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 36. Категории: general, system, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-07-29T00:39:19.527Z"
+    },
+    {
+      "id": 132,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 28. Категории: general, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-07-29T00:39:18.615Z"
+    },
+    {
+      "id": 131,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 0. Категории: ",
+      "ip_address": null,
+      "created_at": "2025-07-29T00:39:15.746Z"
+    },
+    {
+      "id": 130,
+      "admin_id": 1,
+      "action": "application_reviewed",
+      "target_user_id": null,
+      "details": "Заявка shadow одобрена [ПОЛЬЗОВАТЕЛЬ УДАЛЕН]",
+      "ip_address": null,
+      "created_at": "2025-07-29T00:15:55.573Z"
+    },
+    {
+      "id": 129,
+      "admin_id": 1,
+      "action": "application_reviewed",
+      "target_user_id": null,
+      "details": "Заявка TestUser456 отклонена: Старый [ПОЛЬЗОВАТЕЛЬ УДАЛЕН]",
+      "ip_address": null,
+      "created_at": "2025-07-28T19:14:15.051Z"
+    },
+    {
+      "id": 128,
+      "admin_id": 1,
+      "action": "trust_level_changed",
+      "target_user_id": null,
+      "details": "Уровень доверия KORESHon изменен с 1 на 0: да",
+      "ip_address": null,
+      "created_at": "2025-07-28T17:30:16.455Z"
+    },
+    {
+      "id": 127,
+      "admin_id": 1,
+      "action": "profile_update",
+      "target_user_id": null,
+      "details": "Обновлен профиль: имя",
+      "ip_address": "::1",
+      "created_at": "2025-07-28T14:10:34.277Z"
+    },
+    {
+      "id": 126,
+      "admin_id": 1,
+      "action": "profile_update",
+      "target_user_id": null,
+      "details": "Обновлен профиль: имя",
+      "ip_address": "::1",
+      "created_at": "2025-07-28T14:10:26.739Z"
+    },
+    {
+      "id": 125,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 36. Категории: general, system, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-07-28T13:06:56.302Z"
+    },
+    {
+      "id": 124,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 28. Категории: general, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-07-28T13:06:55.420Z"
+    },
+    {
+      "id": 123,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 0. Категории: ",
+      "ip_address": null,
+      "created_at": "2025-07-28T13:06:52.476Z"
+    },
+    {
+      "id": 122,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 36. Категории: general, system, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-07-28T13:01:58.045Z"
+    },
+    {
+      "id": 121,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 28. Категории: general, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-07-28T13:01:56.691Z"
+    },
+    {
+      "id": 120,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 0. Категории: ",
+      "ip_address": null,
+      "created_at": "2025-07-28T13:01:53.705Z"
+    },
+    {
+      "id": 119,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 36. Категории: general, system, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-07-28T12:52:56.038Z"
+    },
+    {
+      "id": 118,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 28. Категории: general, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-07-28T12:52:55.212Z"
+    },
+    {
+      "id": 117,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 0. Категории: ",
+      "ip_address": null,
+      "created_at": "2025-07-28T12:52:52.187Z"
+    },
+    {
+      "id": 116,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 36. Категории: general, system, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-07-28T12:52:11.059Z"
+    },
+    {
+      "id": 115,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 28. Категории: general, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-07-28T12:52:10.247Z"
+    },
+    {
+      "id": 114,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 0. Категории: ",
+      "ip_address": null,
+      "created_at": "2025-07-28T12:52:07.261Z"
+    },
+    {
+      "id": 113,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 36. Категории: general, system, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-07-28T12:51:45.288Z"
+    },
+    {
+      "id": 112,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 28. Категории: general, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-07-28T12:51:44.247Z"
+    },
+    {
+      "id": 111,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 0. Категории: ",
+      "ip_address": null,
+      "created_at": "2025-07-28T12:51:41.318Z"
+    },
+    {
+      "id": 110,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 36. Категории: general, system, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-07-28T01:02:06.278Z"
+    },
+    {
+      "id": 109,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 28. Категории: general, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-07-28T01:02:05.376Z"
+    },
+    {
+      "id": 108,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 0. Категории: ",
+      "ip_address": null,
+      "created_at": "2025-07-28T01:02:02.454Z"
+    },
+    {
+      "id": 107,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 36. Категории: general, system, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-07-28T00:40:17.205Z"
+    },
+    {
+      "id": 106,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 28. Категории: general, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-07-28T00:40:16.231Z"
+    },
+    {
+      "id": 105,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 0. Категории: ",
+      "ip_address": null,
+      "created_at": "2025-07-28T00:40:13.312Z"
+    },
+    {
+      "id": 104,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 36. Категории: general, system, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-07-28T00:34:52.871Z"
+    },
+    {
+      "id": 103,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 36. Категории: general, system, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-07-28T00:34:51.122Z"
+    },
+    {
+      "id": 102,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 0. Категории: ",
+      "ip_address": null,
+      "created_at": "2025-07-28T00:34:49.053Z"
+    },
+    {
+      "id": 101,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 0. Категории: ",
+      "ip_address": null,
+      "created_at": "2025-07-28T00:34:47.221Z"
+    },
+    {
+      "id": 100,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 36. Категории: general, system, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-07-27T23:50:41.970Z"
+    },
+    {
+      "id": 99,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 0. Категории: ",
+      "ip_address": null,
+      "created_at": "2025-07-27T23:50:37.632Z"
+    },
+    {
+      "id": 98,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Настройки сервера обновлены через админ-панель",
+      "ip_address": null,
+      "created_at": "2025-07-27T23:50:37.524Z"
+    },
+    {
+      "id": 97,
+      "admin_id": 1,
+      "action": "email_template_saved",
+      "target_user_id": null,
+      "details": "Сохранен email шаблон: welcome (Приветственное письмо)",
+      "ip_address": null,
+      "created_at": "2025-07-27T23:25:33.418Z"
+    },
+    {
+      "id": 96,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование шаблона \"welcome\" для пользователя ebluffy (dima2_05@mail.ru)",
+      "ip_address": null,
+      "created_at": "2025-07-27T23:15:47.766Z"
+    },
+    {
+      "id": 95,
+      "admin_id": 1,
+      "action": "database_migration",
+      "target_user_id": null,
+      "details": "Выполнена миграция 003: оптимизация структуры БД",
+      "ip_address": null,
+      "created_at": "2025-07-27T23:14:30.579Z"
+    },
+    {
+      "id": 94,
+      "admin_id": 1,
+      "action": "database_migration",
+      "target_user_id": null,
+      "details": "Выполнена миграция 003: оптимизация структуры БД",
+      "ip_address": null,
+      "created_at": "2025-07-27T23:13:19.315Z"
+    },
+    {
+      "id": 93,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование шаблона \"welcome\" на адрес: dima2_05@mail.ru",
+      "ip_address": null,
+      "created_at": "2025-07-27T22:56:37.451Z"
+    },
+    {
+      "id": 92,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование шаблона \"newsletter\" на адрес: dima2_05@mail.ru",
+      "ip_address": null,
+      "created_at": "2025-07-27T22:48:11.661Z"
+    },
+    {
+      "id": 91,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование шаблона \"password-reset\" на адрес: dima2_05@mail.ru",
+      "ip_address": null,
+      "created_at": "2025-07-27T22:47:52.605Z"
+    },
+    {
+      "id": 90,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование шаблона \"application-rejected\" на адрес: dima2_05@mail.ru",
+      "ip_address": null,
+      "created_at": "2025-07-27T22:47:40.141Z"
+    },
+    {
+      "id": 89,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование шаблона \"application-approved\" на адрес: dima2_05@mail.ru",
+      "ip_address": null,
+      "created_at": "2025-07-27T22:47:09.926Z"
+    },
+    {
+      "id": 88,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование шаблона \"verification\" на адрес: dima2_05@mail.ru",
+      "ip_address": null,
+      "created_at": "2025-07-27T22:46:23.120Z"
+    },
+    {
+      "id": 87,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование шаблона \"welcome\" на адрес: dima2_05@mail.ru",
+      "ip_address": null,
+      "created_at": "2025-07-27T22:46:07.539Z"
+    },
+    {
+      "id": 86,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование шаблона \"welcome\" на адрес: dau31420@gmail.com",
+      "ip_address": null,
+      "created_at": "2025-07-27T22:37:36.236Z"
+    },
+    {
+      "id": 85,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование шаблона \"welcome\" на адрес: dima2_05@mail.ru",
+      "ip_address": null,
+      "created_at": "2025-07-27T22:35:16.524Z"
+    },
+    {
+      "id": 84,
+      "admin_id": 1,
+      "action": "email_test",
+      "target_user_id": null,
+      "details": "Тестовое письмо отправлено на dima2_05@mail.ru, время доставки: 1448мс",
+      "ip_address": null,
+      "created_at": "2025-07-27T00:37:04.757Z"
+    },
+    {
+      "id": 83,
+      "admin_id": 1,
+      "action": "email_test",
+      "target_user_id": null,
+      "details": "Тестовое письмо отправлено на dima2_05@mail.ru, время доставки: 1561мс",
+      "ip_address": null,
+      "created_at": "2025-07-27T00:36:21.915Z"
+    },
+    {
+      "id": 82,
+      "admin_id": 1,
+      "action": "email_template_saved",
+      "target_user_id": null,
+      "details": "Сохранен email шаблон: welcome (Приветственное письмо)",
+      "ip_address": null,
+      "created_at": "2025-07-27T00:26:36.262Z"
+    },
+    {
+      "id": 81,
+      "admin_id": 1,
+      "action": "email_template_saved",
+      "target_user_id": null,
+      "details": "Сохранен email шаблон: welcome (Приветственное письмо)",
+      "ip_address": null,
+      "created_at": "2025-07-27T00:25:58.476Z"
+    },
+    {
+      "id": 80,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование email шаблона на адрес: dima2_05@mail.ru",
+      "ip_address": null,
+      "created_at": "2025-07-27T00:24:49.978Z"
+    },
+    {
+      "id": 79,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование email шаблона на адрес: dima2_05@mail.ru",
+      "ip_address": null,
+      "created_at": "2025-07-27T00:24:40.292Z"
+    },
+    {
+      "id": 78,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование email шаблона на адрес: dima2_05@mail.ru",
+      "ip_address": null,
+      "created_at": "2025-07-27T00:24:29.880Z"
+    },
+    {
+      "id": 77,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование email шаблона на адрес: dima2_05@mail.ru",
+      "ip_address": null,
+      "created_at": "2025-07-27T00:19:06.254Z"
+    },
+    {
+      "id": 76,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование email шаблона на адрес: dima2_05@mail.ru",
+      "ip_address": null,
+      "created_at": "2025-07-27T00:14:25.822Z"
+    },
+    {
+      "id": 75,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование email шаблона на адрес: dima2_05@mail.ru",
+      "ip_address": null,
+      "created_at": "2025-07-27T00:12:55.593Z"
+    },
+    {
+      "id": 74,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование email шаблона на адрес: dima2_05@mail.ru",
+      "ip_address": null,
+      "created_at": "2025-07-27T00:00:20.142Z"
+    },
+    {
+      "id": 73,
+      "admin_id": 1,
+      "action": "email_template_saved",
+      "target_user_id": null,
+      "details": "Сохранен email шаблон: welcome (Приветственное письмо)",
+      "ip_address": null,
+      "created_at": "2025-07-27T00:00:17.712Z"
+    },
+    {
+      "id": 72,
+      "admin_id": 1,
+      "action": "email_test",
+      "target_user_id": null,
+      "details": "Тестовое письмо отправлено на dima2_05@mail.ru, время доставки: 1371мс",
+      "ip_address": null,
+      "created_at": "2025-07-27T00:00:09.615Z"
+    },
+    {
+      "id": 71,
+      "admin_id": 1,
+      "action": "email_test",
+      "target_user_id": null,
+      "details": "Тестовое письмо отправлено на dima2_05@mail.ru, время доставки: 1659мс",
+      "ip_address": null,
+      "created_at": "2025-07-26T23:59:40.831Z"
+    },
+    {
+      "id": 70,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование email шаблона на адрес: dima2_05@mail.ru",
+      "ip_address": null,
+      "created_at": "2025-07-26T23:59:17.645Z"
+    },
+    {
+      "id": 69,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование email шаблона на адрес: dima2_05@mail.ru",
+      "ip_address": null,
+      "created_at": "2025-07-26T23:48:56.098Z"
+    },
+    {
+      "id": 68,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование email шаблона на адрес: dima2_05@mail.ru",
+      "ip_address": null,
+      "created_at": "2025-07-26T23:48:47.767Z"
+    },
+    {
+      "id": 67,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование email шаблона на адрес: dima2_05@mail.ru",
+      "ip_address": null,
+      "created_at": "2025-07-26T23:48:29.839Z"
+    },
+    {
+      "id": 66,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 36. Категории: general, system, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-07-26T23:48:18.994Z"
+    },
+    {
+      "id": 65,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 0. Категории: ",
+      "ip_address": null,
+      "created_at": "2025-07-26T23:48:14.750Z"
+    },
+    {
+      "id": 64,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Настройки сервера обновлены через админ-панель",
+      "ip_address": null,
+      "created_at": "2025-07-26T23:48:14.651Z"
+    },
+    {
+      "id": 63,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование email шаблона на адрес: dima2_05@mail.ru",
+      "ip_address": null,
+      "created_at": "2025-07-26T23:47:59.597Z"
+    },
+    {
+      "id": 62,
+      "admin_id": 1,
+      "action": "email_test",
+      "target_user_id": null,
+      "details": "Тестовое письмо отправлено на dima2_05@mail.ru, время доставки: 1501мс",
+      "ip_address": null,
+      "created_at": "2025-07-26T23:47:49.146Z"
+    },
+    {
+      "id": 61,
+      "admin_id": 1,
+      "action": "email_test",
+      "target_user_id": null,
+      "details": "Тестовое письмо отправлено на dima2_05@mail.ru, время доставки: 1507мс",
+      "ip_address": null,
+      "created_at": "2025-07-26T23:47:17.171Z"
+    },
+    {
+      "id": 60,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование email шаблона на адрес: dima2_05@mail.ru",
+      "ip_address": null,
+      "created_at": "2025-07-26T23:46:20.772Z"
+    },
+    {
+      "id": 59,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование email шаблона на адрес: dima2_05@mail.ru",
+      "ip_address": null,
+      "created_at": "2025-07-26T23:46:08.736Z"
+    },
+    {
+      "id": 58,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 36. Категории: general, system, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-07-26T23:46:03.336Z"
+    },
+    {
+      "id": 57,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 0. Категории: ",
+      "ip_address": null,
+      "created_at": "2025-07-26T23:45:59.176Z"
+    },
+    {
+      "id": 56,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Настройки сервера обновлены через админ-панель",
+      "ip_address": null,
+      "created_at": "2025-07-26T23:45:59.070Z"
+    },
+    {
+      "id": 55,
+      "admin_id": 1,
+      "action": "email_template_tested",
+      "target_user_id": null,
+      "details": "Тестирование email шаблона на адрес: dima2_05@mail.ru",
+      "ip_address": null,
+      "created_at": "2025-07-26T23:45:41.166Z"
+    },
+    {
+      "id": 54,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 36. Категории: general, system, applications, trust, security, email",
+      "ip_address": null,
+      "created_at": "2025-07-26T23:08:41.140Z"
+    },
+    {
+      "id": 53,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Обновлено настроек: 0. Категории: ",
+      "ip_address": null,
+      "created_at": "2025-07-26T23:08:36.868Z"
+    },
+    {
+      "id": 52,
+      "admin_id": 1,
+      "action": "settings_updated",
+      "target_user_id": null,
+      "details": "Настройки сервера обновлены через админ-панель",
+      "ip_address": null,
+      "created_at": "2025-07-26T23:08:36.771Z"
+    },
+    {
+      "id": 51,
+      "admin_id": 1,
+      "action": "email_test",
+      "target_user_id": null,
+      "details": "Тестовое письмо отправлено на dima2_05@mail.ru, время доставки: 1446мс",
+      "ip_address": null,
+      "created_at": "2025-07-26T22:41:26.734Z"
+    }
+  ],
+  "emailTemplates": [
+    {
+      "id": 1,
+      "template_name": "Приветственное письмо",
+      "template_subject": "Добро пожаловать на {{serverName}}!",
+      "template_html": "<div style=\"max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 12px; padding: 40px; font-family: Arial, sans-serif; color: #ffffff;\">\n    <div style=\"text-align: center; margin-bottom: 40px; padding: 25px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 10px;\">\n        <h1 style=\"margin: 0; font-size: 28px; color: #000; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.1);\">{{serverName}}</h1>\n        <p style=\"margin: 8px 0 0 0; color: #000; font-weight: 500;\">Приватный Minecraft сервер</p>\n    </div>\n    <h2 style=\"color: #f59e0b; text-align: center; margin-bottom: 25px; font-size: 24px;\">Добро пожаловать, {{nickname}}!</h2>\n    <p style=\"font-size: 16px; line-height: 1.6; margin-bottom: 20px;\">\n        🎉 Поздравляем, ваша регистрация на нашем Minecraft сервере прошла успешно!<br>\n        Мы рады видеть вас в нашем дружном сообществе.\n    </p>\n    <div style=\"background: rgba(30,41,59,0.7); border-radius: 8px; padding: 20px; margin-bottom: 25px;\">\n        <h3 style=\"color: #f59e0b; margin-top: 0;\">Что дальше?</h3>\n        <ul style=\"font-size: 15px; padding-left: 18px; margin-bottom: 10px;\">\n            <li>🔑 <b>Ваш никнейм:</b> <span style=\"color:#f8b500;\">{{nickname}}</span></li>\n            <li>⚡ <b>IP сервера:</b> <span style=\"color:#f8b500;\">{{serverIp}}</span></li>\n            <li>💬 <a href=\"{{discordInvite}}\" style=\"color: #f59e0b; text-decoration: underline;\">Присоединяйтесь к нашему Discord для чата, новостей и поддержки</a></li>\n            <li>🛠 <a href=\"{{telegramInvite}}\" style=\"color: #f59e0b; text-decoration: underline;\">Так же присоединяйтесь к нашему Telegram каналу</a></li>\n        </ul>\n        <p style=\"font-size: 14px; color: #cbd5e1; margin-top: 12px;\">\n            Если у вас возникнут вопросы или сложности с входом, не стесняйтесь обращаться в поддержку через Discord/Telegram или на сайте.\n        </p>\n    </div>\n    <div style=\"text-align: center; color: #94a3b8; font-size: 14px;\">\n        <p style=\"margin: 5px 0; color: #f8b500;\">С уважением, команда {{serverName}}</p>\n        <p style=\"margin: 15px 0 5px 0; font-size: 12px; opacity: 0.7;\">{{currentDate}}</p>\n    </div>\n</div>",
+      "template_variables": null,
+      "is_active": true,
+      "created_at": "2025-07-26T23:32:32.838Z",
+      "updated_at": "2025-07-29T01:12:49.331Z",
+      "updated_by": 1,
+      "created_by": null
+    },
+    {
+      "id": 2,
+      "template_name": "Подтверждение email",
+      "template_subject": "Подтверждение email адреса - {{serverName}}",
+      "template_html": "<div style=\"max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 12px; padding: 40px; font-family: Arial, sans-serif; color: #ffffff;\">\n    <div style=\"text-align: center; margin-bottom: 40px; padding: 25px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 10px;\">\n        <h1 style=\"margin: 0; font-size: 28px; color: #000; font-weight: bold;\">{{serverName}}</h1>\n    </div>\n    <h2 style=\"color: #10b981; text-align: center; margin-bottom: 25px; font-size: 24px;\">🔐 Подтвердите ваш email</h2>\n    <p style=\"font-size: 16px; line-height: 1.6; margin-bottom: 20px;\">\n        Привет, <strong style=\"color: #f8b500;\">{{nickname}}</strong>!<br>\n        Спасибо за регистрацию на нашем сервере.<br>\n        Чтобы завершить регистрацию и получить полный доступ, подтвердите ваш email.\n    </p>\n    <div style=\"text-align: center; margin: 35px 0;\">\n        <a href=\"{{verificationLink}}\" style=\"display: inline-block; padding: 18px 36px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 17px;\">✅ Подтвердить email</a>\n    </div>\n    <p style=\"font-size: 14px; color: #cbd5e1; text-align: center; margin-bottom: 18px;\">\n        Если кнопка не работает, скопируйте и вставьте эту ссылку в браузер:<br>\n        <span style=\"color: #10b981; word-break: break-all;\">{{verificationLink}}</span>\n    </p>\n    <div style=\"background: rgba(16,185,129,0.12); border-radius: 8px; padding: 18px; margin: 28px 0;\">\n        <p style=\"margin: 0 0 10px 0; color: #f8b500; font-size: 15px;\"><b>Полезные ссылки:</b></p>\n        <ul style=\"font-size: 15px; color: #cbd5e1; padding-left: 18px; margin-bottom: 6px;\">\n            <li>🌐 IP сервера: <b style=\"color:#10b981;\">{{serverIp}}</b></li>\n            <li>💬 <a href=\"{{discordInvite}}\" style=\"color: #10b981; text-decoration: underline;\">Наш Discord</a></li>\n            <li>📱 <a href=\"{{telegramInvite}}\" style=\"color: #10b981; text-decoration: underline;\">Наш Telegram</a></li>\n        </ul>\n    </div>\n    <p style=\"text-align: center; color: #94a3b8; font-size: 14px; margin-bottom: 0;\">\n        Если вы не регистрировались, просто проигнорируйте это письмо.<br>\n        — Команда {{serverName}}\n    </p>\n    <p style=\"text-align: center; margin: 15px 0 0 0; font-size: 12px; opacity: 0.7;\">{{currentDate}}</p>\n</div>",
+      "template_variables": null,
+      "is_active": true,
+      "created_at": "2025-07-26T23:32:32.953Z",
+      "updated_at": "2025-07-29T01:12:49.331Z",
+      "updated_by": 1,
+      "created_by": null
+    },
+    {
+      "id": 3,
+      "template_name": "Заявка одобрена",
+      "template_subject": "🎉 Ваша заявка одобрена - {{serverName}}",
+      "template_html": "<div style=\"max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 12px; padding: 40px; font-family: Arial, sans-serif; color: #ffffff;\">\n    <div style=\"text-align: center; margin-bottom: 40px; padding: 25px; background: linear-gradient(135deg, #16a34a 0%, #10b981 100%); border-radius: 10px;\">\n        <h1 style=\"margin: 0; font-size: 28px; color: #fff; font-weight: bold;\">{{serverName}}</h1>\n    </div>\n    <h2 style=\"color: #16a34a; text-align: center; margin-bottom: 25px; font-size: 24px;\">🎉 Заявка одобрена!</h2>\n    <p style=\"font-size: 16px; line-height: 1.6; margin-bottom: 18px;\">\n        Привет, <strong style=\"color: #f8b500;\">{{nickname}}</strong>!<br>\n        Мы с радостью сообщаем, что ваша заявка была одобрена.<br>\n        <span style=\"color: #10b981;\">Теперь у вас есть доступ к новым возможностям сервера!</span>\n    </p>\n    <div style=\"background: rgba(16,185,129,0.12); border-radius: 8px; padding: 20px; margin-bottom: 22px;\">\n        <ul style=\"font-size: 15px; color: #cbd5e1; padding-left: 18px; margin-bottom: 8px;\">\n            <li>🌐 IP сервера: <b style=\"color:#16a34a;\">{{serverIp}}</b></li>\n            <li>💬 <a href=\"{{discordInvite}}\" style=\"color: #16a34a; text-decoration: underline;\">Присоединяйтесь к нашему Discord</a></li>\n            <li>📱 <a href=\"{{telegramInvite}}\" style=\"color: #16a34a; text-decoration: underline;\">Наш Telegram-чат</a></li>\n        </ul>\n        <p style=\"font-size: 14px; color: #cbd5e1; margin: 10px 0 0 0;\">\n            Если у вас возникнут вопросы — не стесняйтесь обращаться к нашей команде или в сообщество.\n        </p>\n    </div>\n    <p style=\"font-size: 15px; color: #f8b500; text-align: center; margin-bottom: 16px;\">\n        Удачной игры и новых достижений на {{serverName}}!\n    </p>\n    <div style=\"text-align: center; color: #94a3b8; font-size: 14px;\">\n        <p style=\"margin: 5px 0;\">С уважением, команда {{serverName}}</p>\n        <p style=\"margin: 13px 0 0 0; font-size: 12px; opacity: 0.7;\">{{currentDate}}</p>\n    </div>\n</div>",
+      "template_variables": null,
+      "is_active": true,
+      "created_at": "2025-07-26T23:32:33.060Z",
+      "updated_at": "2025-07-29T01:12:49.331Z",
+      "updated_by": 1,
+      "created_by": null
+    },
+    {
+      "id": 4,
+      "template_name": "Заявка отклонена",
+      "template_subject": "❌ О вашей заявке - {{serverName}}",
+      "template_html": "<div style=\"max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 12px; padding: 40px; font-family: Arial, sans-serif; color: #ffffff;\">\n    <div style=\"text-align: center; margin-bottom: 40px; padding: 25px; background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); border-radius: 10px;\">\n        <h1 style=\"margin: 0; font-size: 28px; color: #fff; font-weight: bold;\">{{serverName}}</h1>\n    </div>\n    <h2 style=\"color: #dc2626; text-align: center; margin-bottom: 25px; font-size: 24px;\">❌ Заявка не одобрена</h2>\n    <p style=\"font-size: 16px; line-height: 1.6; margin-bottom: 18px;\">\n        Привет, <strong style=\"color: #f8b500;\">{{nickname}}</strong>!<br>\n        К сожалению, на данный момент ваша заявка была отклонена.<br>\n        Не расстраивайтесь — вы всегда можете попробовать снова или задать вопросы нашей команде.\n    </p>\n    <div style=\"background: rgba(220,38,38,0.12); border-radius: 8px; padding: 20px; margin-bottom: 22px;\">\n        <p style=\"color: #f8b500; font-size: 15px; margin: 0 0 10px 0;\"><b>Что делать дальше?</b></p>\n        <ul style=\"font-size: 15px; color: #cbd5e1; padding-left: 18px; margin-bottom: 8px;\">\n            <li>💬 <a href=\"{{discordInvite}}\" style=\"color: #dc2626; text-decoration: underline;\">Discord для вопросов и обратной связи</a></li>\n            <li>📱 <a href=\"{{telegramInvite}}\" style=\"color: #dc2626; text-decoration: underline;\">Telegram-чат поддержки</a></li>\n            <li>📧 Если у вас есть вопросы, пишите нам на почту: <span style=\"color: #dc2626;\">chiwawa.helper@yandex.ru</span></li>\n        </ul>\n        <p style=\"font-size: 14px; color: #cbd5e1; margin: 10px 0 0 0;\">\n            Вы всегда можете подать новую заявку после исправления возможных причин отказа.\n        </p>\n    </div>\n    <p style=\"font-size: 15px; color: #f8b500; text-align: center; margin-bottom: 16px;\">\n        Спасибо за интерес к {{serverName}}. Мы будем рады видеть вас снова!\n    </p>\n    <div style=\"text-align: center; color: #94a3b8; font-size: 14px;\">\n        <p style=\"margin: 5px 0;\">С уважением, команда {{serverName}}</p>\n        <p style=\"margin: 13px 0 0 0; font-size: 12px; opacity: 0.7;\">{{currentDate}}</p>\n    </div>\n</div>",
+      "template_variables": null,
+      "is_active": true,
+      "created_at": "2025-07-26T23:32:33.166Z",
+      "updated_at": "2025-07-29T01:12:49.331Z",
+      "updated_by": 1,
+      "created_by": null
+    },
+    {
+      "id": 5,
+      "template_name": "Сброс пароля",
+      "template_subject": "🔑 Восстановление пароля - {{serverName}}",
+      "template_html": "<div style=\"max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 12px; padding: 40px; font-family: Arial, sans-serif; color: #ffffff;\">\n    <div style=\"text-align: center; margin-bottom: 40px; padding: 25px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 10px;\">\n        <h1 style=\"margin: 0; font-size: 28px; color: #000; font-weight: bold;\">{{serverName}}</h1>\n    </div>\n    <h2 style=\"color: #f59e0b; text-align: center; margin-bottom: 25px; font-size: 24px;\">🔑 Восстановление пароля</h2>\n    <p style=\"font-size: 16px; line-height: 1.6; margin-bottom: 20px;\">\n        Привет, <strong style=\"color: #f8b500;\">{{nickname}}</strong>!<br>\n        Вы получили это письмо, потому что запросили восстановление пароля для аккаунта на сайте {{serverName}}.<br>\n        Для создания нового пароля нажмите на кнопку ниже:\n    </p>\n    <div style=\"text-align: center; margin: 35px 0;\">\n        <a href=\"{{resetLink}}\" style=\"display: inline-block; padding: 18px 36px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 17px;\">🔐 Создать новый пароль</a>\n    </div>\n    <p style=\"font-size: 14px; color: #cbd5e1; text-align: center; margin-bottom: 18px;\">\n        Если кнопка не работает, скопируйте и вставьте эту ссылку в адресную строку браузера:<br>\n        <span style=\"color: #f8b500; word-break: break-all;\">{{resetLink}}</span>\n    </p>\n    <div style=\"background: rgba(245,158,11,0.10); border-radius: 8px; padding: 16px; margin-bottom: 22px;\">\n        <p style=\"font-size: 14px; color: #cbd5e1; margin: 0 0 6px 0;\">\n            Если вы не запрашивали восстановление пароля — просто проигнорируйте это письмо. Ваш пароль останется прежним.\n        </p>\n        <ul style=\"font-size: 15px; color: #cbd5e1; padding-left: 18px; margin-bottom: 4px;\">\n            <li>💬 <a href=\"{{discordInvite}}\" style=\"color: #f59e0b; text-decoration: underline;\">Служба поддержки в Discord</a></li>\n            <li>📱 <a href=\"{{telegramInvite}}\" style=\"color: #f59e0b; text-decoration: underline;\">Чат поддержки Telegram</a></li>\n        </ul>\n    </div>\n    <div style=\"text-align: center; color: #94a3b8; font-size: 14px;\">\n        <p style=\"margin: 5px 0;\">С уважением, команда {{serverName}}</p>\n        <p style=\"margin: 13px 0 0 0; font-size: 12px; opacity: 0.7;\">{{currentDate}}</p>\n    </div>\n</div>",
+      "template_variables": null,
+      "is_active": true,
+      "created_at": "2025-07-26T23:32:33.272Z",
+      "updated_at": "2025-07-29T01:12:49.331Z",
+      "updated_by": 1,
+      "created_by": null
+    },
+    {
+      "id": 6,
+      "template_name": "Новостная рассылка",
+      "template_subject": "📰 Новости {{serverName}}",
+      "template_html": "<div style=\"max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 12px; padding: 40px; font-family: Arial, sans-serif; color: #ffffff;\">\n    <h2 style=\"color: #8b5cf6; text-align: center; margin-bottom: 25px; font-size: 24px;\">📰 Новости</h2>\n    <p style=\"font-size: 16px; line-height: 1.6; margin-bottom: 20px;\">Привет, <strong style=\"color: #f8b500;\">{{nickname}}</strong>!</p>\n</div>",
+      "template_variables": null,
+      "is_active": true,
+      "created_at": "2025-07-26T23:32:33.378Z",
+      "updated_at": "2025-07-29T01:12:49.331Z",
+      "updated_by": 1,
+      "created_by": null
+    }
+  ],
+  "exportDate": "2025-08-01T21:52:21.535Z",
+  "version": "1.0"
+}

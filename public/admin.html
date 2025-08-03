@@ -962,19 +962,18 @@
 
                                         <div class="setting-item">
                                             <label class="block text-sm font-medium text-gray-300 mb-2 flex items-center">
-                                                Автоматическое одобрение по Trust Level
-                                                <span class="tooltip-icon ml-2" data-tooltip="Заявки от игроков с высоким Trust Level одобряются автоматически">
+                                                Автоматическое одобрение заявок
+                                                <span class="tooltip-icon ml-2" data-tooltip="Заявки от игроков с определённым Trust Level одобряются автоматически">
                                                     <i class="fas fa-info-circle text-xs text-gray-500 hover:text-minecraft-gold cursor-help"></i>
                                                 </span>
                                             </label>
                                             <select id="auto-approve-trust-level" 
                                                 class="setting-input w-full px-4 py-3 bg-minecraft-gray border border-minecraft-gold/30 rounded-lg text-white focus:border-minecraft-gold focus:outline-none transition-colors">
                                                 <option value="0">Отключено - все заявки проверяются вручную</option>
-                                                <option value="1">Trust Level 1+ - автоодобрение от 1 уровня</option>
-                                                <option value="2">Trust Level 2+ - автоодобрение от 2 уровня</option>
-                                                <option value="3">Trust Level 3+ - автоодобрение от 3 уровня</option>
+                                                <option value="1">До 1 уровня - автоодобрение с 0 до 1 уровня</option>
+                                                <option value="2">До 2 уровня - автоодобрение с 1 до 2 уровня</option>
                                             </select>
-                                            <p class="text-xs text-gray-500 mt-2">Доверенные игроки могут быть автоматически приняты без модерации.</p>
+                                            <p class="text-xs text-gray-500 mt-2">Игроки с указанным уровнем могут быть автоматически повышены до следующего уровня.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -1043,10 +1042,49 @@
                                                 class="setting-input w-full px-4 py-3 bg-minecraft-gray border border-minecraft-gold/30 rounded-lg text-white focus:border-minecraft-gold focus:outline-none transition-colors">
                                             <p class="text-xs text-gray-500 mt-2">Основной способ набора очков. Не ставьте слишком высоко.</p>
                                         </div>
+
+                                        <div class="setting-item">
+                                            <label class="block text-sm font-medium text-gray-300 mb-2 flex items-center">
+                                                <i class="fas fa-heart mr-2 text-red-400"></i>
+                                                Очки за единицу репутации
+                                                <span class="tooltip-icon ml-2" data-tooltip="Сколько очков доверия даёт 1 единица репутации">
+                                                    <i class="fas fa-info-circle text-xs text-gray-500 hover:text-minecraft-gold cursor-help"></i>
+                                                </span>
+                                            </label>
+                                            <input type="number" id="trust-points-reputation" value="2" min="0" max="20" 
+                                                class="setting-input w-full px-4 py-3 bg-minecraft-gray border border-minecraft-gold/30 rounded-lg text-white focus:border-minecraft-gold focus:outline-none transition-colors">
+                                            <p class="text-xs text-gray-500 mt-2">Поощряет активное участие в сообществе и помощь другим игрокам.</p>
+                                        </div>
                                     </div>
 
                                     <div class="space-y-6">
                                         <h5 class="text-lg font-medium text-gray-300 mb-4">Требования для уровней</h5>
+                                        
+                                        <div class="setting-item">
+                                            <label class="block text-sm font-medium text-gray-300 mb-2 flex items-center">
+                                                <i class="fas fa-hourglass-half text-purple-400 mr-2"></i>
+                                                Минимальное время игры (часов)
+                                                <span class="tooltip-icon ml-2" data-tooltip="Минимум часов игры на сервере для повышения Trust Level">
+                                                    <i class="fas fa-info-circle text-xs text-gray-500 hover:text-minecraft-gold cursor-help"></i>
+                                                </span>
+                                            </label>
+                                            <input type="number" id="trust-minimum-hours" value="5" min="0" max="500" 
+                                                class="setting-input w-full px-4 py-3 bg-minecraft-gray border border-minecraft-gold/30 rounded-lg text-white focus:border-minecraft-gold focus:outline-none transition-colors">
+                                            <p class="text-xs text-gray-500 mt-2">Обязательное условие наравне с очками. Применяется ко всем уровням.</p>
+                                        </div>
+
+                                        <div class="setting-item">
+                                            <label class="block text-sm font-medium text-gray-300 mb-2 flex items-center">
+                                                <i class="fas fa-heart text-red-400 mr-2"></i>
+                                                Минимальная репутация
+                                                <span class="tooltip-icon ml-2" data-tooltip="Минимум репутации для повышения Trust Level">
+                                                    <i class="fas fa-info-circle text-xs text-gray-500 hover:text-minecraft-gold cursor-help"></i>
+                                                </span>
+                                            </label>
+                                            <input type="number" id="trust-minimum-reputation" value="0" min="0" max="100" 
+                                                class="setting-input w-full px-4 py-3 bg-minecraft-gray border border-minecraft-gold/30 rounded-lg text-white focus:border-minecraft-gold focus:outline-none transition-colors">
+                                            <p class="text-xs text-gray-500 mt-2">Обязательное условие наравне с очками. Применяется ко всем уровням.</p>
+                                        </div>
                                         
                                         <div class="setting-item">
                                             <label class="block text-sm font-medium text-gray-300 mb-2 flex items-center">
@@ -1245,7 +1283,7 @@
                                                             <p class="text-xs text-gray-500 leading-relaxed">Обязательно для современных SMTP серверов. Обеспечивает безопасную передачу данных.</p>
                                                         </div>
                                                         <label class="relative inline-flex items-center cursor-pointer ml-4">
-                                                            <input type="checkbox" id="smtp-secure" checked class="sr-only peer">
+                                                            <input type="checkbox" id="smtp-tls" checked class="sr-only peer">
                                                             <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
                                                         </label>
                                                     </div>
@@ -1852,10 +1890,15 @@
                 
                 <!-- Основная информация -->
                 <div class="space-y-4 mb-6">
-                    <div class="grid md:grid-cols-2 gap-6">
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <!-- Аватар и базовая информация -->
                         <div class="space-y-4">
-                            <div>
-                                <label class="text-sm text-gray-400">Никнейм:</label>
+                            <div class="text-center">
+                                <div id="modal-user-avatar" class="w-20 h-20 mx-auto rounded-full overflow-hidden border-2 border-minecraft-gold/30 mb-3">
+                                    <div class="w-full h-full bg-minecraft-gray flex items-center justify-center">
+                                        <i class="fas fa-user text-minecraft-gold text-2xl"></i>
+                                    </div>
+                                </div>
                                 <div class="text-white font-medium text-lg" id="modal-user-nickname">-</div>
                             </div>
                             <div>
@@ -1868,6 +1911,7 @@
                             </div>
                         </div>
                         
+                        <!-- Дополнительная информация -->
                         <div class="space-y-4">
                             <div>
                                 <label class="text-sm text-gray-400">Trust Level:</label>
@@ -1878,116 +1922,154 @@
                                 <div id="modal-user-status">-</div>
                             </div>
                             <div>
+                                <label class="text-sm text-gray-400">Возраст:</label>
+                                <div class="text-white" id="modal-user-age">-</div>
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-400">Discord:</label>
+                                <div class="text-white" id="modal-user-discord">-</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Дата и био -->
+                        <div class="space-y-4">
+                            <div>
                                 <label class="text-sm text-gray-400">Дата регистрации:</label>
                                 <div class="text-white" id="modal-user-created">-</div>
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-400">Биография:</label>
+                                <div class="text-white text-sm max-h-20 overflow-y-auto" id="modal-user-bio">-</div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Блок активности -->
+                <!-- Объединенный блок активности и статистики -->
                 <div class="mb-6">
-                    <label class="text-sm text-gray-400 mb-3 block">Последняя активность на сайте:</label>
-                    <div class="bg-minecraft-dark/30 rounded-lg border border-minecraft-gold/20 max-h-60 overflow-y-auto p-3" id="modal-user-activity">
-                        <div class="text-center py-4 text-gray-400">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <div class="mt-2">Загрузка активности...</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Вкладки и кнопки внизу -->
-                <div class="border-t border-minecraft-gold/20 pt-4">
-                    <!-- Вкладки "Сайт" и "Сервер" -->
-                    <div class="flex justify-center space-x-1 mb-4">
-                        <button class="modal-tab active px-6 py-2 rounded-md text-white bg-minecraft-gold/20 font-medium transition-all" data-tab="website">
-                            <i class="fas fa-globe mr-2"></i>Сайт
+                    <!-- Вкладки переключения -->
+                    <div class="flex space-x-1 mb-4">
+                        <button class="modal-tab active px-4 py-2 rounded-md text-white bg-minecraft-gold/20 font-medium transition-all text-sm" data-tab="activity">
+                            <i class="fas fa-globe mr-2"></i>Активность на сайте
                         </button>
-                        <button class="modal-tab px-6 py-2 rounded-md text-gray-300 hover:text-white hover:bg-minecraft-gold/10 font-medium transition-all" data-tab="server">
-                            <i class="fas fa-server mr-2"></i>Сервер
+                        <button class="modal-tab px-4 py-2 rounded-md text-gray-300 hover:text-white hover:bg-minecraft-gold/10 font-medium transition-all text-sm" data-tab="server">
+                            <i class="fas fa-server mr-2"></i>Статистика с сервера
                         </button>
                     </div>
                     
                     <!-- Контент вкладок -->
-                    <div class="mb-4">
-                        <!-- Вкладка "Сайт" -->
-                        <div id="modal-tab-website" class="modal-tab-content">
-                            <div class="bg-minecraft-dark/20 rounded-lg p-4 text-center">
-                                <p class="text-gray-300 text-sm">
-                                    <i class="fas fa-chart-line mr-2 text-minecraft-gold"></i>
-                                    Статистика активности на сайте отображается выше
-                                </p>
+                    <div class="bg-minecraft-dark/30 rounded-lg border border-minecraft-gold/20">
+                        <!-- Вкладка "Активность на сайте" -->
+                        <div id="modal-tab-activity" class="modal-tab-content max-h-60 overflow-y-auto p-3">
+                            <div class="text-center py-4 text-gray-400" id="modal-user-activity">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <div class="mt-2">Загрузка активности...</div>
                             </div>
                         </div>
                         
                         <!-- Вкладка "Сервер" -->
                         <div id="modal-tab-server" class="modal-tab-content hidden">
                             <div class="space-y-4">
+                                <!-- Основная информация -->
                                 <div class="grid md:grid-cols-2 gap-4">
                                     <div class="space-y-3">
                                         <div>
                                             <label class="text-sm text-gray-400">Статус на сервере:</label>
-                                            <div class="text-green-400" id="modal-server-status">🟢 Онлайн</div>
+                                            <div class="text-green-400" id="modal-server-status">� Загрузка...</div>
                                         </div>
                                         <div>
                                             <label class="text-sm text-gray-400">Время игры:</label>
-                                            <div class="text-white" id="modal-server-playtime">42ч 15м</div>
+                                            <div class="text-white" id="modal-server-playtime">Загрузка...</div>
                                         </div>
                                         <div>
-                                            <label class="text-sm text-gray-400">Последний заход на сервер:</label>
-                                            <div class="text-white" id="modal-server-last-seen">5 минут назад</div>
+                                            <label class="text-sm text-gray-400">Последний заход:</label>
+                                            <div class="text-white" id="modal-server-last-seen">Загрузка...</div>
                                         </div>
                                         <div>
-                                            <label class="text-sm text-gray-400">Местоположение:</label>
-                                            <div class="text-white" id="modal-server-location">x: 1245, y: 64, z: -892</div>
+                                            <label class="text-sm text-gray-400">Последние координаты:</label>
+                                            <div class="text-white font-mono text-sm" id="modal-server-location">Загрузка...</div>
+                                        </div>
+                                        <div>
+                                            <label class="text-sm text-gray-400">Всего входов:</label>
+                                            <div class="text-white" id="modal-server-total-logins">Загрузка...</div>
                                         </div>
                                     </div>
                                     
                                     <div class="space-y-3">
                                         <div>
                                             <label class="text-sm text-gray-400">Уровень:</label>
-                                            <div class="text-minecraft-gold" id="modal-server-level">Level 27</div>
-                                        </div>
-                                        <div>
-                                            <label class="text-sm text-gray-400">Опыт:</label>
-                                            <div class="text-white" id="modal-server-exp">15,432 XP</div>
+                                            <div class="text-minecraft-gold" id="modal-server-level">Загрузка...</div>
                                         </div>
                                         <div>
                                             <label class="text-sm text-gray-400">Смертей:</label>
-                                            <div class="text-red-400" id="modal-server-deaths">23</div>
+                                            <div class="text-red-400" id="modal-server-deaths">Загрузка...</div>
                                         </div>
                                         <div>
                                             <label class="text-sm text-gray-400">Убийств мобов:</label>
-                                            <div class="text-white" id="modal-server-kills">1,847</div>
+                                            <div class="text-white" id="modal-server-kills">Загрузка...</div>
+                                        </div>
+                                        <div>
+                                            <label class="text-sm text-gray-400">Количество сессий:</label>
+                                            <div class="text-white" id="modal-server-sessions">Загрузка...</div>
+                                        </div>
+                                        <div>
+                                            <label class="text-sm text-gray-400">Средняя сессия:</label>
+                                            <div class="text-white" id="modal-server-avg-session">Загрузка...</div>
                                         </div>
                                     </div>
                                 </div>
                                 
-                                <div class="mt-4 p-3 bg-minecraft-dark/30 rounded-lg">
-                                    <label class="text-sm text-gray-400 mb-2 block">Последние действия на сервере:</label>
-                                    <div class="space-y-1 text-sm">
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-300">🏗️ Построил дом</span>
-                                            <span class="text-gray-500">15 мин назад</span>
+                                <!-- Детальная статистика -->
+                                <div class="mt-6">
+                                    <h4 class="text-sm font-medium text-minecraft-gold mb-3">📊 Игровая статистика</h4>
+                                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                        <div class="bg-minecraft-dark/20 rounded-lg p-3 text-center">
+                                            <div class="text-lg font-bold text-white" id="modal-server-blocks-broken">0</div>
+                                            <div class="text-xs text-gray-400">Блоков сломано</div>
                                         </div>
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-300">⛏️ Добыл 64 железной руды</span>
-                                            <span class="text-gray-500">1ч назад</span>
+                                        <div class="bg-minecraft-dark/20 rounded-lg p-3 text-center">
+                                            <div class="text-lg font-bold text-white" id="modal-server-blocks-placed">0</div>
+                                            <div class="text-xs text-gray-400">Блоков поставлено</div>
                                         </div>
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-300">💀 Умер от лавы</span>
-                                            <span class="text-gray-500">2ч назад</span>
+                                        <div class="bg-minecraft-dark/20 rounded-lg p-3 text-center">
+                                            <div class="text-lg font-bold text-white" id="modal-server-distance">0 км</div>
+                                            <div class="text-xs text-gray-400">Пройдено</div>
                                         </div>
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-300">🎣 Поймал рыбу</span>
-                                            <span class="text-gray-500">3ч назад</span>
+                                        <div class="bg-minecraft-dark/20 rounded-lg p-3 text-center">
+                                            <div class="text-lg font-bold text-white" id="modal-server-items-crafted">0</div>
+                                            <div class="text-xs text-gray-400">Предметов создано</div>
+                                        </div>
+                                        <div class="bg-minecraft-dark/20 rounded-lg p-3 text-center">
+                                            <div class="text-lg font-bold text-white" id="modal-server-damage-dealt">0</div>
+                                            <div class="text-xs text-gray-400">Урона нанесено</div>
+                                        </div>
+                                        <div class="bg-minecraft-dark/20 rounded-lg p-3 text-center">
+                                            <div class="text-lg font-bold text-white" id="modal-server-food-eaten">0</div>
+                                            <div class="text-xs text-gray-400">Еды съедено</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Информация о сессиях -->
+                                <div class="mt-4">
+                                    <h4 class="text-sm font-medium text-minecraft-gold mb-3">⏱️ Сессии</h4>
+                                    <div class="bg-minecraft-dark/30 rounded-lg p-4">
+                                        <div class="grid grid-cols-2 gap-4 text-sm">
+                                            <div>
+                                                <span class="text-gray-400">Самая длинная сессия:</span>
+                                                <div class="text-white font-medium" id="modal-server-longest-session">Загрузка...</div>
+                                            </div>
+                                            <div>
+                                                <span class="text-gray-400">Среднее время сессии:</span>
+                                                <div class="text-white font-medium" id="modal-server-avg-session">Загрузка...</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 
                                 <div class="mt-4 text-xs text-gray-500 text-center">
-                                    <i class="fas fa-info-circle mr-1"></i>
-                                    Данные получены с игрового сервера (демо-данные)
+                                    <i class="fas fa-database mr-1"></i>
+                                    Данные получены из базы данных сервера Minecraft
                                 </div>
                             </div>
                         </div>
@@ -2029,7 +2111,6 @@
                         <select id="ban-type" autocomplete="off" class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white focus:border-minecraft-gold focus:outline-none">
                             <option value="temporary">Временная</option>
                             <option value="permanent">Постоянная</option>
-                            <option value="delete">УДАЛИТЬ АККАУНТ</option>
                         </select>
                     </div>
                     
@@ -2053,6 +2134,64 @@
                     </button>
                     <button id="confirm-ban-btn" data-action="confirm-ban-user" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors">
                         Заблокировать
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно удаления пользователя -->
+    <div id="delete-user-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="glass-effect rounded-lg max-w-md w-full mx-4">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-white">
+                        <i class="fas fa-exclamation-triangle mr-2 text-red-500"></i>
+                        Удалить пользователя
+                    </h3>
+                    <button data-action="close-modal" data-modal="delete-user-modal" class="text-gray-400 hover:text-white">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="bg-red-900/30 border border-red-500/50 rounded-lg p-4">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-exclamation-triangle text-red-400 text-2xl"></i>
+                            <div>
+                                <h4 class="text-red-300 font-semibold">ВНИМАНИЕ!</h4>
+                                <p class="text-red-200 text-sm">Это действие нельзя отменить!</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="text-sm text-gray-400">Пользователь для удаления:</label>
+                        <div class="text-white font-medium" id="delete-modal-user-nickname">-</div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Причина удаления:</label>
+                        <textarea id="delete-reason" rows="3" placeholder="Обязательно укажите причину удаления аккаунта..." required
+                            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                            class="w-full px-3 py-2 bg-minecraft-gray border border-minecraft-gold/20 rounded-lg text-white placeholder-gray-400 focus:border-minecraft-gold focus:outline-none resize-none"></textarea>
+                    </div>
+                    
+                    <div class="bg-yellow-900/30 border border-yellow-500/50 rounded-lg p-3">
+                        <p class="text-yellow-300 text-sm">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            При удалении будут удалены все данные пользователя: сессии, логи, заявки, статистика и все связанные записи.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button data-action="close-modal" data-modal="delete-user-modal" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors">
+                        Отмена
+                    </button>
+                    <button id="confirm-delete-btn" data-action="confirm-delete-user" class="px-4 py-2 bg-red-700 hover:bg-red-800 text-white rounded-lg font-medium transition-colors">
+                        <i class="fas fa-trash-alt mr-2"></i>
+                        Удалить навсегда
                     </button>
                 </div>
             </div>
@@ -2248,6 +2387,10 @@
                     const userId = target.getAttribute('data-user-id');
                     const nickname = target.getAttribute('data-user-nickname');
                     unbanUser(userId, nickname);
+                } else if (target.matches('[data-action="delete-user"]')) {
+                    const userId = target.getAttribute('data-user-id');
+                    const nickname = target.getAttribute('data-user-nickname');
+                    deleteUser(userId, nickname);
                 }
                 
                 // Trust Level заявки
@@ -2271,6 +2414,8 @@
                     updateUserRole();
                 } else if (target.matches('[data-action="confirm-ban-user"]')) {
                     confirmBanUser();
+                } else if (target.matches('[data-action="confirm-delete-user"]')) {
+                    confirmDeleteUser();
                 }
                 
                 // Вкладки в модальном окне пользователя
@@ -2610,46 +2755,175 @@
                 activeContent.classList.remove('hidden');
             }
             
-            // Если переключились на вкладку "Сервер", генерируем данные
+            // Если переключились на вкладку "Сервер", загружаем данные
             if (tabName === 'server') {
-                generateServerData();
+                loadServerStats(currentUserId);
             }
         }
 
-        // Функция генерации демо-данных для вкладки "Сервер"
-        function generateServerData() {
-            // Генерируем случайные, но реалистичные данные
-            const onlineChance = Math.random() > 0.3; // 70% шанс что онлайн
-            const playtimeHours = Math.floor(Math.random() * 200) + 5; // 5-205 часов
-            const playtimeMinutes = Math.floor(Math.random() * 60);
-            const level = Math.floor(Math.random() * 50) + 1; // 1-50 уровень
-            const exp = Math.floor(Math.random() * 50000) + 1000; // 1000-51000 опыта
-            const deaths = Math.floor(Math.random() * 100); // 0-100 смертей
-            const kills = Math.floor(Math.random() * 5000) + 100; // 100-5100 убийств
-            
-            // Генерируем координаты
-            const x = Math.floor(Math.random() * 4000) - 2000; // -2000 до 2000
-            const y = Math.floor(Math.random() * 100) + 5; // 5-105
-            const z = Math.floor(Math.random() * 4000) - 2000; // -2000 до 2000
-            
-            // Время последнего захода
-            const lastSeenMinutes = onlineChance ? 0 : Math.floor(Math.random() * 10080); // 0-7 дней в минутах
-            const lastSeenText = onlineChance ? 'Сейчас онлайн' : getTimeAgoText(lastSeenMinutes);
-            
-            // Обновляем элементы
-            document.getElementById('modal-server-status').innerHTML = onlineChance 
-                ? '🟢 <span class="text-green-400">Онлайн</span>' 
-                : '🔴 <span class="text-red-400">Оффлайн</span>';
-            document.getElementById('modal-server-playtime').textContent = `${playtimeHours}ч ${playtimeMinutes}м`;
-            document.getElementById('modal-server-last-seen').textContent = lastSeenText;
-            document.getElementById('modal-server-location').textContent = `x: ${x}, y: ${y}, z: ${z}`;
-            document.getElementById('modal-server-level').textContent = `Level ${level}`;
-            document.getElementById('modal-server-exp').textContent = `${exp.toLocaleString()} XP`;
-            document.getElementById('modal-server-deaths').textContent = deaths;
-            document.getElementById('modal-server-kills').textContent = kills.toLocaleString();
+        // Функция загрузки статистики сервера для пользователя
+        async function loadServerStats(userId) {
+            if (!userId) {
+                console.error('User ID не предоставлен для загрузки статистики сервера');
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch(`/api/admin/users/${userId}/stats`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Ошибка получения статистики');
+                }
+
+                const stats = await response.json();
+                updateServerStatisticsDisplay(stats);
+
+            } catch (error) {
+                console.error('Ошибка загрузки статистики сервера:', error);
+                showDefaultServerStats();
+            }
         }
 
-        // Вспомогательная функция для форматирования времени
+        // Функция обновления отображения статистики сервера
+        function updateServerStatisticsDisplay(stats) {
+            // Безопасно обновляем элементы, проверяя их существование
+            const updateElement = (id, value) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                } else {
+                    console.warn(`Элемент с ID '${id}' не найден`);
+                }
+            };
+
+            const updateElementHTML = (id, html) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.innerHTML = html;
+                } else {
+                    console.warn(`Элемент с ID '${id}' не найден`);
+                }
+            };
+
+            // Основная информация
+            updateElement('modal-server-playtime', formatMinutesToTime(stats.time_played_minutes || 0));
+            updateElement('modal-server-last-seen', formatTimeAgo(stats.last_login));
+            updateElement('modal-server-location', `x: ${stats.last_x || 0}, y: ${stats.last_y || 64}, z: ${stats.last_z || 0}`);
+            updateElement('modal-server-total-logins', (stats.total_logins || 0).toLocaleString());
+            updateElement('modal-server-level', `Level ${stats.player_level || 1}`);
+            updateElement('modal-server-deaths', (stats.deaths || 0).toLocaleString());
+            updateElement('modal-server-kills', (stats.mob_kills || 0).toLocaleString());
+            updateElement('modal-server-sessions', (stats.session_count || 0).toLocaleString());
+            
+            // Средняя сессия
+            const avgSessionMinutes = stats.session_count > 0 ? (stats.time_played_minutes / stats.session_count) : 0;
+            updateElement('modal-server-avg-session', formatMinutesToTime(avgSessionMinutes));
+            updateElement('modal-server-avg-session-2', formatMinutesToTime(avgSessionMinutes));
+
+            // Игровая статистика
+            updateElement('modal-server-blocks-broken', (stats.blocks_broken || 0).toLocaleString());
+            updateElement('modal-server-blocks-placed', (stats.blocks_placed || 0).toLocaleString());
+            updateElement('modal-server-distance', `${((stats.distance_traveled || 0) / 1000).toFixed(1)} км`);
+            updateElement('modal-server-items-crafted', (stats.items_crafted || 0).toLocaleString());
+            updateElement('modal-server-damage-dealt', (stats.damage_dealt || 0).toLocaleString());
+            updateElement('modal-server-food-eaten', (stats.food_eaten || 0).toLocaleString());
+            
+            // Самая длинная сессия (пока используем среднюю)
+            updateElement('modal-server-longest-session', formatMinutesToTime(avgSessionMinutes * 1.5));
+        }
+
+        // Функция показа данных по умолчанию при ошибке
+        function showDefaultServerStats() {
+            const defaultMessage = 'Нет данных';
+            
+            const updateElement = (id, value) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                }
+            };
+
+            const updateElementHTML = (id, html) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.innerHTML = html;
+                }
+            };
+
+            updateElement('modal-server-playtime', '0м');
+            updateElement('modal-server-last-seen', 'Никогда');
+            updateElement('modal-server-location', 'x: 0, y: 64, z: 0');
+            updateElement('modal-server-total-logins', '0');
+            updateElement('modal-server-level', 'Level 1');
+            updateElement('modal-server-deaths', '0');
+            updateElement('modal-server-kills', '0');
+            updateElement('modal-server-sessions', '0');
+            updateElement('modal-server-avg-session', '0м');
+            updateElement('modal-server-avg-session-2', '0м');
+            updateElement('modal-server-blocks-broken', '0');
+            updateElement('modal-server-blocks-placed', '0');
+            updateElement('modal-server-distance', '0 км');
+            updateElement('modal-server-items-crafted', '0');
+            updateElement('modal-server-damage-dealt', '0');
+            updateElement('modal-server-food-eaten', '0');
+            updateElement('modal-server-longest-session', '0м');
+        }
+
+        // Вспомогательные функции
+        function formatMinutesToTime(minutes) {
+            if (!minutes || minutes === 0) return '0м';
+            
+            const hours = Math.floor(minutes / 60);
+            const mins = Math.floor(minutes % 60);
+            
+            if (hours > 0) {
+                return `${hours}ч ${mins}м`;
+            }
+            return `${mins}м`;
+        }
+
+        function formatTimeAgo(dateString) {
+            if (!dateString) return 'Никогда';
+            
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMinutes = Math.floor(diffMs / (1000 * 60));
+            
+            if (diffMinutes < 1) return 'Только что';
+            if (diffMinutes < 60) return `${diffMinutes}м назад`;
+            
+            const diffHours = Math.floor(diffMinutes / 60);
+            if (diffHours < 24) return `${diffHours}ч назад`;
+            
+            const diffDays = Math.floor(diffHours / 24);
+            if (diffDays < 7) return `${diffDays}д назад`;
+            
+            const diffWeeks = Math.floor(diffDays / 7);
+            if (diffWeeks < 4) return `${diffWeeks}нед назад`;
+            
+            const diffMonths = Math.floor(diffDays / 30);
+            return `${diffMonths}мес назад`;
+        }
+
+        function isRecentlyActive(lastLoginString) {
+            if (!lastLoginString) return false;
+            
+            const lastLogin = new Date(lastLoginString);
+            const now = new Date();
+            const diffMinutes = (now - lastLogin) / (1000 * 60);
+            
+            return diffMinutes < 5; // Считаем онлайн если был активен в последние 5 минут
+        }
+
+        // Вспомогательная функция для форматирования времени (оставляем для совместимости)
         function getTimeAgoText(minutes) {
             if (minutes < 60) return `${minutes} мин назад`;
             if (minutes < 1440) return `${Math.floor(minutes / 60)}ч назад`;
@@ -2673,10 +2947,14 @@
             document.getElementById('modal-user-trust-level').textContent = 'Загрузка...';
             document.getElementById('modal-user-status').innerHTML = 'Загрузка...';
             document.getElementById('modal-user-created').textContent = 'Загрузка...';
+            document.getElementById('modal-user-age').textContent = 'Загрузка...';
+            document.getElementById('modal-user-discord').textContent = 'Загрузка...';
+            document.getElementById('modal-user-bio').textContent = 'Загрузка...';
+            document.getElementById('modal-user-avatar').innerHTML = '<div class="w-full h-full bg-minecraft-gray flex items-center justify-center"><i class="fas fa-spinner fa-spin text-minecraft-gold text-2xl"></i></div>';
             document.getElementById('modal-user-activity').innerHTML = '<div class="text-center py-4 text-gray-400"><i class="fas fa-spinner fa-spin"></i><div class="mt-2">Загрузка активности...</div></div>';
             
-            // Инициализируем вкладку "Сайт" как активную
-            switchModalTab('website');
+            // Инициализируем вкладку "Активность" как активную
+            switchModalTab('activity');
             
             try {
                 const token = localStorage.getItem('auth_token');
@@ -2700,9 +2978,30 @@
                 document.getElementById('modal-user-role').textContent = getRoleText(user.role);
                 document.getElementById('modal-user-trust-level').textContent = `Уровень ${user.trust_level || 0}`;
                 
+                // Заполняем новые поля
+                document.getElementById('modal-user-age').textContent = user.age ? `${user.age} лет` : 'Не указан';
+                document.getElementById('modal-user-discord').textContent = user.discord_username || 'Не привязан';
+                document.getElementById('modal-user-bio').textContent = user.bio || 'Не указана';
+                
+                // Аватар
+                const avatarElement = document.getElementById('modal-user-avatar');
+                if (user.avatar_url) {
+                    avatarElement.innerHTML = `<img src="${user.avatar_url}" alt="Аватар ${user.nickname}" class="w-full h-full object-cover">`;
+                } else {
+                    avatarElement.innerHTML = '<div class="w-full h-full bg-minecraft-gray flex items-center justify-center"><i class="fas fa-user text-minecraft-gold text-2xl"></i></div>';
+                }
+                
                 const statusElement = document.getElementById('modal-user-status');
                 if (user.is_banned) {
-                    statusElement.innerHTML = '<span class="text-red-400">Заблокирован</span>';
+                    let statusText = '<span class="text-red-400">Заблокирован</span>';
+                    if (user.ban_reason) {
+                        statusText += `<div class="text-sm text-red-300 mt-1">Причина: ${user.ban_reason}</div>`;
+                    }
+                    if (user.ban_until) {
+                        const banDate = new Date(user.ban_until);
+                        statusText += `<div class="text-sm text-red-300">До: ${banDate.toLocaleDateString('ru-RU')}</div>`;
+                    }
+                    statusElement.innerHTML = statusText;
                 } else {
                     statusElement.innerHTML = '<span class="text-green-400">Активен</span>';
                 }
@@ -2711,6 +3010,9 @@
                 
                 // Загружаем активность пользователя
                 loadUserActivity(userId);
+                
+                // Загружаем статистику сервера
+                loadServerStats(userId);
                 
             } catch (error) {
                 console.error('Ошибка загрузки данных пользователя:', error);
@@ -2794,6 +3096,113 @@
                 document.getElementById('modal-user-activity').innerHTML = 
                     '<div class="text-red-400 text-sm">Ошибка загрузки активности</div>';
             }
+        }
+
+        // Функция загрузки статистики сервера
+        async function loadServerStats(userId) {
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch(`/api/admin/users/${userId}/stats`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Ошибка получения статистики сервера');
+                }
+
+                const stats = await response.json();
+                
+                // Обновляем элементы статистики сервера
+                const playtimeHours = Math.floor((stats.time_played_minutes || 0) / 60);
+                const playtimeMinutes = (stats.time_played_minutes || 0) % 60;
+                document.getElementById('modal-server-playtime').textContent = 
+                    `${playtimeHours}ч ${playtimeMinutes}м`;
+                
+                document.getElementById('modal-server-last-seen').textContent = 
+                    stats.last_seen ? formatTimeAgo(stats.last_seen) : 'Никогда';
+                
+                document.getElementById('modal-server-status').innerHTML = 
+                    stats.last_seen && isRecentlyActive(stats.last_seen) 
+                        ? '🟢 Недавно был онлайн' 
+                        : '🔴 Офлайн';
+                
+                // Обновляем остальные поля
+                document.getElementById('modal-server-level').textContent = 
+                    `Level ${stats.current_level || 0}`;
+                    
+                document.getElementById('modal-server-deaths').textContent = 
+                    stats.deaths_count || 0;
+                    
+                document.getElementById('modal-server-kills').textContent = 
+                    stats.mobs_killed || 0;
+                
+                // Добавляем новые поля статистики
+                updateServerStatisticsDisplay(stats);
+                
+            } catch (error) {
+                console.error('Ошибка загрузки статистики сервера:', error);
+                // Показываем демо-данные при ошибке
+                showDefaultServerStats();
+            }
+        }
+        
+        // Функция обновления дисплея статистики сервера
+        function updateServerStatisticsDisplay(stats) {
+            // Обновляем все элементы статистики сервера реальными данными
+            const elements = {
+                'modal-server-blocks-broken': stats.blocks_broken || 0,
+                'modal-server-blocks-placed': stats.blocks_placed || 0,
+                'modal-server-distance': Math.floor((stats.distance_walked || 0) / 1000) + ' км',
+                'modal-server-items-crafted': stats.items_crafted || 0,
+                'modal-server-damage-dealt': stats.damage_dealt || 0,
+                'modal-server-food-eaten': stats.food_eaten || 0,
+                'modal-server-sessions': stats.session_count || 0,
+                'modal-server-avg-session': formatMinutesToTime(stats.average_session_duration || 0),
+                'modal-server-longest-session': formatMinutesToTime(stats.longest_session_duration || 0),
+                'modal-server-total-logins': stats.total_logins || 0
+            };
+            
+            // Обновляем элементы, если они существуют
+            Object.entries(elements).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                }
+            });
+            
+            // Обновляем IP адрес если есть
+            const ipElement = document.getElementById('modal-server-location');
+            if (ipElement) {
+                ipElement.textContent = stats.last_ip_address || 'Неизвестно';
+            }
+            
+            // Обновляем дополнительную статистику из minecraft_stats
+            if (stats.minecraft_stats) {
+                const mcStats = typeof stats.minecraft_stats === 'string' 
+                    ? JSON.parse(stats.minecraft_stats) 
+                    : stats.minecraft_stats;
+                    
+                if (mcStats.favorite_block) {
+                    const favBlockElement = document.getElementById('modal-server-favorite-block');
+                    if (favBlockElement) {
+                        favBlockElement.textContent = mcStats.favorite_block;
+                    }
+                }
+            }
+        }
+        
+        // Функция показа стандартных демо-данных при ошибке
+        function showDefaultServerStats() {
+            document.getElementById('modal-server-playtime').textContent = '0ч 0м';
+            document.getElementById('modal-server-last-seen').textContent = 'Никогда';
+            document.getElementById('modal-server-status').innerHTML = '🔴 Нет данных';
+            document.getElementById('modal-server-level').textContent = 'Level 0';
+            document.getElementById('modal-server-deaths').textContent = '0';
+            document.getElementById('modal-server-kills').textContent = '0';
         }
 
         // Функция изменения роли пользователя
@@ -2886,24 +3295,16 @@
             try {
                 const token = localStorage.getItem('auth_token');
                 let requestData = { reason, type: banType };
-                let endpoint = `/api/admin/users/${userId}/ban`;
-                let method = 'PUT';
                 
-                // Для удаления аккаунта используем другой endpoint
-                if (banType === 'delete') {
-                    endpoint = `/api/admin/users/${userId}/delete`;
-                    method = 'DELETE';
-                    requestData = { reason }; // Для удаления передаем только причину
-                }
                 // Для временной блокировки добавляем длительность
-                else if (banType === 'temporary') {
+                if (banType === 'temporary') {
                     const duration = parseInt(modal.querySelector('#ban-duration').value);
                     requestData.duration = duration;
                     requestData.unit = 'days';
                 }
                 
-                const response = await fetch(endpoint, {
-                    method: method,
+                const response = await fetch(`/api/admin/users/${userId}/ban`, {
+                    method: 'PUT',
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
@@ -2960,6 +3361,89 @@
             }
         }
 
+        // Функция удаления пользователя
+        async function deleteUser(userId, nickname) {
+            // Сразу открываем модальное окно подтверждения удаления
+            openModal('delete-user-modal');
+            
+            const modal = document.getElementById('delete-user-modal');
+            const nicknameElement = modal.querySelector('#delete-modal-user-nickname');
+            const confirmBtn = modal.querySelector('#confirm-delete-btn');
+            const reasonTextarea = modal.querySelector('#delete-reason');
+            
+            // Устанавливаем данные пользователя
+            nicknameElement.textContent = nickname;
+            confirmBtn.setAttribute('data-user-id', userId);
+            
+            // Сброс формы
+            reasonTextarea.value = '';
+            
+            // Фокусируемся на поле причины для удобства
+            setTimeout(() => {
+                reasonTextarea.focus();
+            }, 100);
+        }
+
+        // Функция подтверждения удаления пользователя
+        async function confirmDeleteUser() {
+            const modal = document.getElementById('delete-user-modal');
+            const reason = modal.querySelector('#delete-reason').value.trim();
+            const confirmBtn = modal.querySelector('#confirm-delete-btn');
+            const userId = confirmBtn.getAttribute('data-user-id');
+            
+            if (!reason) {
+                showMessage('Пожалуйста, укажите причину удаления', 'error');
+                return;
+            }
+            
+            if (reason.length < 5) {
+                showMessage('Причина удаления должна содержать минимум 5 символов', 'error');
+                return;
+            }
+            
+            if (!userId) {
+                showMessage('Ошибка: не указан ID пользователя', 'error');
+                return;
+            }
+            
+            // Показываем индикатор загрузки
+            const originalText = confirmBtn.innerHTML;
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Удаление...';
+            confirmBtn.disabled = true;
+            
+            try {
+                const token = localStorage.getItem('auth_token');
+                
+                const response = await fetch(`/api/admin/users/${userId}/delete`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ reason })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Ошибка удаления пользователя');
+                }
+
+                const result = await response.json();
+                showMessage(result.message || 'Пользователь успешно удален', 'success');
+                closeModal('delete-user-modal');
+                await loadUsers(); // Перезагружаем список пользователей
+                await loadDashboard(); // Обновляем статистику
+                
+            } catch (error) {
+                console.error('Ошибка удаления:', error);
+                showMessage('Ошибка: ' + error.message, 'error');
+            } finally {
+                // Восстанавливаем кнопку
+                confirmBtn.innerHTML = originalText;
+                confirmBtn.disabled = false;
+            }
+        }
+
         // Вспомогательные функции
         function getRoleText(role) {
             switch (role) {
@@ -3010,6 +3494,49 @@
             if (!dateString) return '-';
             const date = new Date(dateString);
             return date.toLocaleString('ru-RU');
+        }
+
+        // Функция для форматирования минут в читаемый формат
+        function formatMinutesToTime(minutes) {
+            if (!minutes || minutes === 0) return '0м';
+            
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            
+            if (hours === 0) return `${mins}м`;
+            if (mins === 0) return `${hours}ч`;
+            return `${hours}ч ${mins}м`;
+        }
+
+        // Функция для форматирования времени "назад"
+        function formatTimeAgo(dateString) {
+            if (!dateString) return 'Никогда';
+            
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / (1000 * 60));
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+            
+            if (diffMins < 1) return 'Только что';
+            if (diffMins < 60) return `${diffMins} мин назад`;
+            if (diffHours < 24) return `${diffHours} ч назад`;
+            if (diffDays < 30) return `${diffDays} дн назад`;
+            
+            return formatDate(dateString);
+        }
+
+        // Функция проверки недавней активности
+        function isRecentlyActive(dateString) {
+            if (!dateString) return false;
+            
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / (1000 * 60));
+            
+            return diffMins < 30; // Считаем активным если был в сети менее 30 минут назад
         }
 
         async function loadDashboard() {
@@ -3132,13 +3659,25 @@
                             <div class="glass-effect border border-gray-200 rounded-lg p-6">
                                 <div class="flex justify-between items-center">
                                     <div class="flex items-center">
-                                        <div class="w-10 h-10 bg-chiwawa-light rounded-full flex items-center justify-center mr-4">
-                                            <i class="fas fa-user text-chiwawa-primary"></i>
+                                        <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4 overflow-hidden border-2 border-minecraft-gold/30">
+                                            ${user.avatar_url 
+                                                ? `<img src="${user.avatar_url}" alt="Аватар ${user.nickname}" class="w-full h-full object-cover">`
+                                                : `<div class="w-full h-full bg-minecraft-gray flex items-center justify-center"><i class="fas fa-user text-minecraft-gold"></i></div>`
+                                            }
                                         </div>
                                         <div>
-                                            <h4 class="font-semibold text-white">${user.nickname}</h4>
+                                            <div class="flex items-center space-x-2">
+                                                <h4 class="font-semibold text-white">${user.nickname}</h4>
+                                                ${user.discord_username ? `<span class="text-xs bg-indigo-600 text-white px-2 py-1 rounded">Discord: ${user.discord_username}</span>` : ''}
+                                            </div>
                                             <p class="text-sm text-gray-300">${user.email}</p>
-                                            <p class="text-xs text-gray-500">Trust Level ${user.trust_level} • ${Math.floor((user.total_minutes || 0) / 60)} часов</p>
+                                            <div class="flex items-center space-x-3 text-xs text-gray-500 mt-1">
+                                                <span>Trust Level ${user.trust_level}</span>
+                                                <span>•</span>
+                                                <span>${Math.floor((user.total_minutes || 0) / 60)} часов</span>
+                                                ${user.age ? `<span>• ${user.age} лет</span>` : ''}
+                                            </div>
+                                            ${user.bio ? `<p class="text-xs text-gray-400 mt-1 italic">${user.bio.length > 60 ? user.bio.substring(0, 60) + '...' : user.bio}</p>` : ''}
                                         </div>
                                     </div>
                                     <div class="flex items-center space-x-2">
@@ -3172,6 +3711,11 @@
                                                     return `<option value="${level}" ${user.trust_level == level ? 'selected' : ''}>${levelNames[level]} (${level})</option>`;
                                                 }).join('')}
                                             </select>
+                                            ${user.role !== 'admin' ? `
+                                                <button data-action="delete-user" data-user-id="${user.id}" data-user-nickname="${user.nickname}" class="px-2 py-1 bg-red-700 text-white text-xs rounded hover:bg-red-800 transition-colors" title="Удалить пользователя">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            ` : ''}
                                         </div>
                                     </div>
                                 </div>
@@ -3856,6 +4400,7 @@
                     serverDescription: document.getElementById('server-description')?.value,
                     serverIp: document.getElementById('server-ip')?.value,
                     serverPort: parseInt(document.getElementById('server-port')?.value),
+                    maxPlayers: parseInt(document.getElementById('max-players')?.value),
                     discordInvite: document.getElementById('discord-invite')?.value,
                     telegramInvite: document.getElementById('telegram-invite')?.value,
                     
@@ -3870,6 +4415,9 @@
                     trustPointsEmail: parseInt(document.getElementById('trust-points-email')?.value),
                     trustPointsDiscord: parseInt(document.getElementById('trust-points-discord')?.value),
                     trustPointsHour: parseInt(document.getElementById('trust-points-hour')?.value),
+                    trustPointsReputation: parseInt(document.getElementById('trust-points-reputation')?.value),
+                    trustMinimumHours: parseInt(document.getElementById('trust-minimum-hours')?.value),
+                    trustMinimumReputation: parseInt(document.getElementById('trust-minimum-reputation')?.value),
                     trustLevel1Required: parseInt(document.getElementById('trust-level-1-required')?.value),
                     trustLevel2Required: parseInt(document.getElementById('trust-level-2-required')?.value),
                     trustLevel3Required: parseInt(document.getElementById('trust-level-3-required')?.value),
@@ -3888,7 +4436,10 @@
                     smtpFrom: document.getElementById('smtp-from')?.value,
                     smtpUser: document.getElementById('smtp-user')?.value,
                     smtpPassword: document.getElementById('smtp-password')?.value,
-                    smtpTls: document.getElementById('smtp-tls')?.checked
+                    smtpTls: document.getElementById('smtp-tls')?.checked,
+                    smtpSenderName: document.getElementById('smtp-sender-name')?.value,
+                    smtpReplyTo: document.getElementById('smtp-reply-to')?.value,
+                    smtpTimeout: parseInt(document.getElementById('smtp-timeout')?.value)
                 };
                 
                 console.log('Отправляемые настройки:', settingsData);
@@ -4041,6 +4592,7 @@
                     'server-description': 'Приватный Minecraft сервер с дружелюбным сообществом',
                     'server-ip': 'play.chiwawa.site',
                     'server-port': '25164',
+                    'max-players': '100',
                     'discord-invite': 'https://discord.gg/chiwawa',
                     'telegram-invite': 'https://t.me/chiwawa',
                     
@@ -4054,6 +4606,9 @@
                     'trust-points-email': '10',
                     'trust-points-discord': '15',
                     'trust-points-hour': '1',
+                    'trust-points-reputation': '2',
+                    'trust-minimum-hours': '5',
+                    'trust-minimum-reputation': '0',
                     'trust-level-1-required': '25',
                     'trust-level-2-required': '100',
                     'trust-level-3-required': '500',
@@ -4069,7 +4624,10 @@
                     'smtp-port': '587',
                     'smtp-from': '',
                     'smtp-user': '',
-                    'smtp-password': ''
+                    'smtp-password': '',
+                    'smtp-sender-name': 'Chiwawa Server',
+                    'smtp-reply-to': '',
+                    'smtp-timeout': '30'
                 };
                 
                 const defaultCheckboxes = {
@@ -4175,6 +4733,7 @@
                     setElementValue('server-description', settings.serverDescription);
                     setElementValue('server-ip', settings.serverIp);
                     setElementValue('server-port', settings.serverPort);
+                    setElementValue('max-players', settings.maxPlayers);
                     setElementValue('discord-invite', settings.discordInvite);
                     setElementValue('telegram-invite', settings.telegramInvite);
                     
@@ -4189,6 +4748,9 @@
                     setElementValue('trust-points-email', settings.trustPointsEmail);
                     setElementValue('trust-points-discord', settings.trustPointsDiscord);
                     setElementValue('trust-points-hour', settings.trustPointsHour);
+                    setElementValue('trust-points-reputation', settings.trustPointsReputation);
+                    setElementValue('trust-minimum-hours', settings.trustMinimumHours);
+                    setElementValue('trust-minimum-reputation', settings.trustMinimumReputation);
                     setElementValue('trust-level-1-required', settings.trustLevel1Required);
                     setElementValue('trust-level-2-required', settings.trustLevel2Required);
                     setElementValue('trust-level-3-required', settings.trustLevel3Required);
@@ -4207,6 +4769,9 @@
                     setElementValue('smtp-user', settings.smtpUser);
                     setElementValue('smtp-password', settings.smtpPassword);
                     setElementChecked('smtp-tls', settings.smtpTls);
+                    setElementValue('smtp-sender-name', settings.smtpSenderName);
+                    setElementValue('smtp-reply-to', settings.smtpReplyTo);
+                    setElementValue('smtp-timeout', settings.smtpTimeout);
                     
                     // Select поля
                     const emailVerificationSelect = document.getElementById('require-email-verification');
@@ -5273,6 +5838,9 @@
             setElementValue('trust-points-email', settings.trustPointsEmail);
             setElementValue('trust-points-discord', settings.trustPointsDiscord);
             setElementValue('trust-points-hour', settings.trustPointsHour);
+            setElementValue('trust-points-reputation', settings.trustPointsReputation);
+            setElementValue('trust-minimum-hours', settings.trustMinimumHours);
+            setElementValue('trust-minimum-reputation', settings.trustMinimumReputation);
             setElementValue('trust-level-1-required', settings.trustLevel1Required);
             setElementValue('trust-level-2-required', settings.trustLevel2Required);
             setElementValue('trust-level-3-required', settings.trustLevel3Required);
@@ -5351,6 +5919,9 @@
                     trustPointsEmail: parseInt(document.getElementById('trust-points-email')?.value),
                     trustPointsDiscord: parseInt(document.getElementById('trust-points-discord')?.value),
                     trustPointsHour: parseInt(document.getElementById('trust-points-hour')?.value),
+                    trustPointsReputation: parseInt(document.getElementById('trust-points-reputation')?.value),
+                    trustMinimumHours: parseInt(document.getElementById('trust-minimum-hours')?.value),
+                    trustMinimumReputation: parseInt(document.getElementById('trust-minimum-reputation')?.value),
                     trustLevel1Required: parseInt(document.getElementById('trust-level-1-required')?.value),
                     trustLevel2Required: parseInt(document.getElementById('trust-level-2-required')?.value),
                     trustLevel3Required: parseInt(document.getElementById('trust-level-3-required')?.value),

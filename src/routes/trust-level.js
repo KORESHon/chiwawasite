@@ -25,9 +25,10 @@ router.post('/apply', [
         
         // Получаем текущие данные пользователя
         const userResult = await db.query(`
-            SELECT u.trust_level, ur.reputation_score, u.total_playtime, u.email_verified
+            SELECT u.trust_level, ur.reputation_score, ps.time_played_minutes as total_playtime, u.is_email_verified as u.is_email_verified
             FROM users u
             LEFT JOIN user_reputation ur ON u.id = ur.user_id
+            LEFT JOIN player_stats ps ON u.id = ps.user_id
             WHERE u.id = $1
         `, [userId]);
         
@@ -61,7 +62,7 @@ router.post('/apply', [
             return res.status(400).json({ error: 'Неверный уровень' });
         }
         
-        if (!user.email_verified && req_level.emailRequired) {
+        if (!user.u.is_email_verified && req_level.emailRequired) {
             return res.status(400).json({ error: 'Необходимо подтвердить email' });
         }
         
@@ -131,7 +132,7 @@ router.get('/applications', authenticateToken, requireRole(['admin', 'moderator'
             JOIN users u ON tla.user_id = u.id
             LEFT JOIN user_reputation ur ON u.id = ur.user_id
             ${whereClause}
-            ORDER BY tla.created_at DESC
+            ORDER BY tla.submitted_at DESC
             LIMIT $1
         `, queryParams);
         
@@ -241,9 +242,10 @@ router.get('/requirements', authenticateToken, async (req, res) => {
         
         // Получаем текущие данные пользователя
         const userResult = await db.query(`
-            SELECT u.trust_level, ur.reputation_score, u.is_email_verified
+            SELECT u.trust_level, ur.reputation_score, u.is_email_verified, ps.time_played_minutes
             FROM users u
             LEFT JOIN user_reputation ur ON u.id = ur.user_id
+            LEFT JOIN player_stats ps ON u.id = ps.user_id
             WHERE u.id = $1
         `, [userId]);
         
@@ -257,8 +259,8 @@ router.get('/requirements', authenticateToken, async (req, res) => {
         const playtime = 0; // Пока нет данных о времени игры, используем 0
         const nextLevel = currentLevel + 1;
         
-        // Максимальный уровень доверия
-        if (currentLevel >= 4) {
+        // Максимальный уровень доверия (Ветеран = 3)
+        if (currentLevel >= 3) {
             return res.json({
                 canApply: false,
                 nextLevel: currentLevel,

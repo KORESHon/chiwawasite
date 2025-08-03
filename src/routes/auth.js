@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const db = require('../../database/connection');
 const { v4: uuidv4 } = require('uuid');
+const fetch = require('node-fetch');
 
 const router = express.Router();
 
@@ -42,6 +43,42 @@ const authenticateToken = async (req, res, next) => {
         next();
     } catch (error) {
         console.error('Ошибка проверки токена:', error);
+        return res.status(403).json({ error: 'Недействительный токен' });
+    }
+};
+
+// Middleware для проверки API токена (для плагинов)
+const authenticateApiToken = async (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ error: 'Токен доступа отсутствует' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        
+        // Для API токенов просто проверяем пользователя в базе
+        const userResult = await db.query(
+            'SELECT * FROM users WHERE id = $1',
+            [decoded.userId]
+        );
+
+        if (userResult.rows.length === 0) {
+            return res.status(401).json({ error: 'Пользователь не найден' });
+        }
+
+        req.user = userResult.rows[0];
+        
+        // Роль уже есть в таблице users
+        if (!req.user.role) {
+            req.user.role = 'user'; // Значение по умолчанию
+        }
+        
+        next();
+    } catch (error) {
+        console.error('Ошибка проверки API токена:', error);
         return res.status(403).json({ error: 'Недействительный токен' });
     }
 };
@@ -149,9 +186,8 @@ router.post('/register', [
         // Создаем начальную статистику игрока
         await db.query(`
             INSERT INTO player_stats (
-                user_id, total_minutes, daily_limit_minutes, is_time_limited,
-                current_level, email_verified, discord_verified, 
-                minecraft_verified, reputation, total_logins, warnings_count
+                user_id, time_played_minutes, is_time_limited,
+                current_level, u.is_email_verified, reputation, total_logins
             ) VALUES ($1, 0, 600, true, 0, false, false, false, 0, 0, 0)
         `, [newUser.id]);
 
@@ -330,7 +366,7 @@ router.post('/logout', authenticateToken, async (req, res) => {
 });
 
 // GET /api/auth/verify - Проверка токена
-router.get('/verify', authenticateToken, async (req, res) => {
+router.get('/verify', authenticateApiToken, async (req, res) => {
     try {
         // Получаем актуальные данные пользователя
         const userResult = await db.query(
@@ -525,13 +561,133 @@ router.get('/discord/callback', async (req, res) => {
 
         const discordUser = await userResponse.json();
         
-        // Здесь нужно связать с авторизованным пользователем
-        // Пока просто перенаправляем с успехом
-        res.redirect(`/profile?discord_linked=${discordUser.username}%23${discordUser.discriminator}`);
+        // Формируем новый Discord username (без дискриминатора, так как Discord его убрал)
+        const discordUsername = discordUser.username;
+        
+        // Временно сохраняем в сессии для связывания с пользователем
+        req.session.pendingDiscordLink = {
+            id: discordUser.id,
+            username: discordUsername,
+            email: discordUser.email,
+            avatar: discordUser.avatar,
+            access_token: tokenData.access_token,
+            refresh_token: tokenData.refresh_token,
+            expires_at: new Date(Date.now() + (tokenData.expires_in * 1000))
+        };
+        
+        res.redirect(`/profile?discord_ready=true&username=${encodeURIComponent(discordUsername)}`);
 
     } catch (error) {
         console.error('Ошибка Discord OAuth:', error);
         res.redirect('/?error=discord_oauth_error');
+    }
+});
+
+// POST /api/auth/link-discord - Привязка Discord аккаунта к профилю
+router.post('/link-discord', authenticateToken, async (req, res) => {
+    try {
+        if (!req.session.pendingDiscordLink) {
+            return res.status(400).json({ 
+                error: 'Нет ожидающей привязки Discord аккаунта. Пройдите авторизацию через Discord заново.' 
+            });
+        }
+
+        const discordData = req.session.pendingDiscordLink;
+
+        // Проверяем, не привязан ли этот Discord к другому пользователю
+        const existingLink = await db.query(`
+            SELECT user_id FROM discord_oauth WHERE discord_id = $1
+        `, [discordData.id]);
+
+        if (existingLink.rows.length > 0 && existingLink.rows[0].user_id !== req.user.id) {
+            return res.status(400).json({
+                error: 'Этот Discord аккаунт уже привязан к другому пользователю'
+            });
+        }
+
+        // Обновляем пользователя
+        await db.query(`
+            UPDATE users 
+            SET discord_username = $1 
+            WHERE id = $2
+        `, [discordData.username, req.user.id]);
+
+        // Сохраняем OAuth данные
+        await db.query(`
+            INSERT INTO discord_oauth (
+                user_id, discord_id, discord_username, discord_avatar,
+                access_token, refresh_token, expires_at
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+            ON CONFLICT (discord_id) 
+            DO UPDATE SET 
+                user_id = $1,
+                discord_username = $3,
+                discord_avatar = $4,
+                access_token = $5,
+                refresh_token = $6,
+                expires_at = $7,
+                updated_at = NOW()
+        `, [
+            req.user.id, 
+            discordData.id, 
+            discordData.username,
+            discordData.avatar,
+            discordData.access_token,
+            discordData.refresh_token,
+            discordData.expires_at
+        ]);
+
+        // Логируем активность
+        await db.query(`
+            INSERT INTO user_activity (user_id, activity_type, description)
+            VALUES ($1, 'discord_linked', $2)
+        `, [req.user.id, `Привязан Discord аккаунт: ${discordData.username}`]);
+
+        // Очищаем временные данные
+        delete req.session.pendingDiscordLink;
+
+        res.json({
+            success: true,
+            message: 'Discord аккаунт успешно привязан',
+            discord_username: discordData.username
+        });
+
+    } catch (error) {
+        console.error('Ошибка привязки Discord:', error);
+        res.status(500).json({ error: 'Ошибка привязки Discord аккаунта' });
+    }
+});
+
+// POST /api/auth/unlink-discord - Отвязка Discord аккаунта
+router.post('/unlink-discord', authenticateToken, async (req, res) => {
+    try {
+        // Удаляем привязку Discord
+        await db.query(`
+            UPDATE users 
+            SET discord_username = NULL 
+            WHERE id = $1
+        `, [req.user.id]);
+
+        // Удаляем OAuth данные
+        await db.query(`
+            DELETE FROM discord_oauth 
+            WHERE user_id = $1
+        `, [req.user.id]);
+
+        // Логируем активность
+        await db.query(`
+            INSERT INTO user_activity (user_id, activity_type, description)
+            VALUES ($1, 'discord_unlinked', 'Отвязан Discord аккаунт')
+        `, [req.user.id]);
+
+        res.json({
+            success: true,
+            message: 'Discord аккаунт успешно отвязан'
+        });
+
+    } catch (error) {
+        console.error('Ошибка отвязки Discord:', error);
+        res.status(500).json({ error: 'Ошибка отвязки Discord аккаунта' });
     }
 });
 
@@ -741,7 +897,336 @@ router.get('/verify-email-token', async (req, res) => {
 });
 
 // Экспорт middleware
+// POST /api/auth/generate-game-token - Генерация токена для входа в игру
+router.post('/generate-game-token', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const userAgent = req.headers['user-agent'] || '';
+        const ipAddress = req.ip || req.connection.remoteAddress;
+
+        // Проверяем, что у пользователя есть доступ к серверу
+        const applicationResult = await db.query(`
+            SELECT status FROM applications 
+            WHERE user_id = $1 AND status = 'approved'
+            ORDER BY submitted_at DESC 
+            LIMIT 1
+        `, [userId]);
+
+        if (applicationResult.rows.length === 0) {
+            return res.status(403).json({ 
+                error: 'У вас нет доступа к серверу. Подайте заявку на доступ.' 
+            });
+        }
+
+        // Генерируем уникальный токен
+        const gameToken = uuidv4() + '-' + Date.now().toString(36);
+        const tokenHash = require('crypto').createHash('sha256').update(gameToken).digest('hex');
+
+        // Время жизни токена - 15 минут
+        const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+        // Деактивируем старые неиспользованные токены пользователя
+        await db.query(`
+            UPDATE game_tokens 
+            SET is_used = true, used_at = NOW() 
+            WHERE user_id = $1 AND is_used = false AND expires_at > NOW()
+        `, [userId]);
+
+        // Создаем новый токен
+        await db.query(`
+            INSERT INTO game_tokens (user_id, token_hash, expires_at, ip_address, user_agent)
+            VALUES ($1, $2, $3, $4, $5)
+        `, [userId, tokenHash, expiresAt, ipAddress, userAgent]);
+
+        res.json({
+            success: true,
+            token: gameToken,
+            expires_at: expiresAt,
+            expires_in: 15 * 60, // секунды
+            message: 'Токен для входа в игру создан. Используйте команду /login ' + gameToken + ' в игре.'
+        });
+
+    } catch (error) {
+        console.error('Ошибка генерации игрового токена:', error);
+        res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    }
+});
+
+// POST /api/auth/verify-game-token - Проверка игрового токена (для плагина)
+router.post('/verify-game-token', authenticateApiToken, async (req, res) => {
+    try {
+        const { token, nickname } = req.body;
+
+        if (!token || !nickname) {
+            return res.status(400).json({ error: 'Токен и никнейм обязательны' });
+        }
+
+        // Хешируем токен для поиска
+        const tokenHash = require('crypto').createHash('sha256').update(token).digest('hex');
+
+        // Ищем токен и проверяем его валидность
+        const tokenResult = await db.query(`
+            SELECT gt.*, u.nickname, u.id as user_id, u.role, u.trust_level, u.is_banned
+            FROM game_tokens gt
+            JOIN users u ON gt.user_id = u.id
+            WHERE gt.token_hash = $1 AND gt.expires_at > NOW() AND gt.is_used = false
+        `, [tokenHash]);
+
+        if (tokenResult.rows.length === 0) {
+            return res.status(401).json({ 
+                error: 'Недействительный или истекший токен',
+                valid: false 
+            });
+        }
+
+        const tokenData = tokenResult.rows[0];
+
+        // Проверяем, что никнейм соответствует владельцу токена
+        if (tokenData.nickname.toLowerCase() !== nickname.toLowerCase()) {
+            return res.status(403).json({ 
+                error: 'Токен не принадлежит данному игроку',
+                valid: false 
+            });
+        }
+
+        // Проверяем, что пользователь не забанен
+        if (tokenData.is_banned) {
+            return res.status(403).json({ 
+                error: 'Пользователь заблокирован',
+                valid: false 
+            });
+        }
+
+        // Отмечаем токен как использованный
+        await db.query(`
+            UPDATE game_tokens 
+            SET is_used = true, used_at = NOW() 
+            WHERE id = $1
+        `, [tokenData.id]);
+
+        res.json({
+            valid: true,
+            user: {
+                id: tokenData.user_id,
+                nickname: tokenData.nickname,
+                role: tokenData.role,
+                trust_level: tokenData.trust_level
+            },
+            message: 'Токен действителен'
+        });
+
+    } catch (error) {
+        console.error('Ошибка проверки игрового токена:', error);
+        res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    }
+});
+
+// GET /api/auth/game-tokens - Получение списка игровых токенов пользователя
+router.get('/game-tokens', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const tokensResult = await db.query(`
+            SELECT id, expires_at, is_used, used_at, created_at, ip_address
+            FROM game_tokens 
+            WHERE user_id = $1 
+            ORDER BY created_at DESC 
+            LIMIT 10
+        `, [userId]);
+
+        res.json({
+            tokens: tokensResult.rows.map(token => ({
+                id: token.id,
+                expires_at: token.expires_at,
+                is_used: token.is_used,
+                used_at: token.used_at,
+                created_at: token.created_at,
+                ip_address: token.ip_address,
+                status: token.is_used ? 'used' : (new Date(token.expires_at) < new Date() ? 'expired' : 'active')
+            }))
+        });
+
+    } catch (error) {
+        console.error('Ошибка получения игровых токенов:', error);
+        res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    }
+});
+
+// POST /api/auth/create-game-session - Создание игровой сессии после авторизации токеном
+router.post('/create-game-session', authenticateApiToken, async (req, res) => {
+    try {
+        const { nickname, player_uuid, ip_address, user_agent } = req.body;
+
+        if (!nickname || !player_uuid || !ip_address) {
+            return res.status(400).json({ error: 'Nickname, player_uuid и ip_address обязательны' });
+        }
+
+        // Найдем пользователя по никнейму
+        const userResult = await db.query(
+            'SELECT id FROM users WHERE nickname = $1',
+            [nickname]
+        );
+
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Пользователь не найден' });
+        }
+
+        const userId = userResult.rows[0].id;
+
+        // Деактивируем старые сессии этого игрока
+        await db.query(`
+            UPDATE game_sessions 
+            SET is_active = false 
+            WHERE user_id = $1 AND player_uuid = $2 AND is_active = true
+        `, [userId, player_uuid]);
+
+        // Создаем новую сессию на 7 дней
+        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+        const sessionResult = await db.query(`
+            INSERT INTO game_sessions (user_id, player_uuid, nickname, expires_at, ip_address, user_agent)
+            VALUES ($1, $2, $3, $4, $5, $6)
+            RETURNING id
+        `, [userId, player_uuid, nickname, expiresAt, ip_address, user_agent]);
+
+        res.json({
+            success: true,
+            session_id: sessionResult.rows[0].id,
+            expires_at: expiresAt,
+            message: 'Игровая сессия создана'
+        });
+
+    } catch (error) {
+        console.error('Ошибка создания игровой сессии:', error);
+        res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    }
+});
+
+// POST /api/auth/check-game-session - Проверка активной игровой сессии
+router.post('/check-game-session', authenticateApiToken, async (req, res) => {
+    try {
+        const { nickname, player_uuid, ip_address } = req.body;
+
+        if (!nickname || !player_uuid || !ip_address) {
+            return res.status(400).json({ error: 'Nickname, player_uuid и ip_address обязательны' });
+        }
+
+        // Ищем активную сессию
+        const sessionResult = await db.query(`
+            SELECT gs.*, u.id as user_id, u.role, u.trust_level, u.is_banned
+            FROM game_sessions gs
+            JOIN users u ON gs.user_id = u.id
+            WHERE gs.nickname = $1 
+            AND gs.player_uuid = $2 
+            AND gs.ip_address = $3 
+            AND gs.is_active = true 
+            AND gs.expires_at > NOW()
+        `, [nickname, player_uuid, ip_address]);
+
+        if (sessionResult.rows.length === 0) {
+            return res.status(404).json({ 
+                session_valid: false,
+                error: 'Активная сессия не найдена' 
+            });
+        }
+
+        const session = sessionResult.rows[0];
+
+        // Проверяем, что пользователь не забанен
+        if (session.is_banned) {
+            return res.status(403).json({ 
+                session_valid: false,
+                error: 'Пользователь заблокирован' 
+            });
+        }
+
+        // Обновляем время последнего входа
+        await db.query(`
+            UPDATE game_sessions 
+            SET last_login = NOW() 
+            WHERE id = $1
+        `, [session.id]);
+
+        res.json({
+            session_valid: true,
+            user: {
+                id: session.user_id,
+                nickname: session.nickname,
+                role: session.role,
+                trust_level: session.trust_level
+            },
+            session: {
+                id: session.id,
+                expires_at: session.expires_at,
+                created_at: session.created_at
+            },
+            message: 'Сессия действительна'
+        });
+
+    } catch (error) {
+        console.error('Ошибка проверки игровой сессии:', error);
+        res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    }
+});
+
+// GET /api/auth/game-sessions - Получение активных игровых сессий пользователя
+router.get('/game-sessions', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const sessionsResult = await db.query(`
+            SELECT id, player_uuid, nickname, expires_at, ip_address, is_active, created_at, last_login
+            FROM game_sessions 
+            WHERE user_id = $1 AND is_active = true
+            ORDER BY last_login DESC 
+            LIMIT 10
+        `, [userId]);
+
+        res.json({
+            sessions: sessionsResult.rows.map(session => ({
+                id: session.id,
+                player_uuid: session.player_uuid,
+                nickname: session.nickname,
+                expires_at: session.expires_at,
+                ip_address: session.ip_address,
+                created_at: session.created_at,
+                last_login: session.last_login,
+                status: new Date(session.expires_at) < new Date() ? 'expired' : 'active'
+            }))
+        });
+
+    } catch (error) {
+        console.error('Ошибка получения игровых сессий:', error);
+        res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    }
+});
+
+// POST /api/auth/terminate-game-sessions - Завершение всех игровых сессий пользователя
+router.post('/terminate-game-sessions', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const result = await db.query(`
+            UPDATE game_sessions 
+            SET is_active = false 
+            WHERE user_id = $1 AND is_active = true
+            RETURNING id
+        `, [userId]);
+
+        res.json({
+            success: true,
+            terminated_sessions: result.rows.length,
+            message: `Завершено сессий: ${result.rows.length}`
+        });
+
+    } catch (error) {
+        console.error('Ошибка завершения игровых сессий:', error);
+        res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    }
+});
+
 router.authenticateToken = authenticateToken;
+router.authenticateApiToken = authenticateApiToken;
 router.requireRole = requireRole;
 
 module.exports = router;

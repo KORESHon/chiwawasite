@@ -62,12 +62,10 @@ class ProfileManager {
 
     renderTrustLevel(level, progress) {
         const trustLevels = [
-            { name: 'Новичок', color: 'yellow', description: 'Начинающий игрок' },
-            { name: 'Игрок', color: 'green', description: 'Освоился на сервере' },
+            { name: 'Проходимец', color: 'gray', description: 'Новый пользователь' },
+            { name: 'Новичок', color: 'yellow', description: 'Подтвержденный email' },
             { name: 'Проверенный', color: 'blue', description: 'Доверенный участник' },
-            { name: 'Ветеран', color: 'purple', description: 'Опытный игрок' },
-            { name: 'Модератор', color: 'orange', description: 'Помощник администрации' },
-            { name: 'Администратор', color: 'red', description: 'Полные права' }
+            { name: 'Ветеран', color: 'purple', description: 'Опытный игрок' }
         ];
 
         const currentLevel = trustLevels[level] || trustLevels[0];
@@ -86,7 +84,7 @@ class ProfileManager {
             <div class="bg-gradient-to-r from-${currentLevel.color}-50 to-${currentLevel.color}-100 border border-${currentLevel.color}-200 rounded-lg p-4">
                 <div class="flex items-center justify-between mb-3">
                     <h4 class="font-semibold text-gray-800">Текущий уровень: ${currentLevel.name}</h4>
-                    <span class="text-sm text-gray-600">Уровень ${level} из 5</span>
+                    <span class="text-sm text-gray-600">Уровень ${level} из 3</span>
                 </div>
                 
                 <div class="space-y-3">

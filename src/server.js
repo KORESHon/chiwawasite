@@ -92,6 +92,11 @@ app.use(express.static(path.join(__dirname, '../public'), {
     maxAge: process.env.NODE_ENV === 'production' ? '1d' : '0'
 }));
 
+// Статические файлы для загрузок (аватары и т.д.)
+app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
+    maxAge: process.env.NODE_ENV === 'production' ? '7d' : '0'
+}));
+
 // Дополнительный маршрут для Tailwind CSS
 app.use('/tailwind_theme', express.static(path.join(__dirname, '../tailwind_theme'), {
     maxAge: process.env.NODE_ENV === 'production' ? '1d' : '0'

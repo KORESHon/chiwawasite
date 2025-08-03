@@ -304,6 +304,41 @@
                 </div>
             </div>
 
+            <!-- Предупреждение о бане -->
+            <div id="ban-warning" class="hidden mb-8">
+                <div class="glass-effect rounded-xl border-2 border-red-500 bg-red-500/10 p-6">
+                    <div class="flex items-start">
+                        <div class="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center mr-4 mt-1">
+                            <i class="fas fa-ban text-red-400 text-xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Аккаунт заблокирован</h3>
+                            <div class="space-y-2">
+                                <div class="flex items-center text-sm">
+                                    <span class="text-gray-300 mr-2">Причина:</span>
+                                    <span id="ban-reason" class="text-white font-medium">-</span>
+                                </div>
+                                <div class="flex items-center text-sm">
+                                    <span class="text-gray-300 mr-2">Тип бана:</span>
+                                    <span id="ban-type" class="text-white font-medium">-</span>
+                                </div>
+                                <div id="ban-time-info" class="flex items-center text-sm">
+                                    <span class="text-gray-300 mr-2">Осталось времени:</span>
+                                    <span id="ban-time-remaining" class="text-minecraft-gold font-medium">-</span>
+                                </div>
+                            </div>
+                            <div class="mt-4 p-3 bg-minecraft-dark/50 rounded-lg border border-red-500/30">
+                                <p class="text-sm text-gray-300">
+                                    <i class="fas fa-info-circle mr-2 text-red-400"></i>
+                                    Пока действует блокировка, вы не можете заходить на сервер Minecraft и пользоваться форумом. 
+                                    Остальные функции сайта доступны.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Быстрая статистика -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <div class="glass-effect rounded-xl shadow-lg p-6 stat-card">
@@ -362,6 +397,9 @@
                         <button class="profile-tab py-4 px-2 border-b-2 border-transparent text-gray-400 hover:text-minecraft-gold transition-all duration-300" data-tab="application">
                             <i class="fas fa-file-alt mr-2"></i>Заявка
                         </button>
+                        <button class="profile-tab py-4 px-2 border-b-2 border-transparent text-gray-400 hover:text-minecraft-gold transition-all duration-300" data-tab="game-token">
+                            <i class="fas fa-key mr-2"></i>Игровой токен
+                        </button>
                         <button class="profile-tab py-4 px-2 border-b-2 border-transparent text-gray-400 hover:text-minecraft-gold transition-all duration-300" data-tab="settings">
                             <i class="fas fa-cog mr-2"></i>Настройки
                         </button>
@@ -401,6 +439,12 @@
                                     </div>
                                     <div class="flex justify-between items-center py-3 border-b border-minecraft-light-gray">
                                         <span class="text-gray-300 flex items-center">
+                                            <i class="fas fa-birthday-cake mr-3 text-minecraft-gold"></i>Возраст:
+                                        </span>
+                                        <span id="profile-age" class="font-medium text-white">Неизвестно</span>
+                                    </div>
+                                    <div class="flex justify-between items-center py-3 border-b border-minecraft-light-gray">
+                                        <span class="text-gray-300 flex items-center">
                                             <i class="fab fa-discord mr-3 text-minecraft-gold"></i>Discord:
                                         </span>
                                         <span id="profile-discord" class="font-medium text-white">Loading...</span>
@@ -416,6 +460,16 @@
                                             <i class="fas fa-calendar mr-3 text-minecraft-gold"></i>Дата регистрации:
                                         </span>
                                         <span id="profile-created" class="font-medium text-white">Loading...</span>
+                                    </div>
+                                    
+                                    <!-- Биография -->
+                                    <div id="profile-bio-section" class="mt-6 pt-6 border-t border-minecraft-light-gray hidden">
+                                        <div class="text-gray-300 mb-2 flex items-center">
+                                            <i class="fas fa-pen mr-2 text-minecraft-gold"></i>О себе:
+                                        </div>
+                                        <div id="profile-bio" class="text-white bg-minecraft-dark/30 rounded-lg p-3 text-sm leading-relaxed">
+                                            Информация не указана
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -645,6 +699,129 @@
                         </div>
                     </div>
 
+                    <!-- Вкладка игрового токена -->
+                    <div id="tab-game-token" class="tab-content hidden">
+                        <div class="space-y-8">
+                            <!-- Текущий токен -->
+                            <div class="glass-effect rounded-xl p-6">
+                                <h3 class="text-xl font-bold text-minecraft-gold mb-6 flex items-center">
+                                    <i class="fas fa-key mr-3"></i>Игровой токен
+                                </h3>
+                                
+                                <div class="mb-6">
+                                    <p class="text-gray-300 mb-4">
+                                        Игровой токен нужен для авторизации на сервере Minecraft. 
+                                        Каждый токен действует 15 минут и может быть использован только один раз.
+                                    </p>
+                                </div>
+
+                                <div id="current-token-section" class="hidden mb-6">
+                                    <div class="bg-minecraft-gray/50 rounded-lg p-4 border border-minecraft-gold/30">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <span class="text-minecraft-gold font-medium">Активный токен:</span>
+                                            <button id="copy-token-btn" class="text-minecraft-gold hover:text-white transition-colors">
+                                                <i class="fas fa-copy mr-1"></i>Копировать
+                                            </button>
+                                        </div>
+                                        <div id="current-token-display" class="font-mono text-sm bg-minecraft-darker p-3 rounded border break-all"></div>
+                                        <div class="flex justify-between text-sm text-gray-400 mt-3">
+                                            <span>Истекает через: <span id="token-expires-in" class="text-minecraft-gold"></span></span>
+                                            <span>Создан: <span id="token-created-at"></span></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-col sm:flex-row gap-4">
+                                    <button id="generate-token-btn" class="bg-gradient-to-r from-minecraft-gold to-yellow-500 text-minecraft-dark px-6 py-3 rounded-lg font-bold hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-minecraft-gold/50 flex items-center justify-center">
+                                        <i class="fas fa-magic mr-2"></i>Сгенерировать токен
+                                    </button>
+                                    <button id="refresh-tokens-btn" class="bg-minecraft-gray text-minecraft-gold px-6 py-3 rounded-lg font-bold hover:bg-minecraft-light-gray transition-all duration-300 border border-minecraft-gold/30 flex items-center justify-center">
+                                        <i class="fas fa-sync mr-2"></i>Обновить
+                                    </button>
+                                    <button id="terminate-sessions-btn" class="bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-700 transition-all duration-300 border border-red-500/30 flex items-center justify-center">
+                                        <i class="fas fa-sign-out-alt mr-2"></i>Завершить все сессии
+                                    </button>
+                                </div>
+
+                                <div id="token-message" class="hidden"></div>
+
+                                <div id="token-loading" class="hidden text-center py-8">
+                                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-minecraft-gold"></div>
+                                    <p class="text-minecraft-gold mt-2">Генерация токена...</p>
+                                </div>
+                            </div>
+
+                            <!-- Инструкции -->
+                            <div class="glass-effect rounded-xl p-6">
+                                <h3 class="text-xl font-bold text-minecraft-gold mb-6 flex items-center">
+                                    <i class="fas fa-info-circle mr-3"></i>Как использовать
+                                </h3>
+                                
+                                <div class="space-y-4">
+                                    <div class="flex items-start">
+                                        <div class="bg-minecraft-gold text-minecraft-dark rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 mt-1 text-sm">1</div>
+                                        <div>
+                                            <p class="text-gray-300">Нажмите кнопку "Сгенерировать токен" выше</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <div class="bg-minecraft-gold text-minecraft-dark rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 mt-1 text-sm">2</div>
+                                        <div>
+                                            <p class="text-gray-300">Скопируйте полученный токен</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <div class="bg-minecraft-gold text-minecraft-dark rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 mt-1 text-sm">3</div>
+                                        <div>
+                                            <p class="text-gray-300">Зайдите на игровой сервер Minecraft</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <div class="bg-minecraft-gold text-minecraft-dark rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 mt-1 text-sm">4</div>
+                                        <div>
+                                            <p class="text-gray-300">Введите команду: <code class="bg-minecraft-darker px-2 py-1 rounded text-minecraft-gold">/login &lt;ваш_токен&gt;</code></p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <div class="bg-minecraft-gold text-minecraft-dark rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 mt-1 text-sm">5</div>
+                                        <div>
+                                            <p class="text-gray-300">Готово! Вы авторизованы на сервере</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-6 p-4 bg-yellow-900/30 border border-yellow-600/50 rounded-lg">
+                                    <div class="flex items-start">
+                                        <i class="fas fa-exclamation-triangle text-yellow-400 mr-3 mt-1"></i>
+                                        <div>
+                                            <p class="text-yellow-200 font-medium mb-2">Важно:</p>
+                                            <ul class="text-yellow-200 text-sm space-y-1">
+                                                <li>• Токен действует только 15 минут</li>
+                                                <li>• Каждый токен можно использовать только один раз</li>
+                                                <li>• Не передавайте токен другим игрокам</li>
+                                                <li>• При каждом новом входе нужен новый токен</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- История токенов -->
+                            <div class="glass-effect rounded-xl p-6">
+                                <h3 class="text-xl font-bold text-minecraft-gold mb-6 flex items-center">
+                                    <i class="fas fa-history mr-3"></i>История токенов
+                                </h3>
+                                
+                                <div id="token-history" class="space-y-3">
+                                    <div class="text-center text-gray-400 py-4">
+                                        <i class="fas fa-clock text-2xl mb-2"></i>
+                                        <p>История токенов загружается...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Вкладка настроек -->
                     <div id="tab-settings" class="tab-content hidden">
                         <div class="space-y-8">
@@ -657,6 +834,31 @@
                                 <div id="settings-message" class="hidden mb-6"></div>
                                 
                                 <form id="personal-settings-form" class="space-y-6">
+                                    <!-- Аватар -->
+                                    <div class="text-center mb-6">
+                                        <div class="flex flex-col items-center space-y-4">
+                                            <div class="relative">
+                                                <img id="current-avatar" src="/assets/images/default-avatar.png" 
+                                                     alt="Аватар" class="w-24 h-24 rounded-full border-4 border-minecraft-gold object-cover">
+                                                <button type="button" id="change-avatar-btn" 
+                                                        class="absolute bottom-0 right-0 bg-minecraft-gold hover:bg-minecraft-yellow p-2 rounded-full transition-colors">
+                                                    <i class="fas fa-camera text-minecraft-dark text-sm"></i>
+                                                </button>
+                                            </div>
+                                            <input type="file" id="avatar-input" accept="image/*" class="hidden">
+                                            <div class="flex gap-2">
+                                                <button type="button" id="upload-avatar-btn" 
+                                                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm">
+                                                    <i class="fas fa-upload mr-1"></i>Загрузить
+                                                </button>
+                                                <button type="button" id="remove-avatar-btn" 
+                                                        class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm">
+                                                    <i class="fas fa-trash mr-1"></i>Удалить
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="grid md:grid-cols-2 gap-6">
                                         <div>
                                             <label class="block text-sm font-medium text-gray-300 mb-2">
@@ -667,6 +869,19 @@
                                                 placeholder="Ваше имя (опционально)">
                                         </div>
                                         <div>
+                                            <label class="block text-sm font-medium text-gray-300 mb-2">
+                                                <i class="fas fa-birthday-cake mr-2 text-minecraft-gold"></i>Возраст
+                                            </label>
+                                            <div class="relative">
+                                                <input type="number" name="age" id="settings-age" min="10" max="100"
+                                                    class="w-full px-4 py-3 bg-minecraft-gray border border-minecraft-light-gray rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-minecraft-gold focus:border-minecraft-gold transition-all duration-300"
+                                                    placeholder="Ваш возраст">
+                                                <div class="text-xs text-gray-500 mt-1">
+                                                    Сохраняется после одобрения заявки
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="md:col-span-2">
                                             <label class="block text-sm font-medium text-gray-300 mb-2">
                                                 <i class="fas fa-gamepad mr-2 text-minecraft-gold"></i>Minecraft ник
                                             </label>
@@ -679,6 +894,20 @@
                                             <p class="text-xs text-gray-500 mt-1">
                                                 Minecraft ник нельзя изменить самостоятельно. Обратитесь к администрации для смены.
                                             </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Биография -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">
+                                            <i class="fas fa-pen mr-2 text-minecraft-gold"></i>О себе
+                                        </label>
+                                        <textarea name="bio" id="settings-bio" rows="4" maxlength="1000"
+                                            class="w-full px-4 py-3 bg-minecraft-gray border border-minecraft-light-gray rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-minecraft-gold focus:border-minecraft-gold transition-all duration-300 resize-none"
+                                            placeholder="Расскажите о себе... (будет отображаться в профиле и на форуме)"></textarea>
+                                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                            <span>Отображается в профиле и на форуме</span>
+                                            <span id="bio-counter">0/1000</span>
                                         </div>
                                     </div>
                                     
@@ -901,6 +1130,12 @@
                         currentUser = userData.user;
                         showProfile();
                         await loadProfileData();
+                        
+                        // Обрабатываем Discord callback
+                        const urlParams = new URLSearchParams(window.location.search);
+                        if (urlParams.get('discord_ready') === 'true') {
+                            await handleDiscordLinkComplete(urlParams.get('username'));
+                        }
                     } else {
                         localStorage.removeItem('auth_token');
                         showNotAuthorized();
@@ -942,6 +1177,12 @@
                 });
             });
 
+            // Copy token button
+            const copyTokenBtn = document.getElementById('copy-token-btn');
+            if (copyTokenBtn) {
+                copyTokenBtn.addEventListener('click', copyCurrentToken);
+            }
+
             // Form submissions
             setupFormHandlers();
             
@@ -973,6 +1214,34 @@
             const securityForm = document.getElementById('security-settings-form');
             if (securityForm) {
                 securityForm.addEventListener('submit', handleSecuritySettings);
+            }
+
+            // Avatar handlers
+            const changeAvatarBtn = document.getElementById('change-avatar-btn');
+            const avatarInput = document.getElementById('avatar-input');
+            const uploadAvatarBtn = document.getElementById('upload-avatar-btn');
+            const removeAvatarBtn = document.getElementById('remove-avatar-btn');
+
+            if (changeAvatarBtn && avatarInput) {
+                changeAvatarBtn.addEventListener('click', () => avatarInput.click());
+                avatarInput.addEventListener('change', handleAvatarSelect);
+            }
+
+            if (uploadAvatarBtn) {
+                uploadAvatarBtn.addEventListener('click', handleAvatarUpload);
+            }
+
+            if (removeAvatarBtn) {
+                removeAvatarBtn.addEventListener('click', handleAvatarRemove);
+            }
+
+            // Bio character counter
+            const bioTextarea = document.getElementById('settings-bio');
+            const bioCounter = document.getElementById('bio-counter');
+            if (bioTextarea && bioCounter) {
+                bioTextarea.addEventListener('input', () => {
+                    bioCounter.textContent = `${bioTextarea.value.length}/1000`;
+                });
             }
 
             // Server access application form
@@ -1012,6 +1281,169 @@
             }
         }
 
+        // Функции для работы с игровыми токенами
+        async function generateGameToken() {
+            const generateBtn = document.getElementById('generate-token-btn');
+            const loading = document.getElementById('token-loading');
+            const currentTokenSection = document.getElementById('current-token-section');
+            
+            generateBtn.style.display = 'none';
+            loading.classList.remove('hidden');
+            
+            try {
+                const response = await fetch('/api/auth/generate-game-token', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('auth_token'),
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('current-token-display').textContent = data.token;
+                    document.getElementById('token-created-at').textContent = new Date(data.expires_at).toLocaleString('ru-RU');
+                    
+                    currentTokenSection.classList.remove('hidden');
+                    
+                    // Обновляем время каждую секунду
+                    let remainingTime = data.expires_in;
+                    const timer = setInterval(() => {
+                        remainingTime--;
+                        if (remainingTime <= 0) {
+                            clearInterval(timer);
+                            document.getElementById('token-expires-in').textContent = 'Истек';
+                            document.getElementById('token-expires-in').className = 'text-red-400';
+                            return;
+                        }
+                        document.getElementById('token-expires-in').textContent = formatTime(remainingTime);
+                    }, 1000);
+                    
+                    // Загружаем историю токенов
+                    loadTokenHistory();
+                    
+                    showMessage('token-message', 'Токен успешно создан! Скопируйте его и используйте в игре.', 'success');
+                } else {
+                    showMessage('token-message', 'Ошибка: ' + data.error, 'error');
+                    generateBtn.style.display = 'block';
+                }
+            } catch (error) {
+                showMessage('token-message', 'Ошибка соединения с сервером', 'error');
+                generateBtn.style.display = 'block';
+            }
+            
+            loading.classList.add('hidden');
+        }
+        
+        function copyCurrentToken() {
+            const tokenDisplay = document.getElementById('current-token-display');
+            const copyBtn = document.getElementById('copy-token-btn');
+            
+            navigator.clipboard.writeText(tokenDisplay.textContent).then(() => {
+                const originalHtml = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check mr-1"></i>Скопировано';
+                copyBtn.className = 'text-green-400 transition-colors';
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHtml;
+                    copyBtn.className = 'text-minecraft-gold hover:text-white transition-colors';
+                }, 2000);
+            });
+        }
+        
+        async function loadTokenHistory() {
+            try {
+                const response = await fetch('/api/auth/game-tokens', {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('auth_token')
+                    }
+                });
+                
+                const data = await response.json();
+                const historyContainer = document.getElementById('token-history');
+                
+                if (data.tokens && data.tokens.length > 0) {
+                    historyContainer.innerHTML = data.tokens.map(token => {
+                        const statusClass = token.status === 'used' ? 'text-green-400' : 
+                                          token.status === 'expired' ? 'text-red-400' : 'text-minecraft-gold';
+                        const statusText = token.status === 'used' ? 'Использован' :
+                                         token.status === 'expired' ? 'Истек' : 'Активен';
+                        
+                        return `
+                            <div class="bg-minecraft-gray/30 rounded-lg p-4 border border-minecraft-gold/20">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <span class="text-sm text-gray-400">ID: ${token.id.slice(0, 8)}...</span>
+                                        <span class="ml-4 ${statusClass} font-medium">${statusText}</span>
+                                    </div>
+                                    <div class="text-sm text-gray-400">
+                                        Создан: ${new Date(token.created_at).toLocaleString('ru-RU')}
+                                    </div>
+                                </div>
+                                ${token.used_at ? `
+                                    <div class="text-sm text-gray-400 mt-2">
+                                        Использован: ${new Date(token.used_at).toLocaleString('ru-RU')}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    historyContainer.innerHTML = `
+                        <div class="text-center text-gray-400 py-4">
+                            <i class="fas fa-clock text-2xl mb-2"></i>
+                            <p>У вас пока нет созданных токенов</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки истории токенов:', error);
+            }
+        }
+
+        async function terminateAllSessions() {
+            if (!confirm('Вы уверены, что хотите завершить все игровые сессии? Это выкинет вас с сервера, если вы сейчас играете.')) {
+                return;
+            }
+
+            const terminateBtn = document.getElementById('terminate-sessions-btn');
+            const originalText = terminateBtn.innerHTML;
+            
+            terminateBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Завершение...';
+            terminateBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/auth/terminate-game-sessions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('auth_token'),
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('token-message', `Успешно завершено сессий: ${data.terminated}`, 'success');
+                } else {
+                    showMessage('token-message', 'Ошибка: ' + data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка завершения сессий:', error);
+                showMessage('token-message', 'Ошибка соединения с сервером', 'error');
+            }
+            
+            terminateBtn.innerHTML = originalText;
+            terminateBtn.disabled = false;
+        }
+        
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
         function switchTab(tabId) {
             // Remove active class from all tabs
             document.querySelectorAll('.profile-tab').forEach(tab => {
@@ -1041,6 +1473,9 @@
             switch(tabId) {
                 case 'application':
                     loadApplicationsData();
+                    break;
+                case 'game-token':
+                    loadTokenHistory();
                     break;
                 case 'stats':
                     loadStatistics();
@@ -1157,10 +1592,34 @@
             document.getElementById('profile-first-name').textContent = data.first_name || 'Не указано';
             document.getElementById('profile-nickname').textContent = displayName;
             document.getElementById('profile-email').textContent = data.email || 'N/A';
+            document.getElementById('profile-age').textContent = data.age || 'Неизвестно';
             document.getElementById('profile-discord').textContent = data.discord || 'Не привязан';
             document.getElementById('profile-role').textContent = getRoleDisplayName(data.role);
             document.getElementById('profile-created').textContent = new Date(data.registered_at).toLocaleDateString('ru-RU');
             document.getElementById('user-created').textContent = new Date(data.registered_at).toLocaleDateString('ru-RU');
+
+            // Avatar
+            const avatarElement = document.getElementById('current-avatar');
+            if (avatarElement) {
+                avatarElement.src = data.avatar_url || '/assets/images/default-avatar.png';
+            }
+
+            // Bio
+            const bioSection = document.getElementById('profile-bio-section');
+            const bioElement = document.getElementById('profile-bio');
+            if (data.bio && data.bio.trim()) {
+                bioSection.classList.remove('hidden');
+                bioElement.textContent = data.bio;
+            } else {
+                bioSection.classList.add('hidden');
+            }
+
+            // Ban info
+            if (data.ban_info && data.is_banned) {
+                showBanWarning(data.ban_info);
+            } else {
+                hideBanWarning();
+            }
 
             // Trust level
             updateTrustLevel(data);
@@ -1185,13 +1644,40 @@
             }
         }
 
+        function showBanWarning(banInfo) {
+            const banWarning = document.getElementById('ban-warning');
+            const reasonElement = document.getElementById('ban-reason');
+            const typeElement = document.getElementById('ban-type');
+            const timeInfo = document.getElementById('ban-time-info');
+            const timeRemaining = document.getElementById('ban-time-remaining');
+
+            banWarning.classList.remove('hidden');
+            reasonElement.textContent = banInfo.reason || 'Не указана';
+            typeElement.textContent = banInfo.is_permanent ? 'Постоянный' : 'Временный';
+
+            if (banInfo.is_permanent) {
+                timeInfo.classList.add('hidden');
+            } else {
+                timeInfo.classList.remove('hidden');
+                if (banInfo.time_remaining && !banInfo.time_remaining.expired) {
+                    timeRemaining.textContent = banInfo.time_remaining.formatted || 'Неизвестно';
+                } else {
+                    timeRemaining.textContent = 'Истекло';
+                }
+            }
+        }
+
+        function hideBanWarning() {
+            const banWarning = document.getElementById('ban-warning');
+            banWarning.classList.add('hidden');
+        }
+
         function updateTrustLevel(data) {
             const trustLevelNames = {
                 0: '🚶 Проходимец',
                 1: '👤 Новичок', 
                 2: '✅ Проверенный',
-                3: '🏆 Ветеран',
-                4: '👑 Легенда'
+                3: '🏆 Ветеран'
             };
             
             const trustLevel = data.trust_level || 0;
@@ -1217,7 +1703,7 @@
             let progressPercent = 0;
             let progressText = '';
             
-            if (trustLevel >= 4) {
+            if (trustLevel >= 3) {
                 progressPercent = 100;
                 progressText = 'Максимальный уровень';
             } else {
@@ -1236,7 +1722,7 @@
             document.getElementById('trust-progress-text').textContent = progressText;
             document.getElementById('trust-reputation').textContent = currentReputation;
             
-            if (trustLevel >= 4) {
+            if (trustLevel >= 3) {
                 document.getElementById('trust-next').textContent = 'Макс. уровень';
             } else {
                 const nextLevel = trustLevel + 1;
@@ -1312,6 +1798,14 @@
         function updateSettingsForms(data) {
             // Personal settings
             document.getElementById('settings-firstname').value = data.first_name || '';
+            document.getElementById('settings-age').value = data.age || '';
+            document.getElementById('settings-bio').value = data.bio || '';
+            
+            // Update bio character counter
+            const bioCounter = document.getElementById('bio-counter');
+            if (bioCounter) {
+                bioCounter.textContent = `${(data.bio || '').length}/1000`;
+            }
             
             // Отображаем никнейм как неизменяемый текст
             const nicknameDisplay = document.getElementById('settings-minecraft-nick-display');
@@ -1643,9 +2137,123 @@
                 window.location.href = '/api/auth/discord';
             } else {
                 if (confirm('Вы уверены, что хотите отвязать Discord аккаунт?')) {
-                    // TODO: Implement Discord disconnect
-                    showMessage('settings-message', 'Отвязка Discord пока не реализована', 'error');
+                    try {
+                        const token = localStorage.getItem('auth_token');
+                        const response = await fetch('/api/auth/unlink-discord', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        if (response.ok) {
+                            showMessage('settings-message', 'Discord аккаунт успешно отвязан', 'success');
+                            await loadProfileData(); // Перезагружаем профиль
+                        } else {
+                            const error = await response.json();
+                            showMessage('settings-message', error.error || 'Ошибка отвязки Discord', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Ошибка отвязки Discord:', error);
+                        showMessage('settings-message', 'Ошибка соединения с сервером', 'error');
+                    }
                 }
+            }
+        }
+
+        // Avatar functions
+        let selectedAvatarFile = null;
+
+        function handleAvatarSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Проверяем размер файла (5MB max)
+            if (file.size > 5 * 1024 * 1024) {
+                showMessage('settings-message', 'Размер файла не должен превышать 5MB', 'error');
+                return;
+            }
+
+            // Проверяем тип файла
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                showMessage('settings-message', 'Разрешены только изображения (JPEG, PNG, GIF, WebP)', 'error');
+                return;
+            }
+
+            selectedAvatarFile = file;
+
+            // Показываем превью
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const avatarElement = document.getElementById('current-avatar');
+                avatarElement.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+
+            showMessage('settings-message', 'Файл выбран. Нажмите "Загрузить" для сохранения.', 'info');
+        }
+
+        async function handleAvatarUpload() {
+            if (!selectedAvatarFile) {
+                showMessage('settings-message', 'Сначала выберите файл', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('avatar', selectedAvatarFile);
+
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch('/api/profile/avatar', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showMessage('settings-message', 'Аватар успешно загружен!', 'success');
+                    selectedAvatarFile = null;
+                    await loadProfileData(); // Перезагружаем профиль
+                } else {
+                    const error = await response.json();
+                    showMessage('settings-message', error.error || 'Ошибка загрузки аватара', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки аватара:', error);
+                showMessage('settings-message', 'Ошибка соединения с сервером', 'error');
+            }
+        }
+
+        async function handleAvatarRemove() {
+            if (!confirm('Вы уверены, что хотите удалить аватар?')) {
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch('/api/profile/avatar', {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    showMessage('settings-message', 'Аватар успешно удален!', 'success');
+                    await loadProfileData(); // Перезагружаем профиль
+                } else {
+                    const error = await response.json();
+                    showMessage('settings-message', error.error || 'Ошибка удаления аватара', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка удаления аватара:', error);
+                showMessage('settings-message', 'Ошибка соединения с сервером', 'error');
             }
         }
 
@@ -2034,53 +2642,177 @@
         }
 
         async function loadStatistics() {
-            await loadAchievements();
-        }
-
-        async function loadAchievements() {
             const token = localStorage.getItem('auth_token');
-            const achievementsContainer = document.getElementById('achievements-list');
             
             try {
-                const response = await fetch('/api/profile/achievements', {
+                // Загружаем детальную статистику
+                const response = await fetch('/api/profile/detailed-stats', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 
                 if (response.ok) {
                     const data = await response.json();
-                    
-                    if (data.achievements && data.achievements.length > 0) {
-                        achievementsContainer.innerHTML = data.achievements.slice(0, 5).map(achievement => `
-                            <div class="flex items-center p-3 bg-minecraft-dark/50 rounded-lg border border-minecraft-light-gray">
-                                <i class="fas fa-trophy text-minecraft-gold mr-3"></i>
-                                <div class="flex-1">
-                                    <div class="font-medium text-white">${achievement.name}</div>
-                                    <div class="text-sm text-gray-400">${achievement.description}</div>
-                                </div>
-                                <div class="text-xs text-gray-400">
-                                    ${new Date(achievement.earned_at).toLocaleDateString('ru-RU')}
-                                </div>
-                            </div>
-                        `).join('');
-                    } else {
-                        achievementsContainer.innerHTML = `
-                            <div class="text-center text-gray-400 py-8">
-                                <i class="fas fa-trophy text-2xl mb-2"></i>
-                                <p>Пока нет достижений</p>
-                                <p class="text-sm mt-1">Играйте на сервере, чтобы получить первые достижения!</p>
-                            </div>
-                        `;
-                    }
+                    updateDetailedStatistics(data);
                 } else {
-                    achievementsContainer.innerHTML = `
-                        <div class="text-center text-gray-400 py-8">
-                            <i class="fas fa-trophy text-2xl mb-2"></i>
-                            <p>Ошибка загрузки достижений</p>
-                        </div>
-                    `;
+                    console.error('Ошибка загрузки статистики:', response.status);
                 }
             } catch (error) {
+                console.error('Ошибка загрузки статистики:', error);
+            }
+            
+            await loadAchievements();
+        }
+
+        function updateDetailedStatistics(data) {
+            const stats = data.stats;
+            
+            // Обновляем основную статистику
+            document.getElementById('stat-total-playtime').textContent = stats.total_playtime_formatted || '0ч 0м';
+            document.getElementById('stat-total-logins').textContent = stats.total_logins || 0;
+            document.getElementById('stat-achievements').textContent = stats.achievements_count || 0;
+            
+            // Последний вход
+            const lastSeenEl = document.getElementById('stat-last-seen');
+            if (stats.last_seen) {
+                const lastSeen = new Date(stats.last_seen);
+                const now = new Date();
+                const diffTime = Math.abs(now - lastSeen);
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (diffDays === 0) {
+                    lastSeenEl.textContent = 'Сегодня';
+                } else if (diffDays === 1) {
+                    lastSeenEl.textContent = 'Вчера';
+                } else {
+                    lastSeenEl.textContent = `${diffDays} дн. назад`;
+                }
+            } else {
+                lastSeenEl.textContent = 'Никогда';
+            }
+            
+            // Детальная игровая статистика
+            document.getElementById('stat-avg-session').textContent = stats.average_session_formatted || '-';
+            document.getElementById('stat-longest-session').textContent = stats.longest_session_formatted || '-';
+            document.getElementById('stat-active-days').textContent = stats.active_days || 0;
+            
+            // Любимое время игры
+            const favoriteHour = stats.favorite_play_hour || 12;
+            document.getElementById('stat-favorite-time').textContent = `${favoriteHour}:00`;
+            
+            // Обновляем дополнительную статистику, если есть соответствующие элементы
+            updateGameplayStats(stats);
+            
+            // Обновляем график активности
+            if (data.activity_chart) {
+                updateActivityChart(data.activity_chart);
+            }
+        }
+
+        function updateGameplayStats(stats) {
+            // Создаем дополнительную статистику если элементы существуют
+            const gameplayStats = [
+                { id: 'blocks-broken', value: stats.blocks_broken || 0, label: 'Блоков сломано' },
+                { id: 'blocks-placed', value: stats.blocks_placed || 0, label: 'Блоков поставлено' },
+                { id: 'distance-walked', value: formatDistance(stats.distance_walked || 0), label: 'Пройдено' },
+                { id: 'mobs-killed', value: stats.mobs_killed || 0, label: 'Мобов убито' },
+                { id: 'deaths-count', value: stats.deaths_count || 0, label: 'Смертей' },
+                { id: 'damage-dealt', value: stats.damage_dealt || 0, label: 'Урона нанесено' }
+            ];
+            
+            // Добавляем детальную игровую статистику к существующей
+            const gameplayContainer = document.querySelector('#tab-stats .space-y-4');
+            if (gameplayContainer && !document.getElementById('gameplay-stats-section')) {
+                const gameplaySection = document.createElement('div');
+                gameplaySection.id = 'gameplay-stats-section';
+                gameplaySection.innerHTML = `
+                    <div class="glass-effect rounded-xl p-6">
+                        <h4 class="text-lg font-bold text-minecraft-gold mb-4 flex items-center">
+                            <i class="fas fa-cubes mr-3"></i>Игровая статистика
+                        </h4>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            ${gameplayStats.map(stat => `
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-white">${stat.value}</div>
+                                    <div class="text-sm text-gray-400">${stat.label}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                
+                gameplayContainer.parentNode.insertBefore(gameplaySection, gameplayContainer.nextSibling);
+            }
+        }
+
+        function formatDistance(blocks) {
+            if (blocks < 1000) return blocks + ' бл.';
+            if (blocks < 1000000) return Math.round(blocks / 1000) + ' км';
+            return Math.round(blocks / 1000000) + ' Мкм';
+        }
+
+        function updateActivityChart(activityData) {
+            const chartContainer = document.getElementById('activity-chart');
+            if (!chartContainer || !activityData.length) {
+                chartContainer.innerHTML = `
+                    <div class="text-center">
+                        <i class="fas fa-chart-bar text-4xl mb-4 text-gray-500"></i>
+                        <p class="text-gray-400">Недостаточно данных для графика</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Простой график активности
+            const maxPlaytime = Math.max(...activityData.map(d => d.playtime_minutes || 0));
+            const chartHTML = `
+                <div class="relative h-full">
+                    <div class="flex items-end justify-between h-48 px-2">
+                        ${activityData.slice(-14).map(day => {
+                            const height = maxPlaytime > 0 ? (day.playtime_minutes || 0) / maxPlaytime * 100 : 0;
+                            const date = new Date(day.stat_date);
+                            return `
+                                <div class="flex flex-col items-center group cursor-pointer">
+                                    <div class="bg-minecraft-gold rounded-t transition-all group-hover:bg-minecraft-yellow" 
+                                         style="height: ${height}%; width: 20px; min-height: 2px;"></div>
+                                    <div class="text-xs text-gray-400 mt-2 transform rotate-45 origin-bottom-left">
+                                        ${date.getDate()}/${date.getMonth() + 1}
+                                    </div>
+                                    <div class="absolute bottom-full mb-2 hidden group-hover:block bg-minecraft-dark p-2 rounded shadow-lg text-sm whitespace-nowrap">
+                                        ${Math.floor((day.playtime_minutes || 0) / 60)}ч ${(day.playtime_minutes || 0) % 60}м
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    <div class="text-center text-gray-400 text-sm mt-4">
+                        Последние 14 дней (время игры в часах)
+                    </div>
+                </div>
+            `;
+            
+            chartContainer.innerHTML = chartHTML;
+        }
+
+        async function loadAchievements() {
+            const achievementsContainer = document.getElementById('achievements-list');
+            
+            try {
+                // Пока система достижений не реализована, показываем заглушку
+                achievementsContainer.innerHTML = `
+                    <div class="text-center text-gray-400 py-8">
+                        <i class="fas fa-trophy text-2xl mb-2"></i>
+                        <p>Система достижений в разработке</p>
+                        <p class="text-sm mt-1">Играйте на сервере, система достижений будет добавлена в будущих обновлениях!</p>
+                    </div>
+                `;
+            } catch (error) {
                 console.error('Ошибка загрузки достижений:', error);
+                achievementsContainer.innerHTML = `
+                    <div class="text-center text-gray-400 py-8">
+                        <i class="fas fa-trophy text-2xl mb-2"></i>
+                        <p>Система достижений в разработке</p>
+                    </div>
+                `;
             }
         }
 
@@ -2110,6 +2842,52 @@
             setTimeout(() => {
                 element.classList.add('hidden');
             }, 5000);
+        }
+
+        // Добавляем обработчики событий для токенов
+        document.addEventListener('DOMContentLoaded', function() {
+            const generateBtn = document.getElementById('generate-token-btn');
+            const refreshBtn = document.getElementById('refresh-tokens-btn');
+            const terminateBtn = document.getElementById('terminate-sessions-btn');
+            
+            if (generateBtn) {
+                generateBtn.addEventListener('click', generateGameToken);
+            }
+            
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', loadTokenHistory);
+            }
+
+            if (terminateBtn) {
+                terminateBtn.addEventListener('click', terminateAllSessions);
+            }
+        });
+
+        async function handleDiscordLinkComplete(username) {
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch('/api/auth/link-discord', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    showMessage('settings-message', `Discord аккаунт ${username} успешно привязан!`, 'success');
+                    await loadProfileData(); // Перезагружаем профиль
+                    
+                    // Очищаем URL от параметров
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                } else {
+                    const error = await response.json();
+                    showMessage('settings-message', error.error || 'Ошибка привязки Discord', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка привязки Discord:', error);
+                showMessage('settings-message', 'Ошибка соединения с сервером', 'error');
+            }
         }
     </script>
 </body>

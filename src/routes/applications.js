@@ -4,7 +4,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const db = require('../../database/connection');
-const { authenticateToken, requireRole } = require('./auth');
+const { authenticateToken, authenticateApiToken, requireRole } = require('./auth');
 const bcrypt = require('bcryptjs');
 
 const router = express.Router();
@@ -12,7 +12,7 @@ const router = express.Router();
 // POST /api/applications - Подача заявки
 router.post('/', [
     body('minecraft_nick').isLength({ min: 3, max: 16 }).matches(/^[a-zA-Z0-9_]+$/),
-    body('age').isIn(['under_16', '16_20', '21_25', '26_30', 'over_30']),
+    body('age').isInt({ min: 10, max: 100 }),
     body('discord').isLength({ min: 3, max: 100 }),
     body('email').isEmail().normalizeEmail(),
     body('experience').isIn(['beginner', 'intermediate', 'advanced', 'expert']),
@@ -372,9 +372,8 @@ async function createUserFromApplication(application) {
             if (existingStats.rows.length === 0) {
                 await db.query(`
                     INSERT INTO player_stats (
-                        user_id, total_minutes, daily_limit_minutes, is_time_limited,
-                        current_level, email_verified, discord_verified, 
-                        minecraft_verified, reputation, total_logins, warnings_count
+                        user_id, time_played_minutes, is_time_limited,
+                        current_level, u.is_email_verified, reputation, total_logins
                     ) VALUES ($1, 0, 600, true, 0, false, false, false, 0, 0, 0)
                 `, [userId]);
             }
@@ -423,9 +422,21 @@ function getStatusText(status) {
 }
 
 // GET /api/applications/server-access - Получение информации о заявке на доступ к серверу
-router.get('/server-access', authenticateToken, async (req, res) => {
+router.get('/server-access', authenticateApiToken, async (req, res) => {
     try {
-        const userId = req.user.id;
+        let userId;
+        
+        // Если передан nickname (для плагина), находим пользователя по никнейму
+        if (req.query.nickname) {
+            const userResult = await db.query('SELECT id FROM users WHERE nickname = $1', [req.query.nickname]);
+            if (userResult.rows.length === 0) {
+                return res.json({ hasAccess: false, application: null });
+            }
+            userId = userResult.rows[0].id;
+        } else {
+            // Иначе используем аутентифицированного пользователя
+            userId = req.user.id;
+        }
         
         // Ищем последнюю заявку пользователя
         const applicationResult = await db.query(`
@@ -536,7 +547,7 @@ router.get('/trust-level', authenticateToken, async (req, res) => {
         const applicationResult = await db.query(`
             SELECT * FROM trust_level_applications 
             WHERE user_id = $1 
-            ORDER BY created_at DESC 
+            ORDER BY submitted_at DESC 
             LIMIT 1
         `, [userId]);
         
@@ -600,7 +611,7 @@ router.post('/trust-level', [
         // Создаем заявку (объединяем motivation и plans в поле reason)
         const result = await db.query(`
             INSERT INTO trust_level_applications 
-            (user_id, current_level, requested_level, reason, reputation_score, hours_played, email_verified)
+            (user_id, current_level, requested_level, reason, reputation_score, hours_played, u.is_email_verified)
             VALUES ($1, $2, $3, $4, $5, $6, $7)
             RETURNING id
         `, [userId, currentLevel, requestedLevel, `Мотивация: ${motivation}\n\nПланы: ${plans}`, reputation, 0, user.is_email_verified || false]);

@@ -18,6 +18,7 @@ const createTransporter = () => {
 // Функция получения шаблона из базы данных
 const getEmailTemplate = async (id) => {
     try {
+        console.log(`🔍 Получение шаблона email с ID: ${id}`);
         const result = await db.query(`
             SELECT template_subject, template_html, template_variables FROM email_templates WHERE id = $1
         `, [id]);
@@ -26,25 +27,31 @@ const getEmailTemplate = async (id) => {
             throw new Error(`Email template with ID '${id}' not found`);
         }
 
+        const row = result.rows[0];
+        console.log(`📋 Найден шаблон: subject=${!!row.template_subject}, html=${!!row.template_html}`);
+
         // template_variables может быть строкой (CSV) или JSON-массивом
         let variables = [];
-        if (result.rows[0].template_variables) {
+        if (row.template_variables) {
             try {
-                if (result.rows[0].template_variables.trim().startsWith('[')) {
-                    variables = JSON.parse(result.rows[0].template_variables);
+                if (row.template_variables.trim().startsWith('[')) {
+                    variables = JSON.parse(row.template_variables);
                 } else {
-                    variables = result.rows[0].template_variables.split(',').map(v => v.trim());
+                    variables = row.template_variables.split(',').map(v => v.trim());
                 }
             } catch (e) {
                 variables = [];
             }
         }
 
-        return {
-            subject: result.rows[0].template_subject,
-            html: result.rows[0].template_html,
+        const template = {
+            subject: row.template_subject,
+            html: row.template_html,
             variables: variables
         };
+
+        console.log(`✅ Шаблон загружен: переменных=${variables.length}`);
+        return template;
     } catch (error) {
         console.error('Ошибка получения шаблона email:', error);
         throw error;
@@ -53,6 +60,11 @@ const getEmailTemplate = async (id) => {
 
 // Функция замены переменных в шаблоне
 const replaceTemplateVariables = (template, variables) => {
+    if (!template) {
+        console.error('Template is undefined or null');
+        return '';
+    }
+    
     let result = template;
     
     for (const [key, value] of Object.entries(variables)) {
@@ -126,6 +138,11 @@ const sendEmail = async (to, id, customVariables = {}) => {
             if (missing.length > 0) {
                 console.warn(`⚠️ Не переданы переменные для шаблона: ${missing.join(', ')}`);
             }
+        }
+
+        // Проверяем, что шаблон содержит необходимые поля
+        if (!template.subject || !template.html) {
+            throw new Error(`Шаблон '${id}' имеет неполные данные: subject=${!!template.subject}, html=${!!template.html}`);
         }
 
         // Заменяем переменные в шаблоне
