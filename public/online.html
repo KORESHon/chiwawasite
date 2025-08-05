@@ -53,18 +53,59 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
-                    <a href="/" class="text-2xl font-bold text-minecraft-yellow text-shadow">Chiwawa</a>
+                    <a href="/" class="text-2xl font-bold text-minecraft-yellow text-shadow" id="server-name">Chiwawa</a>
                 </div>
+                <!-- Центральная часть - основные кнопки -->
                 <div class="flex items-center space-x-6">
-                    <a href="/" class="text-white hover:text-minecraft-gold transition-colors text-shadow">Главная</a>
-                    <a href="/rules" class="text-white hover:text-minecraft-gold transition-colors text-shadow">Правила</a>
-                    <a href="/online" class="text-minecraft-gold font-medium text-shadow">Онлайн</a>
-                    <a href="/map" target="_blank" class="text-white hover:text-minecraft-gold transition-colors text-shadow">Карта</a>
+                    <a href="/" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Главная</a>
+                    <a href="/rules" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Правила</a>
+                    <a href="/forum" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Форум</a>
+                    <a href="/online" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Онлайн</a>
+                    <a href="http://play.chiwawa.site:25773" target="_blank" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Карта</a>
                 </div>
-                <div class="flex items-center">
-                    <a href="/" class="text-minecraft-gold hover:text-minecraft-yellow transition-colors">
-                        <i class="fas fa-arrow-left mr-2"></i>Назад
+                <!-- Правая часть - социальные сети и профиль -->
+                <div class="flex items-center space-x-4">
+                    <!-- Социальные сети -->
+                    <div class="flex items-center space-x-2">
+                        <a id="discord-link" href="https://discord.gg/chiwawa" target="_blank" class="text-gray-400 hover:text-purple-400 transition-colors text-lg" title="Discord">
+                            <i class="fab fa-discord"></i>
+                        </a>
+                        <a id="telegram-link" href="https://t.me/chiwawa" target="_blank" class="text-gray-400 hover:text-blue-400 transition-colors text-lg" title="Telegram">
+                            <i class="fab fa-telegram"></i>
+                        </a>
+                    </div>
+                    
+                    <!-- Разделитель -->
+                    <div class="h-6 w-px bg-minecraft-gold/30"></div>
+                    
+                    <!-- Кнопка входа (для неавторизованных) -->
+                    <a href="/login" id="login-btn" class="nav-item bg-gradient-to-r from-minecraft-gray to-minecraft-light-gray text-minecraft-gold px-6 py-2 rounded-lg border border-minecraft-gold/30 hover:bg-gradient-to-r hover:from-minecraft-gold hover:to-minecraft-yellow hover:text-minecraft-dark transition-all duration-300 font-medium shadow-lg">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Войти
                     </a>
+                    
+                    <!-- Профиль пользователя (для авторизованных) -->
+                    <div id="user-profile" class="relative nav-item hidden bg-gradient-to-r from-minecraft-gold to-yellow-500 text-minecraft-dark px-4 py-2 rounded-lg font-bold hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-minecraft-gold/50 cursor-pointer">
+                        <button id="profile-dropdown-btn" class="flex items-center space-x-2">
+                            <div class="w-8 h-8 bg-minecraft-dark rounded-full overflow-hidden border-2 border-minecraft-gold">
+                                <img id="navbar-avatar" src="/assets/images/default-avatar.png" alt="Аватар" class="w-full h-full object-cover">
+                            </div>
+                            <span id="user-nickname" class="font-medium">Player</span>
+                            <i class="fas fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        
+                        <!-- Dropdown меню -->
+                        <div id="profile-dropdown" class="absolute top-full right-0 mt-2 w-48 bg-minecraft-gray rounded-lg shadow-xl border border-minecraft-gold/30 hidden">
+                            <a href="/profile" class="block px-4 py-3 text-minecraft-gold hover:bg-minecraft-light-gray transition-colors border-b border-minecraft-gold/20">
+                                <i class="fas fa-user-circle mr-2 text-minecraft-gold"></i>Личный кабинет
+                            </a>
+                            <a href="/admin" id="admin-dropdown-link" class="block px-4 py-3 text-white hover:bg-minecraft-light-gray transition-colors border-b border-minecraft-gold/20 hidden">
+                                <i class="fas fa-crown mr-2 text-minecraft-gold"></i>Админ панель
+                            </a>
+                            <button id="logout-btn" class="w-full text-left px-4 py-3 text-red-400 hover:bg-minecraft-light-gray transition-colors">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Выйти
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -81,7 +122,7 @@
         </div>
 
         <!-- Статистика сервера -->
-        <div class="grid md:grid-cols-3 gap-6 mb-8">
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div class="glass-effect rounded-xl p-6 text-center">
                 <div class="text-3xl font-bold text-minecraft-gold mb-2" id="online-count">Загрузка...</div>
                 <div class="text-gray-300">Игроков онлайн</div>
@@ -93,6 +134,26 @@
             <div class="glass-effect rounded-xl p-6 text-center">
                 <div class="text-3xl font-bold text-blue-400 mb-2" id="server-version">Загрузка...</div>
                 <div class="text-gray-300">Версия</div>
+            </div>
+            <div class="glass-effect rounded-xl p-6 text-center">
+                <div class="text-3xl font-bold text-purple-400 mb-2" id="server-tps">Загрузка...</div>
+                <div class="text-gray-300">TPS</div>
+            </div>
+        </div>
+
+        <!-- Дополнительная информация о производительности -->
+        <div class="grid md:grid-cols-3 gap-6 mb-8">
+            <div class="glass-effect rounded-xl p-6 text-center">
+                <div class="text-2xl font-bold text-orange-400 mb-2" id="server-ping">Загрузка...</div>
+                <div class="text-gray-300">Пинг (мс)</div>
+            </div>
+            <div class="glass-effect rounded-xl p-6 text-center">
+                <div class="text-2xl font-bold text-cyan-400 mb-2" id="server-players-max">Загрузка...</div>
+                <div class="text-gray-300">Максимум игроков</div>
+            </div>
+            <div class="glass-effect rounded-xl p-6 text-center">
+                <div class="text-2xl font-bold text-yellow-400 mb-2" id="server-uptime">Загрузка...</div>
+                <div class="text-gray-300">Время работы</div>
             </div>
         </div>
 
@@ -138,58 +199,270 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Информация -->
-        <div class="glass-effect rounded-xl p-6 mt-8">
-            <h3 class="text-xl font-semibold text-minecraft-yellow mb-4">
-                <i class="fas fa-info-circle mr-2"></i>
-                Информация
-            </h3>
-            <div class="grid md:grid-cols-2 gap-6 text-gray-300">
+    <!-- Футер -->
+    <footer class="mt-16 glass-effect rounded-t-xl">
+        <div class="container mx-auto px-6 py-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <!-- О проекте -->
                 <div>
-                    <h4 class="font-medium text-white mb-2">IP сервера:</h4>
-                    <code class="bg-minecraft-gray px-3 py-1 rounded text-minecraft-gold" id="server-ip">play.chiwawa.site</code>
+                    <h3 class="text-lg font-semibold text-minecraft-yellow mb-4">ChiwawaMine</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Приватный Minecraft сервер с дружелюбным сообществом и уникальными возможностями.
+                    </p>
                 </div>
+                
+                <!-- Навигация -->
                 <div>
-                    <h4 class="font-medium text-white mb-2">Порт:</h4>
-                    <code class="bg-minecraft-gray px-3 py-1 rounded text-minecraft-gold" id="server-port">25164</code>
+                    <h3 class="text-lg font-semibold text-minecraft-yellow mb-4">Навигация</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/" class="text-gray-400 hover:text-minecraft-gold transition-colors">Главная</a></li>
+                        <li><a href="/online" class="text-gray-400 hover:text-minecraft-gold transition-colors">Онлайн</a></li>
+                        <li><a href="/forum" class="text-gray-400 hover:text-minecraft-gold transition-colors">Форум</a></li>
+                        <li><a href="/profile" class="text-gray-400 hover:text-minecraft-gold transition-colors">Профиль</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Сообщество -->
+                <div>
+                    <h3 class="text-lg font-semibold text-minecraft-yellow mb-4">Сообщество</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" id="footer-discord" class="text-gray-400 hover:text-minecraft-gold transition-colors"><i class="fab fa-discord mr-2"></i>Discord</a></li>
+                        <li><a href="#" id="footer-telegram" class="text-gray-400 hover:text-minecraft-gold transition-colors"><i class="fab fa-telegram mr-2"></i>Telegram</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Контакты -->
+                <div>
+                    <h3 class="text-lg font-semibold text-minecraft-yellow mb-4">Подключение</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="text-gray-400">
+                            <span class="text-white">IP:</span> 
+                            <code class="bg-minecraft-gray px-2 py-1 rounded text-minecraft-gold" id="footer-server-ip">loading...</code>
+                        </div>
+                        <div class="text-gray-400">
+                            <span class="text-white">Версия:</span> 
+                            <span id="footer-server-version">loading...</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <p class="text-sm text-gray-400 mt-4">
-                <i class="fas fa-clock mr-2"></i>
-                Данные обновляются каждые 30 секунд
-            </p>
+            
+            <div class="border-t border-minecraft-gold/20 mt-8 pt-6 text-center text-sm text-gray-400">
+                <p>&copy; 2025 ChiwawaMine. Создано с ❤️ для сообщества</p>
+            </div>
         </div>
-    </div>
+    </footer>
 
     <script>
         let allPlayers = [];
 
+        // Проверка авторизации пользователя
+        async function checkAuth() {
+            const token = localStorage.getItem('auth_token');
+            
+            if (!token) {
+                showNotAuthorized();
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/verify', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const userData = await response.json();
+                    showAuthorized(userData.user);
+                } else {
+                    localStorage.removeItem('auth_token');
+                    showNotAuthorized();
+                }
+            } catch (error) {
+                console.error('Ошибка проверки авторизации:', error);
+                showNotAuthorized();
+            }
+        }
+
+        function showAuthorized(user) {
+            const loginBtn = document.getElementById('login-btn');
+            const userProfile = document.getElementById('user-profile');
+            const navUsername = document.getElementById('user-nickname');
+            const navUserAvatar = document.getElementById('navbar-avatar');
+            
+            if (loginBtn) loginBtn.classList.add('hidden');
+            if (userProfile) userProfile.classList.remove('hidden');
+            if (navUsername) navUsername.textContent = user.nickname;
+            
+            // Показываем админ-панель если нужно
+            if (['admin', 'moderator'].includes(user.role)) {
+                const adminDropdownLink = document.getElementById('admin-dropdown-link');
+                if (adminDropdownLink) adminDropdownLink.classList.remove('hidden');
+            }
+            
+            // Устанавливаем аватар
+            if (navUserAvatar) {
+                if (user.avatar_url) {
+                    navUserAvatar.src = user.avatar_url;
+                } else {
+                    navUserAvatar.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="%23228B22"/><rect x="8" y="8" width="48" height="48" fill="%2332CD32"/><rect x="20" y="20" width="8" height="8" fill="%23000"/><rect x="36" y="20" width="8" height="8" fill="%23000"/><rect x="24" y="36" width="16" height="4" fill="%23000"/></svg>`;
+                }
+            }
+        }
+
+        function showNotAuthorized() {
+            const loginBtn = document.getElementById('login-btn');
+            const userProfile = document.getElementById('user-profile');
+            
+            if (loginBtn) loginBtn.classList.remove('hidden');
+            if (userProfile) userProfile.classList.add('hidden');
+        }
+
+        // Выпадающее меню профиля
+        function initProfileDropdown() {
+            const dropdownBtn = document.getElementById('profile-dropdown-btn');
+            const dropdown = document.getElementById('profile-dropdown');
+            const logoutBtn = document.getElementById('logout-btn');
+            
+            if (dropdownBtn && dropdown) {
+                dropdownBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    dropdown.classList.toggle('hidden');
+                });
+
+                // Закрываем меню при клике вне его
+                document.addEventListener('click', () => {
+                    dropdown.classList.add('hidden');
+                });
+            }
+            
+            // Обработчик кнопки выхода
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    logout();
+                });
+            }
+        }
+
+        // Выход из системы
+        function logout() {
+            localStorage.removeItem('auth_token');
+            window.location.reload();
+        }
+
+        // Загрузка настроек сервера
+        async function loadServerSettings() {
+            try {
+                const response = await fetch('/api/settings/public');
+                if (response.ok) {
+                    const settings = await response.json();
+                    updateServerUI(settings);
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки настроек сервера:', error);
+            }
+        }
+
+        function updateServerUI(settings) {
+            // Обновляем название сервера в навигации
+            const serverNameElement = document.getElementById('server-name');
+            if (serverNameElement && settings.serverName) {
+                serverNameElement.textContent = settings.serverName;
+                document.title = `Онлайн - ${settings.serverName}`;
+            }
+            
+            // Обновляем футер
+            if (settings.discordInvite) {
+                document.getElementById('footer-discord').href = settings.discordInvite;
+            }
+            if (settings.telegramInvite) {
+                document.getElementById('footer-telegram').href = settings.telegramInvite;
+            }
+            if (settings.serverIp) {
+                document.getElementById('footer-server-ip').textContent = settings.serverIp;
+            }
+        }
+
         // Загрузка данных о сервере
         async function loadServerData() {
             try {
-                const response = await fetch('/api/server-info');
+                const response = await fetch('/api/settings/server-info');
                 const data = await response.json();
                 
-                // Обновляем статистику
-                document.getElementById('online-count').textContent = data.players?.online || 0;
-                document.getElementById('server-status').textContent = data.status === 'online' ? 'Онлайн' : 'Оффлайн';
-                document.getElementById('server-version').textContent = data.version || '1.20+';
+                // Проверяем статус сервера
+                const isOnline = data.status === 'online' && data.online === true;
                 
-                // Обновляем IP и порт
-                document.getElementById('server-ip').textContent = data.ip || 'play.chiwawa.site';
-                document.getElementById('server-port').textContent = data.port || '25164';
+                // Обновляем основную статистику
+                document.getElementById('online-count').textContent = isOnline ? (data.players?.online || 0) : 0;
+                document.getElementById('server-status').textContent = isOnline ? 'Онлайн' : 'Оффлайн';
+                document.getElementById('server-version').textContent = isOnline ? (data.server?.version || 'Unknown') : 'Оффлайн';
+                
+                // Обновляем производительность (только если сервер онлайн)
+                const tps = isOnline ? (data.performance?.tps || null) : null;
+                const tpsElement = document.getElementById('server-tps');
+                
+                if (tps === null || tps === undefined) {
+                    tpsElement.textContent = 'N/A';
+                    tpsElement.className = 'text-3xl font-bold text-gray-400 mb-2';
+                } else {
+                    tpsElement.textContent = tps.toFixed(1);
+                    // Меняем цвет TPS в зависимости от значения
+                    if (tps >= 19) {
+                        tpsElement.className = 'text-3xl font-bold text-green-400 mb-2';
+                    } else if (tps >= 15) {
+                        tpsElement.className = 'text-3xl font-bold text-yellow-400 mb-2';
+                    } else {
+                        tpsElement.className = 'text-3xl font-bold text-red-400 mb-2';
+                    }
+                }
+                
+                const ping = isOnline ? (data.performance?.ping || 0) : 0;
+                document.getElementById('server-ping').textContent = ping;
+                document.getElementById('server-players-max').textContent = data.players?.max || 50;
+                
+                // Uptime - форматируем uptime_seconds в читаемый вид
+                const uptimeSeconds = isOnline && data.performance?.uptime_seconds ? data.performance.uptime_seconds : null;
+                let uptimeText = 'N/A';
+                
+                if (uptimeSeconds !== null && uptimeSeconds > 0) {
+                    const days = Math.floor(uptimeSeconds / 86400);
+                    const hours = Math.floor((uptimeSeconds % 86400) / 3600);
+                    const minutes = Math.floor((uptimeSeconds % 3600) / 60);
+                    
+                    if (days > 0) {
+                        uptimeText = `${days}д ${hours}ч ${minutes}м`;
+                    } else if (hours > 0) {
+                        uptimeText = `${hours}ч ${minutes}м`;
+                    } else {
+                        uptimeText = `${minutes}м`;
+                    }
+                }
+                
+                document.getElementById('server-uptime').textContent = uptimeText;
+                
+                // Обновляем футер
+                document.getElementById('footer-server-version').textContent = isOnline ? (data.server?.version || 'Unknown') : 'Оффлайн';
 
-                // Обновляем список игроков
-                updatePlayersList(data.players?.list || []);
+                // Обновляем список игроков (только если сервер онлайн)
+                updatePlayersList(isOnline ? (data.players?.list || []) : []);
                 
             } catch (error) {
                 console.error('Ошибка загрузки данных сервера:', error);
-                document.getElementById('online-count').textContent = '0';
-                document.getElementById('server-status').textContent = 'Оффлайн';
-                document.getElementById('server-version').textContent = 'N/A';
-                updatePlayersList([]);
+                showOfflineStatus();
             }
+        }
+
+        function showOfflineStatus() {
+            document.getElementById('online-count').textContent = '0';
+            document.getElementById('server-status').textContent = 'Оффлайн';
+            document.getElementById('server-version').textContent = 'N/A';
+            document.getElementById('server-tps').textContent = 'N/A';
+            document.getElementById('server-ping').textContent = '0';
+            document.getElementById('server-uptime').textContent = 'N/A';
+            updatePlayersList([]);
         }
 
         // Обновление списка игроков
@@ -219,13 +492,17 @@
             const nickname = player.name || player.nickname || 'Неизвестный';
             const playTime = formatPlayTime(player.playtime || 0);
             const trustLevel = getTrustLevelInfo(player.trust_level || 0);
+            const sessionTime = getSessionTime(player.session_start);
             
             return `
                 <div class="bg-minecraft-gray border border-minecraft-gold/20 rounded-lg p-4 hover:border-minecraft-gold/50 transition-all">
                     <div class="flex items-center space-x-4">
                         <div class="w-12 h-12 player-avatar rounded-lg border-2 border-minecraft-gold/30"></div>
                         <div class="flex-1">
-                            <h3 class="font-bold text-white">${nickname}</h3>
+                            <h3 class="font-bold text-white flex items-center">
+                                ${nickname}
+                                ${getRoleBadge(player.role)}
+                            </h3>
                             <div class="flex items-center space-x-2 text-sm text-gray-400">
                                 <span class="flex items-center">
                                     <i class="fas fa-clock mr-1"></i>
@@ -234,13 +511,40 @@
                                 <span class="text-minecraft-gold">•</span>
                                 <span class="${trustLevel.color}">${trustLevel.name}</span>
                             </div>
+                            <div class="text-xs text-gray-500 mt-1">
+                                В сети: ${sessionTime}
+                            </div>
                         </div>
                         <div class="text-green-400">
-                            <i class="fas fa-circle text-xs"></i>
+                            <i class="fas fa-circle text-xs animate-pulse"></i>
                         </div>
                     </div>
                 </div>
             `;
+        }
+
+        // Получение бейджа роли
+        function getRoleBadge(role) {
+            const badges = {
+                'admin': '<span class="ml-2 px-2 py-1 text-xs bg-red-500 text-white rounded">ADMIN</span>',
+                'moderator': '<span class="ml-2 px-2 py-1 text-xs bg-blue-500 text-white rounded">MOD</span>',
+                'helper': '<span class="ml-2 px-2 py-1 text-xs bg-green-500 text-white rounded">HELPER</span>'
+            };
+            return badges[role] || '';
+        }
+
+        // Время сессии
+        function getSessionTime(sessionStart) {
+            if (!sessionStart) return 'Неизвестно';
+            
+            const start = new Date(sessionStart);
+            const now = new Date();
+            const diff = Math.floor((now - start) / 1000 / 60); // минуты
+            
+            if (diff < 60) return `${diff} мин`;
+            const hours = Math.floor(diff / 60);
+            const minutes = diff % 60;
+            return `${hours}ч ${minutes}м`;
         }
 
         // Форматирование времени игры
@@ -258,7 +562,8 @@
                 0: { name: 'Проходимец', color: 'text-gray-400' },
                 1: { name: 'Новичок', color: 'text-blue-400' },
                 2: { name: 'Проверенный', color: 'text-green-400' },
-                3: { name: 'Ветеран', color: 'text-minecraft-gold' }
+                3: { name: 'Ветеран', color: 'text-minecraft-gold' },
+                4: { name: 'Легенда', color: 'text-purple-400' }
             };
             return levels[level] || levels[0];
         }
@@ -297,11 +602,14 @@
 
         // Инициализация
         document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadServerSettings();
             loadServerData();
             setupSearch();
+            initProfileDropdown();
             
-            // Обновляем данные каждые 30 секунд
-            setInterval(loadServerData, 30000);
+            // Обновляем данные каждые 15 секунд
+            setInterval(loadServerData, 15000);
         });
     </script>
 </body>

@@ -48,14 +48,17 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
-                    <a href="/" class="text-2xl font-bold text-minecraft-yellow text-shadow">Chiwawa</a>
+                    <a href="/" class="text-2xl font-bold text-minecraft-yellow text-shadow" id="server-name">Chiwawa</a>
                 </div>
+                <!-- Центральная часть - основные кнопки -->
                 <div class="flex items-center space-x-6">
-                    <a href="/" class="text-white hover:text-minecraft-gold transition-colors text-shadow">Главная</a>
-                    <a href="/rules" class="text-minecraft-gold font-medium text-shadow">Правила</a>
-                    <a href="/online" class="text-white hover:text-minecraft-gold transition-colors text-shadow">Онлайн</a>
-                    <a href="/map" target="_blank" class="text-white hover:text-minecraft-gold transition-colors text-shadow">Карта</a>
+                    <a href="/" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Главная</a>
+                    <a href="/rules" class="nav-item text-minecraft-gold font-medium text-shadow">Правила</a>
+                    <a href="/forum" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Форум</a>
+                    <a href="/online" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Онлайн</a>
+                    <a href="http://play.chiwawa.site:25773" target="_blank" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Карта</a>
                 </div>
+                <!-- Правая часть - кнопка назад -->
                 <div class="flex items-center">
                     <a href="/" class="text-minecraft-gold hover:text-minecraft-yellow transition-colors">
                         <i class="fas fa-arrow-left mr-2"></i>Назад
@@ -67,132 +70,113 @@
 
     <!-- Основной контент -->
     <div class="max-w-4xl mx-auto px-4 py-8">
-        <div class="glass-effect rounded-xl p-8 shadow-2xl">
-            <div class="text-center mb-8">
+        <div class="glass-effect rounded-xl p-8 shadow-2xl text-center">
+            <!-- Иконка и заголовок -->
+            <div class="mb-8">
+                <div class="w-24 h-24 mx-auto mb-6 bg-minecraft-gold/20 rounded-full flex items-center justify-center">
+                    <i class="fas fa-construction text-5xl text-minecraft-gold"></i>
+                </div>
                 <h1 class="text-4xl font-bold text-minecraft-gold mb-4 text-shadow">
-                    <i class="fas fa-scroll mr-3"></i>Правила сервера
+                    Страница в разработке
                 </h1>
-                <p class="text-gray-300 text-lg">Пожалуйста, внимательно ознакомьтесь с правилами нашего сервера</p>
+                <p class="text-gray-300 text-lg">Правила сервера временно перемещены в раздел форума</p>
             </div>
 
-            <!-- Основные правила -->
-            <div class="space-y-6">
-                <div class="glass-effect rounded-lg p-6">
-                    <h2 class="text-2xl font-semibold text-minecraft-yellow mb-4 flex items-center">
-                        <i class="fas fa-exclamation-triangle mr-3 text-red-400"></i>
-                        Основные правила
-                    </h2>
-                    <ul class="space-y-3 text-gray-300">
-                        <li class="flex items-start">
-                            <span class="text-minecraft-gold mr-3 font-bold">1.</span>
-                            <span>Запрещено использование читов, модов, дающих преимущество, и любых программ для автоматизации игрового процесса.</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-minecraft-gold mr-3 font-bold">2.</span>
-                            <span>Запрещены оскорбления, мат, флуд, спам, реклама других серверов и ресурсов.</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-minecraft-gold mr-3 font-bold">3.</span>
-                            <span>Запрещено гриферство - уничтожение и порча чужих построек без разрешения владельца.</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-minecraft-gold mr-3 font-bold">4.</span>
-                            <span>Запрещена кража предметов из чужих сундуков, ящиков и других хранилищ.</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-minecraft-gold mr-3 font-bold">5.</span>
-                            <span>Запрещено создание ловушек для игроков с целью убийства или кражи предметов.</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-minecraft-gold mr-3 font-bold">6.</span>
-                            <span>Уважайте других игроков и их творчество. Будьте дружелюбны и помогайте новичкам.</span>
-                        </li>
-                    </ul>
+            <!-- Информационное сообщение -->
+            <div class="bg-minecraft-gray/50 border border-minecraft-gold/30 rounded-lg p-6 mb-8">
+                <div class="flex items-center justify-center text-minecraft-yellow mb-4">
+                    <i class="fas fa-info-circle text-2xl mr-3"></i>
+                    <span class="text-xl font-semibold">Временное решение</span>
                 </div>
+                <p class="text-gray-300 leading-relaxed mb-4">
+                    Мы работаем над улучшением структуры сайта. Правила сервера временно размещены в разделе форума, 
+                    где они будут более удобными для обсуждения и обновления.
+                </p>
+                <p class="text-gray-400 text-sm">
+                    В ближайшее время правила будут интегрированы в основную структуру сайта с улучшенным дизайном и функциональностью.
+                </p>
+            </div>
 
-                <!-- Правила строительства -->
-                <div class="glass-effect rounded-lg p-6">
-                    <h2 class="text-2xl font-semibold text-minecraft-yellow mb-4 flex items-center">
-                        <i class="fas fa-hammer mr-3 text-minecraft-gold"></i>
-                        Правила строительства
-                    </h2>
-                    <ul class="space-y-3 text-gray-300">
-                        <li class="flex items-start">
-                            <span class="text-minecraft-gold mr-3 font-bold">•</span>
-                            <span>Стройте красиво и аккуратно. Избегайте создания уродливых построек из грязи, булыжника и других некрасивых блоков.</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-minecraft-gold mr-3 font-bold">•</span>
-                            <span>Не стройте слишком близко к чужим постройкам без разрешения владельца.</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-minecraft-gold mr-3 font-bold">•</span>
-                            <span>Запрещено строительство лагающих механизмов и ферм, создающих большую нагрузку на сервер.</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-minecraft-gold mr-3 font-bold">•</span>
-                            <span>Не создавайте постройки, содержащие неприемлемый контент (18+, политика, экстремизм).</span>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Система наказаний -->
-                <div class="glass-effect rounded-lg p-6">
-                    <h2 class="text-2xl font-semibold text-minecraft-yellow mb-4 flex items-center">
-                        <i class="fas fa-gavel mr-3 text-red-400"></i>
-                        Система наказаний
-                    </h2>
-                    <div class="space-y-4 text-gray-300">
-                        <div class="flex items-start">
-                            <span class="text-yellow-400 mr-3 font-bold">Предупреждение:</span>
-                            <span>Выдается за небольшие нарушения. 3 предупреждения = временный бан на 1 день.</span>
-                        </div>
-                        <div class="flex items-start">
-                            <span class="text-orange-400 mr-3 font-bold">Мут:</span>
-                            <span>Запрет на использование чата от 10 минут до 7 дней за нарушения в чате.</span>
-                        </div>
-                        <div class="flex items-start">
-                            <span class="text-red-400 mr-3 font-bold">Временный бан:</span>
-                            <span>Запрет входа на сервер от 1 дня до 30 дней за серьезные нарушения.</span>
-                        </div>
-                        <div class="flex items-start">
-                            <span class="text-red-600 mr-3 font-bold">Перманентный бан:</span>
-                            <span>Полный запрет доступа к серверу за критические нарушения (читы, серьезный гриф).</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Контакты -->
-                <div class="glass-effect rounded-lg p-6 text-center">
-                    <h2 class="text-2xl font-semibold text-minecraft-yellow mb-4">
-                        <i class="fas fa-phone mr-3"></i>Связь с администрацией
-                    </h2>
-                    <p class="text-gray-300 mb-4">
-                        Если у вас есть вопросы или вы столкнулись с нарушениями, обращайтесь к администрации:
-                    </p>
-                    <div class="flex justify-center space-x-6">
-                        <a href="/profile" class="bg-minecraft-gold text-minecraft-dark px-6 py-2 rounded-lg font-bold hover:bg-minecraft-yellow transition-colors">
-                            <i class="fas fa-ticket-alt mr-2"></i>Подать жалобу
-                        </a>
-                        <a href="#" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors">
-                            <i class="fab fa-discord mr-2"></i>Discord
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Важная информация -->
-                <div class="bg-red-900/30 border border-red-400/50 rounded-lg p-6">
-                    <h3 class="text-xl font-semibold text-red-400 mb-3 flex items-center">
-                        <i class="fas fa-info-circle mr-3"></i>
-                        Важно знать
-                    </h3>
-                    <p class="text-gray-300">
-                        Незнание правил не освобождает от ответственности. Администрация имеет право изменять правила 
-                        и применять наказания по своему усмотрению. Решения администрации окончательны и обжалованию не подлежат.
-                    </p>
+            <!-- Кнопки действий -->
+            <div class="space-y-4">
+                <a href="/forum" 
+                   class="inline-block bg-gradient-to-r from-minecraft-gold to-minecraft-yellow text-minecraft-dark px-8 py-4 rounded-lg font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-minecraft-gold/50">
+                    <i class="fas fa-comments mr-3"></i>
+                    Перейти к правилам на форуме
+                </a>
+                
+                <div class="flex justify-center space-x-4 mt-6">
+                    <a href="/" 
+                       class="bg-minecraft-gray text-white px-6 py-3 rounded-lg font-medium hover:bg-minecraft-light-gray transition-colors">
+                        <i class="fas fa-home mr-2"></i>На главную
+                    </a>
+                    <a href="/online" 
+                       class="bg-minecraft-gray text-white px-6 py-3 rounded-lg font-medium hover:bg-minecraft-light-gray transition-colors">
+                        <i class="fas fa-users mr-2"></i>Онлайн игроки
+                    </a>
                 </div>
             </div>
+
+            <!-- Заметка для разработчика -->
+            <!-- 
+                ===== ИНФОРМАЦИЯ ДЛЯ РАЗРАБОТЧИКА =====
+                
+                Эта страница является временной заглушкой для раздела "Правила".
+                
+                ЗАДАЧА: Заменить эту заглушку на полноценную страницу правил
+                
+                КАК ЗАМЕНИТЬ:
+                1. Откройте файл: z:\!Others\chiwawasite\public\rules.html
+                2. Замените весь контент между тегами <body> на новую разметку правил
+                3. Используйте существующую структуру навигации (не меняйте <nav>)
+                4. Сохраните общий стиль с minecraft-тематикой и стеклянными эффектами
+                
+                СТРУКТУРА ПРАВИЛ ДОЛЖНА ВКЛЮЧАТЬ:
+                - Основные правила сервера (поведение, читы, гриф)
+                - Правила строительства
+                - Правила чата
+                - Система наказаний (предупреждения, баны, муты)
+                - Контактная информация администрации
+                - Процедура подачи жалоб
+                
+                СТИЛИСТИЧЕСКИЕ ТРЕБОВАНИЯ:
+                - Используйте классы minecraft-gold, minecraft-yellow для акцентов
+                - Применяйте glass-effect для блоков контента  
+                - Добавляйте иконки Font Awesome для лучшей визуализации
+                - Сохраните адаптивность для мобильных устройств
+                
+                ТЕХНИЧЕСКИЕ МОМЕНТЫ:
+                - Убедитесь что навигация обновляет активную ссылку
+                - Добавьте мета-теги для SEO если необходимо
+                - Проверьте работу всех ссылок после замены
+                
+                После замены удалите этот комментарий-заметку.
+            -->
         </div>
     </div>
+
+    <script>
+        // Загрузка настроек сервера для обновления названия
+        async function loadServerSettings() {
+            try {
+                const response = await fetch('/api/settings/public');
+                if (response.ok) {
+                    const settings = await response.json();
+                    const serverNameElement = document.getElementById('server-name');
+                    if (serverNameElement && settings.serverName) {
+                        serverNameElement.textContent = settings.serverName;
+                        document.title = `Правила - ${settings.serverName}`;
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки настроек сервера:', error);
+            }
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            loadServerSettings();
+        });
+    </script>
 </body>
 </html>

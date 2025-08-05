@@ -454,7 +454,7 @@
                     <a href="/rules" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Правила</a>
                     <a href="/forum" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Форум</a>
                     <a href="/online" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Онлайн</a>
-                    <a href="/map" target="_blank" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Карта</a>
+                    <a href="http://play.chiwawa.site:25773" target="_blank" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Карта</a>
                 </div>
                 
                 <!-- Правая часть - социальные сети и профиль -->
@@ -475,8 +475,8 @@
                     <!-- Профиль администратора -->
                     <div class="relative">
                         <button id="profile-dropdown-btn" class="nav-item bg-gradient-to-r from-minecraft-gold to-yellow-500 text-minecraft-dark px-4 py-2 rounded-lg font-bold hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-minecraft-gold/50 cursor-pointer flex items-center space-x-2">
-                            <div class="w-8 h-8 bg-minecraft-dark rounded-full flex items-center justify-center">
-                                <i class="fas fa-user text-minecraft-gold text-sm"></i>
+                            <div class="w-8 h-8 bg-minecraft-dark rounded-full overflow-hidden border-2 border-minecraft-gold">
+                                <img id="navbar-avatar" src="/assets/images/default-avatar.png" alt="Аватар" class="w-full h-full object-cover">
                             </div>
                             <span id="admin-nickname" class="font-medium">ebluffy</span>
                             <span class="ml-2 px-2 py-1 bg-red-500/80 text-white text-xs font-bold rounded-full border border-red-500/40">
@@ -2536,6 +2536,13 @@
                     const adminNickname = document.getElementById('admin-nickname');
                     if (adminNickname && userData.user) {
                         adminNickname.textContent = userData.user.nickname || userData.user.email || 'Admin';
+                    }
+                    
+                    // Обновляем аватарку админа
+                    const navbarAvatar = document.getElementById('navbar-avatar');
+                    if (navbarAvatar && userData.user) {
+                        navbarAvatar.src = userData.user.avatar_url || '/assets/images/default-avatar.png';
+                        navbarAvatar.alt = `Аватар ${userData.user.nickname || 'админа'}`;
                     }
                     
                     // Проверяем права администратора
@@ -6124,36 +6131,49 @@
             switch(blockType) {
                 case 'header':
                     blockHtml = `
-                        <div style="background: #f8b500; color: white; padding: 20px; text-align: center; margin-bottom: 20px;">
-                            <h1 style="margin: 0; font-size: 24px;">{{serverName}}</h1>
+                        <div style="background: linear-gradient(90deg, #f8b500 0%, #ffde85 100%); color: #1e293b; padding: 24px 10px; text-align: center; margin-bottom: 28px; border-radius: 10px; box-shadow: 0 2px 8px 0 rgba(248,181,0,0.08);">
+                            <h1 style="margin: 0; font-size: 28px; font-weight: bold; letter-spacing: 1px;">{{serverName}}</h1>
                         </div>
                     `;
                     break;
                 case 'button':
                     blockHtml = `
-                        <div style="text-align: center; margin: 20px 0;">
-                            <a href="#" style="display: inline-block; background: #f8b500; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Кнопка действия</a>
+                        <div style="text-align: center; margin: 28px 0;">
+                            <a href="#" style="display: inline-block; background: linear-gradient(90deg, #f8b500 0%, #ffde85 100%); color: #1e293b; padding: 14px 32px; text-decoration: none; border-radius: 7px; font-weight: bold; font-size: 16px; box-shadow: 0 1px 6px 0 rgba(248,181,0,0.10); transition: background 0.3s;">
+                                Кнопка действия
+                            </a>
                         </div>
                     `;
                     break;
                 case 'separator':
                     blockHtml = `
-                        <hr style="border: none; border-top: 2px solid #f8b500; margin: 30px 0;">
+                        <hr style="
+                            border: none;
+                            height: 3px;
+                            margin: 40px 0;
+                            background: linear-gradient(90deg, #f8b500 0%, #fffbe6 50%, #f8b500 100%);
+                            border-radius: 2px;
+                            box-shadow: 0 1px 4px 0 rgba(248,181,0,0.15);
+                        ">
                     `;
                     break;
                 case 'footer':
                     blockHtml = `
-                        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #666; font-size: 12px;">
-                            <p>С уважением, команда {{serverName}}</p>
-                            <p>Это письмо отправлено автоматически, пожалуйста, не отвечайте на него.</p>
+                        <div style="margin-top: 48px; padding-top: 22px; border-top: 1px solid #e5e7eb; text-align: center; color: #64748b; font-size: 13px; background: rgba(248,181,0,0.04); border-radius: 0 0 10px 10px;">
+                            <p style="margin: 4px 0 2px 0;">С уважением, команда <b>{{serverName}}</b></p>
+                            <p style="margin: 0; opacity: 0.7;">Это письмо отправлено автоматически, пожалуйста, не отвечайте на него.</p>
                         </div>
                     `;
                     break;
                 case 'social':
                     blockHtml = `
-                        <div style="text-align: center; margin: 20px 0;">
-                            <a href="{{discordInvite}}" style="margin: 0 10px; color: #5865F2; text-decoration: none;">Discord</a>
-                            <a href="{{telegramInvite}}" style="margin: 0 10px; color: #0088cc; text-decoration: none;">Telegram</a>
+                        <div style="text-align: center; margin: 24px 0;">
+                            <a href="{{discordInvite}}" style="margin: 0 14px; color: #5865F2; text-decoration: none; font-weight: bold; font-size: 15px;">
+                                <span style="vertical-align:middle;">💬</span> Discord
+                            </a>
+                            <a href="{{telegramInvite}}" style="margin: 0 14px; color: #0088cc; text-decoration: none; font-weight: bold; font-size: 15px;">
+                                <span style="vertical-align:middle;">📱</span> Telegram
+                            </a>
                         </div>
                     `;
                     break;

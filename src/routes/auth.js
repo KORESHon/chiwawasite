@@ -83,6 +83,92 @@ const authenticateApiToken = async (req, res, next) => {
     }
 };
 
+// Middleware для проверки долгосрочных API токенов (для плагинов и внешних приложений)
+const authenticateLongTermApiToken = async (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    let token = authHeader && authHeader.split(' ')[1];
+
+    // Также проверяем заголовок X-API-Key
+    if (!token) {
+        token = req.headers['x-api-key'];
+    }
+
+    if (!token) {
+        return res.status(401).json({ error: 'API токен отсутствует' });
+    }
+
+    try {
+        // Сначала пытаемся проверить как долгосрочный API токен
+        const crypto = require('crypto');
+        const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+        
+        const apiTokenResult = await db.query(`
+            SELECT at.*, u.* 
+            FROM api_tokens at
+            JOIN users u ON at.user_id = u.id
+            WHERE at.token_hash = $1 
+                AND at.is_active = true 
+                AND (at.expires_at IS NULL OR at.expires_at > NOW())
+        `, [tokenHash]);
+
+        if (apiTokenResult.rows.length > 0) {
+            // Найден долгосрочный API токен
+            const tokenData = apiTokenResult.rows[0];
+            
+            // Обновляем время последнего использования
+            await db.query(
+                'UPDATE api_tokens SET last_used_at = NOW() WHERE id = $1',
+                [tokenData.id]
+            );
+
+            req.user = {
+                id: tokenData.user_id,
+                nickname: tokenData.nickname,
+                email: tokenData.email,
+                role: tokenData.role || 'user',
+                trust_level: tokenData.trust_level
+            };
+            
+            req.apiToken = {
+                id: tokenData.id,
+                name: tokenData.token_name,
+                permissions: tokenData.permissions || []
+            };
+            
+            return next();
+        }
+
+        // Если не долгосрочный токен, пытаемся проверить как JWT
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            
+            const userResult = await db.query(
+                'SELECT * FROM users WHERE id = $1',
+                [decoded.userId]
+            );
+
+            if (userResult.rows.length === 0) {
+                return res.status(401).json({ error: 'Пользователь не найден' });
+            }
+
+            req.user = userResult.rows[0];
+            
+            if (!req.user.role) {
+                req.user.role = 'user';
+            }
+            
+            return next();
+        } catch (jwtError) {
+            // JWT токен тоже невалидный
+            console.error('Ошибка проверки токена:', jwtError.message);
+            return res.status(403).json({ error: 'Недействительный токен' });
+        }
+    } catch (error) {
+        console.error('Ошибка проверки API токена:', error);
+        return res.status(403).json({ error: 'Недействительный токен' });
+    }
+};
+
 // Middleware для проверки роли
 const requireRole = (roles) => {
     return (req, res, next) => {
@@ -953,7 +1039,7 @@ router.post('/generate-game-token', authenticateToken, async (req, res) => {
 });
 
 // POST /api/auth/verify-game-token - Проверка игрового токена (для плагина)
-router.post('/verify-game-token', authenticateApiToken, async (req, res) => {
+router.post('/verify-game-token', authenticateLongTermApiToken, async (req, res) => {
     try {
         const { token, nickname } = req.body;
 
@@ -1053,7 +1139,7 @@ router.get('/game-tokens', authenticateToken, async (req, res) => {
 });
 
 // POST /api/auth/create-game-session - Создание игровой сессии после авторизации токеном
-router.post('/create-game-session', authenticateApiToken, async (req, res) => {
+router.post('/create-game-session', authenticateLongTermApiToken, async (req, res) => {
     try {
         const { nickname, player_uuid, ip_address, user_agent } = req.body;
 
@@ -1103,7 +1189,7 @@ router.post('/create-game-session', authenticateApiToken, async (req, res) => {
 });
 
 // POST /api/auth/check-game-session - Проверка активной игровой сессии
-router.post('/check-game-session', authenticateApiToken, async (req, res) => {
+router.post('/check-game-session', authenticateLongTermApiToken, async (req, res) => {
     try {
         const { nickname, player_uuid, ip_address } = req.body;
 
@@ -1227,6 +1313,7 @@ router.post('/terminate-game-sessions', authenticateToken, async (req, res) => {
 
 router.authenticateToken = authenticateToken;
 router.authenticateApiToken = authenticateApiToken;
+router.authenticateLongTermApiToken = authenticateLongTermApiToken;
 router.requireRole = requireRole;
 
 module.exports = router;

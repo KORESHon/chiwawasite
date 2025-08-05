@@ -4,7 +4,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const db = require('../../database/connection');
-const { authenticateToken, authenticateApiToken, requireRole } = require('./auth');
+const { authenticateToken, authenticateApiToken, authenticateLongTermApiToken, requireRole } = require('./auth');
 const bcrypt = require('bcryptjs');
 
 const router = express.Router();
@@ -89,7 +89,7 @@ const safeDeleteUser = async (userId, adminId, reason) => {
 };
 
 // GET /api/admin/users - Управление пользователями
-router.get('/users', authenticateApiToken, requireRole(['admin']), async (req, res) => {
+router.get('/users', authenticateLongTermApiToken, requireRole(['admin']), async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 50;
@@ -617,7 +617,7 @@ router.get('/stats', authenticateToken, requireRole(['admin', 'moderator']), asy
 });
 
 // PUT /api/admin/users/:id/playtime - Обновить время игры (для плагина)
-router.put('/users/:id/playtime', authenticateApiToken, requireRole(['admin']), async (req, res) => {
+router.put('/users/:id/playtime', authenticateLongTermApiToken, requireRole(['admin']), async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
         const { playtime_minutes } = req.body;
@@ -649,7 +649,7 @@ router.put('/users/:id/playtime', authenticateApiToken, requireRole(['admin']), 
 });
 
 // GET /api/admin/users/:id/stats - Получить статистику игрока (для плагина)
-router.get('/users/:id/stats', authenticateApiToken, requireRole(['admin']), async (req, res) => {
+router.get('/users/:id/stats', authenticateLongTermApiToken, requireRole(['admin']), async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
 
@@ -694,7 +694,7 @@ router.get('/users/:id/stats', authenticateApiToken, requireRole(['admin']), asy
 });
 
 // POST /api/admin/user-activity - Записать активность игрока (для плагина)
-router.post('/user-activity', authenticateApiToken, requireRole(['admin']), async (req, res) => {
+router.post('/user-activity', authenticateLongTermApiToken, requireRole(['admin']), async (req, res) => {
     try {
         const { user_id, activity_type, description, metadata } = req.body;
 
@@ -1344,102 +1344,7 @@ router.post('/settings', [
     }
 });
 
-// POST /api/admin/test-email-template - Тестирование email шаблона
-router.post('/test-email-template', [
-    authenticateToken,
-    requireRole(['admin']),
-    body('html').notEmpty().withMessage('HTML шаблон обязателен'),
-    body('subject').notEmpty().withMessage('Тема письма обязательна'),
-    body('testEmail').optional().isEmail().withMessage('Некорректный email для тестирования')
-], async (req, res) => {
-    try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({
-                error: 'Ошибка валидации',
-                details: errors.array()
-            });
-        }
 
-        const { html, subject, testEmail } = req.body;
-        const recipientEmail = testEmail || req.user.email;
-
-        // Получаем настройки сервера для замены переменных
-        const settingsResult = await db.query(`
-            SELECT setting_key, setting_value 
-            FROM server_settings 
-            WHERE setting_key IN ('server-name', 'server-ip', 'discord-invite', 'telegram-invite')
-        `);
-
-        const serverSettings = {};
-        settingsResult.rows.forEach(row => {
-            // Теперь не используем JSON.parse, поскольку данные сохраняются как обычные строки
-            serverSettings[row.setting_key] = row.setting_value;
-        });
-
-        // Подготавливаем переменные для замены
-        const templateVars = {
-            username: req.user.nickname || req.user.email.split('@')[0],
-            email: recipientEmail,
-            serverName: serverSettings.server_name || 'ChiwawaMine',
-            serverIP: serverSettings.server_ip || 'play.chiwawa.site',
-            discordLink: serverSettings.discord_invite || 'https://discord.gg/chiwawa',
-            telegramLink: serverSettings.telegram_invite || 'https://t.me/chiwawa',
-            verificationLink: 'https://chiwawa.site/verify?token=TEST_TOKEN',
-            resetLink: 'https://chiwawa.site/reset?token=TEST_TOKEN',
-            currentDate: new Date().toLocaleDateString('ru-RU'),
-            unsubscribeLink: 'https://chiwawa.site/unsubscribe?token=TEST_TOKEN',
-            rejectionReason: 'Тестовая причина для демонстрации',
-            newsletterTitle: 'Тестовые новости',
-            newsTitle1: 'Первая новость',
-            newsContent1: 'Содержание первой новости для тестирования шаблона.',
-            newsTitle2: 'Вторая новость',
-            newsContent2: 'Содержание второй новости для тестирования шаблона.',
-            serverLink: `https://chiwawa.site`
-        };
-
-        // Заменяем переменные в HTML и теме
-        let processedHtml = html;
-        let processedSubject = subject;
-
-        Object.entries(templateVars).forEach(([key, value]) => {
-            const regex = new RegExp(`{{${key}}}`, 'g');
-            processedHtml = processedHtml.replace(regex, value);
-            processedSubject = processedSubject.replace(regex, value);
-        });
-
-        // TODO: Здесь должна быть отправка email через nodemailer
-        // Пока что симулируем успешную отправку
-        console.log(`📧 Тестовое письмо:\nКому: ${recipientEmail}\nТема: ${processedSubject}\nHTML длина: ${processedHtml.length} символов`);
-
-        // Логируем действие
-        await db.query(`
-            INSERT INTO admin_logs (admin_id, action, details)
-            VALUES ($1, $2, $3)
-        `, [
-            req.user.id,
-            'email_template_tested',
-            `Тестирование email шаблона на адрес: ${recipientEmail}`
-        ]);
-
-        res.json({
-            success: true,
-            message: `✅ Тестовое письмо успешно отправлено на ${recipientEmail}`,
-            details: {
-                recipient: recipientEmail,
-                subject: processedSubject,
-                htmlLength: processedHtml.length,
-                variablesReplaced: Object.keys(templateVars).length
-            }
-        });
-
-    } catch (error) {
-        console.error('Ошибка тестирования email шаблона:', error);
-        res.status(500).json({
-            error: 'Ошибка при тестировании email шаблона'
-        });
-    }
-});
 
 // POST /api/admin/email-templates - Сохранить email шаблон
 router.post('/email-templates', [
@@ -1655,11 +1560,11 @@ router.post('/test-email-with-template', [
             trustLevel: targetUser ? targetUser.trust_level : 0,
             joinDate: targetUser ? new Date(targetUser.registered_at).toLocaleDateString('ru-RU') : new Date().toLocaleDateString('ru-RU'),
             
-            // Специальные переменные для разных типов писем
-            verificationLink: `https://${getSetting('server-ip', 'chiwawa.site')}/verify/${Math.random().toString(36).substring(7)}`,
-            resetLink: `https://${getSetting('server-ip', 'chiwawa.site')}/reset/${Math.random().toString(36).substring(7)}`,
-            unsubscribeLink: `https://${getSetting('server-ip', 'chiwawa.site')}/unsubscribe/${Math.random().toString(36).substring(7)}`,
-            serverLink: `https://${getSetting('server-ip', 'chiwawa.site')}`,
+            // Специальные переменные для разных типов писем (используем текущий хост)
+            verificationLink: `${req.protocol}://${req.get('host')}/verify/${Math.random().toString(36).substring(7)}`,
+            resetLink: `${req.protocol}://${req.get('host')}/reset/${Math.random().toString(36).substring(7)}`,
+            unsubscribeLink: `${req.protocol}://${req.get('host')}/unsubscribe/${Math.random().toString(36).substring(7)}`,
+            serverLink: `${req.protocol}://${req.get('host')}`,
 
             // Переменные для заявок
             rejectionReason: 'Пример причины отклонения для демонстрации',
@@ -1764,9 +1669,9 @@ router.post('/test-email-with-template', [
         // Проверяем подключение
         await transporter.verify();
 
-        // Отправляем письмо
+        // Отправляем письмо (используем user как from для совместимости с Yandex)
         await transporter.sendMail({
-            from: `"${emailConfig.senderName || 'ChiwawaMine'}" <${emailConfig.from || emailConfig.user}>`,
+            from: `"${emailConfig.senderName || 'ChiwawaMine'}" <${emailConfig.user}>`,
             to: finalEmail,
             subject: processedSubject,
             html: processedHtml
@@ -2404,6 +2309,245 @@ router.get('/system-info', authenticateToken, requireRole(['admin']), async (req
     } catch (error) {
         console.error('Ошибка получения системной информации:', error);
         res.status(500).json({ error: 'Ошибка получения системной информации' });
+    }
+});
+
+// ===========================================
+// API ТОКЕНЫ ДЛЯ ПЛАГИНОВ И ВНЕШНИХ ПРИЛОЖЕНИЙ
+// ===========================================
+
+// GET /api/admin/api-tokens - Получить список API токенов
+router.get('/api-tokens', authenticateToken, requireRole(['admin']), async (req, res) => {
+    try {
+        const result = await db.query(`
+            SELECT 
+                at.id,
+                at.token_name,
+                at.token_prefix,
+                at.permissions,
+                at.is_active,
+                at.last_used_at,
+                at.expires_at,
+                at.created_at,
+                at.description,
+                u.nickname as created_by_name
+            FROM api_tokens at
+            LEFT JOIN users u ON at.created_by = u.id
+            ORDER BY at.created_at DESC
+        `);
+
+        res.json({
+            tokens: result.rows.map(token => ({
+                ...token,
+                permissions: token.permissions || []
+            }))
+        });
+    } catch (error) {
+        console.error('Ошибка получения API токенов:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+// POST /api/admin/api-tokens - Создать новый API токен
+router.post('/api-tokens', authenticateToken, requireRole(['admin']), async (req, res) => {
+    try {
+        const { name, description, permissions = [], expiresInDays = null, userId = null } = req.body;
+
+        if (!name || name.trim().length === 0) {
+            return res.status(400).json({ error: 'Название токена обязательно' });
+        }
+
+        // Генерируем случайный токен
+        const crypto = require('crypto');
+        const tokenLength = 64;
+        const rawToken = crypto.randomBytes(tokenLength).toString('hex');
+        const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+        const tokenPrefix = rawToken.substring(0, 8);
+
+        // Вычисляем дату истечения
+        let expiresAt = null;
+        if (expiresInDays && expiresInDays > 0) {
+            expiresAt = new Date();
+            expiresAt.setDate(expiresAt.getDate() + expiresInDays);
+        }
+
+        // Определяем пользователя для токена (по умолчанию - создатель)
+        const targetUserId = userId || req.user.id;
+
+        // Создаем токен в базе данных
+        const result = await db.query(`
+            INSERT INTO api_tokens (
+                token_name, token_hash, token_prefix, user_id, 
+                permissions, expires_at, created_by, description
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            RETURNING id, token_name, token_prefix, created_at
+        `, [
+            name.trim(),
+            tokenHash,
+            tokenPrefix,
+            targetUserId,
+            JSON.stringify(permissions),
+            expiresAt,
+            req.user.id,
+            description?.trim() || null
+        ]);
+
+        // Логируем создание токена
+        await db.query(
+            'INSERT INTO admin_logs (admin_id, action, details) VALUES ($1, $2, $3)',
+            [req.user.id, 'api_token_created', `Создан API токен: ${name}`]
+        );
+
+        res.json({
+            success: true,
+            message: 'API токен создан успешно',
+            token: {
+                id: result.rows[0].id,
+                name: result.rows[0].token_name,
+                prefix: result.rows[0].token_prefix,
+                created_at: result.rows[0].created_at,
+                // ВАЖНО: возвращаем полный токен только при создании!
+                full_token: rawToken
+            }
+        });
+
+    } catch (error) {
+        console.error('Ошибка создания API токена:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+// PUT /api/admin/api-tokens/:id - Обновить API токен
+router.put('/api-tokens/:id', authenticateToken, requireRole(['admin']), async (req, res) => {
+    try {
+        const tokenId = parseInt(req.params.id);
+        const { name, description, permissions, is_active } = req.body;
+
+        const result = await db.query(`
+            UPDATE api_tokens 
+            SET token_name = $1, description = $2, permissions = $3, is_active = $4
+            WHERE id = $5
+            RETURNING token_name
+        `, [
+            name?.trim(),
+            description?.trim() || null,
+            JSON.stringify(permissions || []),
+            is_active !== undefined ? is_active : true,
+            tokenId
+        ]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'API токен не найден' });
+        }
+
+        // Логируем обновление
+        await db.query(
+            'INSERT INTO admin_logs (admin_id, action, details) VALUES ($1, $2, $3)',
+            [req.user.id, 'api_token_updated', `Обновлен API токен: ${result.rows[0].token_name}`]
+        );
+
+        res.json({ success: true, message: 'API токен обновлен' });
+
+    } catch (error) {
+        console.error('Ошибка обновления API токена:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+// DELETE /api/admin/api-tokens/:id - Удалить API токен
+router.delete('/api-tokens/:id', authenticateToken, requireRole(['admin']), async (req, res) => {
+    try {
+        const tokenId = parseInt(req.params.id);
+
+        const result = await db.query(`
+            DELETE FROM api_tokens 
+            WHERE id = $1
+            RETURNING token_name
+        `, [tokenId]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'API токен не найден' });
+        }
+
+        // Логируем удаление
+        await db.query(
+            'INSERT INTO admin_logs (admin_id, action, details) VALUES ($1, $2, $3)',
+            [req.user.id, 'api_token_deleted', `Удален API токен: ${result.rows[0].token_name}`]
+        );
+
+        res.json({ success: true, message: 'API токен удален' });
+
+    } catch (error) {
+        console.error('Ошибка удаления API токена:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+// POST /api/admin/api-tokens/plugin - Создать специальный токен для плагина (бессрочный)
+router.post('/api-tokens/plugin', authenticateToken, requireRole(['admin']), async (req, res) => {
+    try {
+        const { name = 'Minecraft Plugin Token' } = req.body;
+
+        // Генерируем специальный токен для плагина
+        const crypto = require('crypto');
+        const rawToken = crypto.randomBytes(64).toString('hex');
+        const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+        const tokenPrefix = rawToken.substring(0, 8);
+
+        // Права для плагина
+        const pluginPermissions = [
+            'server:status',
+            'players:read',
+            'players:update',
+            'sessions:manage',
+            'stats:update'
+        ];
+
+        // Создаем бессрочный токен
+        const result = await db.query(`
+            INSERT INTO api_tokens (
+                token_name, token_hash, token_prefix, user_id, 
+                permissions, expires_at, created_by, description
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            RETURNING id, token_name, token_prefix, created_at
+        `, [
+            name,
+            tokenHash,
+            tokenPrefix,
+            req.user.id,
+            JSON.stringify(pluginPermissions),
+            null, // Никогда не истекает
+            req.user.id,
+            'Бессрочный токен для Minecraft плагина'
+        ]);
+
+        // Логируем создание
+        await db.query(
+            'INSERT INTO admin_logs (admin_id, action, details) VALUES ($1, $2, $3)',
+            [req.user.id, 'plugin_token_created', `Создан токен для плагина: ${name}`]
+        );
+
+        res.json({
+            success: true,
+            message: 'Токен для плагина создан успешно',
+            token: {
+                id: result.rows[0].id,
+                name: result.rows[0].token_name,
+                prefix: result.rows[0].token_prefix,
+                created_at: result.rows[0].created_at,
+                full_token: rawToken,
+                permissions: pluginPermissions
+            },
+            instructions: {
+                config_field: 'admin_token',
+                expires: 'never',
+                usage: 'Скопируйте этот токен в config.yml плагина'
+            }
+        });
+
+    } catch (error) {
+        console.error('Ошибка создания токена для плагина:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
     }
 });
 

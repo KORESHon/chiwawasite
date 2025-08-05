@@ -4,10 +4,11 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const db = require('../../database/connection');
-const { authenticateToken } = require('./auth');
+const { authenticateToken, authenticateLongTermApiToken } = require('./auth');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs').promises;
+const sharp = require('sharp');
 
 const router = express.Router();
 
@@ -32,7 +33,8 @@ const avatarStorage = multer.diskStorage({
 const avatarUpload = multer({
     storage: avatarStorage,
     limits: {
-        fileSize: 5 * 1024 * 1024 // 5MB
+        fileSize: 20 * 1024 * 1024, // 20MB
+        files: 1
     },
     fileFilter: (req, file, cb) => {
         const allowedTypes = /jpeg|jpg|png|gif|webp/;
@@ -42,7 +44,7 @@ const avatarUpload = multer({
         if (mimetype && extname) {
             return cb(null, true);
         } else {
-            cb(new Error('Разрешены только изображения (JPEG, JPG, PNG, GIF, WebP)'));
+            cb(new Error('Разрешены только изображения (JPEG, JPG, PNG, GIF, WebP). Максимальный размер: 20MB'));
         }
     }
 });
@@ -189,18 +191,12 @@ router.get('/detailed-stats', authenticateToken, async (req, res) => {
 });
 
 // POST /api/profile/update-stats - Обновление статистики с сервера Minecraft (только для плагина)
-router.post('/update-stats', async (req, res) => {
+router.post('/update-stats', authenticateLongTermApiToken, async (req, res) => {
     try {
         const {
             minecraft_nick,
-            admin_token,
             stats
         } = req.body;
-
-        // Проверяем токен администратора (для безопасности)
-        if (!admin_token || admin_token !== process.env.ADMIN_TOKEN) {
-            return res.status(401).json({ error: 'Неверный токен администратора' });
-        }
 
         if (!minecraft_nick || !stats) {
             return res.status(400).json({ error: 'Отсутствуют обязательные поля' });
@@ -747,7 +743,83 @@ router.post('/avatar', authenticateToken, avatarUpload.single('avatar'), async (
             return res.status(400).json({ error: 'Файл не загружен' });
         }
 
-        const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+        const originalPath = req.file.path;
+        
+        // Получаем данные о кропе если они есть
+        let cropData = null;
+        if (req.body.cropData) {
+            try {
+                cropData = JSON.parse(req.body.cropData);
+            } catch (e) {
+                console.log('Ошибка парсинга данных кропа:', e.message);
+            }
+        }
+        
+        // Проверяем размеры изображения
+        const metadata = await sharp(originalPath).metadata();
+        
+        // Создаем финальное изображение
+        const finalFileName = `avatar-${req.user.id}-${Date.now()}-final.png`;
+        const finalPath = path.join(path.dirname(originalPath), finalFileName);
+        
+        let sharpInstance = sharp(originalPath);
+        
+        // Если есть данные кропа, применяем их
+        if (cropData) {
+            const { scale, rotation, flipX, offsetX, offsetY, cropSize } = cropData;
+            
+            // Вычисляем размеры для кропа
+            const scaledWidth = Math.round(metadata.width * scale);
+            const scaledHeight = Math.round(metadata.height * scale);
+            
+            // Начальная обработка: масштабирование и поворот
+            sharpInstance = sharpInstance.resize(scaledWidth, scaledHeight);
+            
+            if (rotation !== 0) {
+                sharpInstance = sharpInstance.rotate(rotation);
+            }
+            
+            if (flipX < 0) {
+                sharpInstance = sharpInstance.flop();
+            }
+            
+            // Получаем метаданные после трансформаций
+            const processedBuffer = await sharpInstance.toBuffer();
+            const processedMetadata = await sharp(processedBuffer).metadata();
+            
+            // Вычисляем область кропа (256x256 из центра с учетом смещения)
+            const centerX = Math.round(processedMetadata.width / 2);
+            const centerY = Math.round(processedMetadata.height / 2);
+            const cropRadius = 128; // половина от 256
+            
+            const cropLeft = Math.max(0, centerX - cropRadius - Math.round(offsetX));
+            const cropTop = Math.max(0, centerY - cropRadius - Math.round(offsetY));
+            const cropWidth = Math.min(256, processedMetadata.width - cropLeft);
+            const cropHeight = Math.min(256, processedMetadata.height - cropTop);
+            
+            // Применяем кроп и финальный ресайз до 512x512
+            sharpInstance = sharp(processedBuffer)
+                .extract({ 
+                    left: cropLeft, 
+                    top: cropTop, 
+                    width: cropWidth, 
+                    height: cropHeight 
+                })
+                .resize(512, 512, { fit: 'cover' });
+        } else {
+            // Если нет данных кропа, просто ресайзим
+            sharpInstance = sharpInstance.resize(512, 512, { fit: 'cover' });
+        }
+        
+        // Сохраняем финальное изображение
+        await sharpInstance
+            .png({ quality: 90 })
+            .toFile(finalPath);
+        
+        // Удаляем оригинальный файл
+        await fs.unlink(originalPath);
+
+        const avatarUrl = `/uploads/avatars/${finalFileName}`;
 
         // Получаем старый аватар для удаления
         const oldAvatarResult = await db.query(
@@ -781,11 +853,24 @@ router.post('/avatar', authenticateToken, avatarUpload.single('avatar'), async (
         res.json({
             success: true,
             message: 'Аватар успешно загружен',
-            avatar_url: avatarUrl
+            avatar_url: avatarUrl,
+            original_size: `${metadata.width}x${metadata.height}`,
+            final_size: '512x512',
+            crop_applied: !!cropData
         });
 
     } catch (error) {
         console.error('Ошибка загрузки аватара:', error);
+        
+        // Удаляем файл при ошибке
+        if (req.file && req.file.path) {
+            try {
+                await fs.unlink(req.file.path);
+            } catch (unlinkError) {
+                console.error('Ошибка удаления файла при ошибке:', unlinkError);
+            }
+        }
+        
         res.status(500).json({ error: 'Ошибка загрузки аватара' });
     }
 });

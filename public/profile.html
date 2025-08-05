@@ -202,7 +202,7 @@
                     <a href="/rules" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Правила</a>
                     <a href="/forum" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Форум</a>
                     <a href="/online" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Онлайн</a>
-                    <a href="/map" target="_blank" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Карта</a>
+                    <a href="http://play.chiwawa.site:25773" target="_blank" class="nav-item text-white hover:text-minecraft-gold transition-colors text-shadow">Карта</a>
                 </div>
                 
                 <!-- Правая часть - социальные сети и профиль -->
@@ -228,8 +228,8 @@
                     <!-- Профиль пользователя (для авторизованных) -->
                     <div id="user-profile" class="relative nav-item hidden bg-gradient-to-r from-minecraft-gold to-yellow-500 text-minecraft-dark px-4 py-2 rounded-lg font-bold hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-minecraft-gold/50 cursor-pointer">
                         <button id="profile-dropdown-btn" class="flex items-center space-x-2">
-                            <div class="w-8 h-8 bg-minecraft-dark rounded-full flex items-center justify-center">
-                                <i class="fas fa-user text-minecraft-gold text-sm"></i>
+                            <div class="w-8 h-8 bg-minecraft-dark rounded-full overflow-hidden border-2 border-minecraft-gold">
+                                <img id="navbar-avatar" src="/assets/images/default-avatar.png" alt="Аватар" class="w-full h-full object-cover">
                             </div>
                             <span id="user-nickname" class="font-medium">Player</span>
                             <i class="fas fa-chevron-down text-xs ml-1"></i>
@@ -281,10 +281,10 @@
             <div class="glass-effect rounded-xl shadow-lg p-6 mb-8">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
-                        <div class="w-20 h-20 bg-gradient-to-br from-minecraft-gold to-minecraft-yellow rounded-full flex items-center justify-center mr-6 shadow-lg">
-                            <i class="fas fa-user text-minecraft-dark text-3xl"></i>
+                        <div class="w-20 h-20 bg-gradient-to-br from-minecraft-gold to-minecraft-yellow rounded-full overflow-hidden border-4 border-minecraft-gold shadow-lg">
+                            <img id="header-avatar" src="/assets/images/default-avatar.png" alt="Аватар профиля" class="w-full h-full object-cover">
                         </div>
-                        <div>
+                        <div class="ml-6">
                             <h1 class="text-3xl font-bold text-minecraft-yellow text-shadow" id="user-display-name">Loading...</h1>
                             <p class="text-gray-300 text-lg" id="user-trust-level">Загрузка...</p>
                             <div class="flex items-center mt-2">
@@ -847,10 +847,6 @@
                                             </div>
                                             <input type="file" id="avatar-input" accept="image/*" class="hidden">
                                             <div class="flex gap-2">
-                                                <button type="button" id="upload-avatar-btn" 
-                                                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm">
-                                                    <i class="fas fa-upload mr-1"></i>Загрузить
-                                                </button>
                                                 <button type="button" id="remove-avatar-btn" 
                                                         class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm">
                                                     <i class="fas fa-trash mr-1"></i>Удалить
@@ -1216,19 +1212,18 @@
                 securityForm.addEventListener('submit', handleSecuritySettings);
             }
 
+            // Avatar editor variables
+            let currentCropper = null;
+            let selectedFile = null;
+
             // Avatar handlers
             const changeAvatarBtn = document.getElementById('change-avatar-btn');
             const avatarInput = document.getElementById('avatar-input');
-            const uploadAvatarBtn = document.getElementById('upload-avatar-btn');
             const removeAvatarBtn = document.getElementById('remove-avatar-btn');
 
             if (changeAvatarBtn && avatarInput) {
                 changeAvatarBtn.addEventListener('click', () => avatarInput.click());
                 avatarInput.addEventListener('change', handleAvatarSelect);
-            }
-
-            if (uploadAvatarBtn) {
-                uploadAvatarBtn.addEventListener('click', handleAvatarUpload);
             }
 
             if (removeAvatarBtn) {
@@ -1278,6 +1273,41 @@
             const logoutBtn = document.getElementById('logout-btn');
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', handleLogout);
+            }
+
+            // Avatar editor modal handlers
+            const closeAvatarBtn = document.getElementById('close-avatar-editor');
+            const cancelAvatarBtn = document.getElementById('cancel-avatar-edit');
+            const saveAvatarBtn = document.getElementById('save-avatar-edit');
+            const zoomSlider = document.getElementById('zoom-slider');
+            const rotateLeftBtn = document.getElementById('rotate-left');
+            const rotateRightBtn = document.getElementById('rotate-right');
+            const flipBtn = document.getElementById('flip-horizontal');
+            const resetBtn = document.getElementById('reset-crop');
+
+            if (closeAvatarBtn) {
+                closeAvatarBtn.addEventListener('click', closeAvatarEditor);
+            }
+            if (cancelAvatarBtn) {
+                cancelAvatarBtn.addEventListener('click', closeAvatarEditor);
+            }
+            if (saveAvatarBtn) {
+                saveAvatarBtn.addEventListener('click', saveAvatar);
+            }
+            if (zoomSlider) {
+                zoomSlider.addEventListener('input', (e) => zoomImage(e.target.value));
+            }
+            if (rotateLeftBtn) {
+                rotateLeftBtn.addEventListener('click', rotateLeft);
+            }
+            if (rotateRightBtn) {
+                rotateRightBtn.addEventListener('click', rotateRight);
+            }
+            if (flipBtn) {
+                flipBtn.addEventListener('click', flipHorizontal);
+            }
+            if (resetBtn) {
+                resetBtn.addEventListener('click', resetCropper);
             }
         }
 
@@ -1598,11 +1628,19 @@
             document.getElementById('profile-created').textContent = new Date(data.registered_at).toLocaleDateString('ru-RU');
             document.getElementById('user-created').textContent = new Date(data.registered_at).toLocaleDateString('ru-RU');
 
-            // Avatar
-            const avatarElement = document.getElementById('current-avatar');
-            if (avatarElement) {
-                avatarElement.src = data.avatar_url || '/assets/images/default-avatar.png';
-            }
+            // Avatar - обновляем все аватарки на странице
+            const avatarUrl = data.avatar_url || '/assets/images/default-avatar.png';
+            const avatarElements = [
+                document.getElementById('current-avatar'),
+                document.getElementById('navbar-avatar'),
+                document.getElementById('header-avatar')
+            ];
+            
+            avatarElements.forEach(element => {
+                if (element) {
+                    element.src = avatarUrl;
+                }
+            });
 
             // Bio
             const bioSection = document.getElementById('profile-bio-section');
@@ -2162,16 +2200,17 @@
             }
         }
 
-        // Avatar functions
-        let selectedAvatarFile = null;
+        // Функции для работы с аватарами и редактором
+        let cropper = null;
+        let currentImageFile = null;
 
         function handleAvatarSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            // Проверяем размер файла (5MB max)
-            if (file.size > 5 * 1024 * 1024) {
-                showMessage('settings-message', 'Размер файла не должен превышать 5MB', 'error');
+            // Проверяем размер файла (20MB max)
+            if (file.size > 20 * 1024 * 1024) {
+                showMessage('settings-message', 'Размер файла не должен превышать 20MB', 'error');
                 return;
             }
 
@@ -2182,50 +2221,336 @@
                 return;
             }
 
-            selectedAvatarFile = file;
-
-            // Показываем превью
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const avatarElement = document.getElementById('current-avatar');
-                avatarElement.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-
-            showMessage('settings-message', 'Файл выбран. Нажмите "Загрузить" для сохранения.', 'info');
+            // Открываем редактор аватара
+            openAvatarEditor(file);
         }
 
-        async function handleAvatarUpload() {
-            if (!selectedAvatarFile) {
-                showMessage('settings-message', 'Сначала выберите файл', 'error');
-                return;
-            }
+        function openAvatarEditor(file) {
+            currentImageFile = file;
+            const modal = document.getElementById('avatar-editor-modal');
+            const image = document.getElementById('cropper-image');
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                image.src = e.target.result;
+                modal.style.display = 'flex';
+                
+                // Ждем загрузки изображения для расчета минимального масштаба
+                image.onload = () => {
+                    const container = image.parentElement;
+                    const containerSize = 400; // размер контейнера
+                    const cropSize = 256; // размер области кропа (круга)
+                    
+                    // Вычисляем минимальный масштаб чтобы изображение покрывало весь круг
+                    const minScaleX = cropSize / image.naturalWidth;
+                    const minScaleY = cropSize / image.naturalHeight;
+                    const minScale = Math.max(minScaleX, minScaleY);
+                    
+                    // Инициализируем переменные для трансформации
+                    image.dataset.scale = minScale.toString();
+                    image.dataset.rotation = '0';
+                    image.dataset.flipX = '1';
+                    image.dataset.offsetX = '0';
+                    image.dataset.offsetY = '0';
+                    image.dataset.minScale = minScale.toString();
+                    
+                    // Устанавливаем начальное позиционирование
+                    image.style.position = 'absolute';
+                    image.style.top = '0';
+                    image.style.left = '0';
+                    image.style.transformOrigin = 'center center';
+                    
+                    updateImageTransform();
+                    
+                    // Обновляем слайдер зума
+                    const zoomSlider = document.getElementById('zoom-slider');
+                    if (zoomSlider) {
+                        zoomSlider.min = minScale;
+                        zoomSlider.max = Math.max(3, minScale * 2);
+                        zoomSlider.step = 0.1;
+                        zoomSlider.value = minScale;
+                    }
+                    
+                    // Добавляем обработчики перетаскивания
+                    setupImageDragging(image);
+                };
+            };
+            reader.readAsDataURL(file);
+        }
 
-            const formData = new FormData();
-            formData.append('avatar', selectedAvatarFile);
+        function closeAvatarEditor() {
+            const modal = document.getElementById('avatar-editor-modal');
+            modal.style.display = 'none';
+            currentImageFile = null;
+        }
+
+        function setupImageDragging(image) {
+            let isDragging = false;
+            let startX = 0;
+            let startY = 0;
+            let startOffsetX = 0;
+            let startOffsetY = 0;
+            
+            // Убираем сглаживание при перетаскивании
+            image.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                startOffsetX = parseFloat(image.dataset.offsetX || 0);
+                startOffsetY = parseFloat(image.dataset.offsetY || 0);
+                image.style.cursor = 'grabbing';
+                image.style.transition = 'none'; // Убираем сглаживание
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+                
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+                
+                const newOffsetX = startOffsetX + deltaX;
+                const newOffsetY = startOffsetY + deltaY;
+                
+                // Ограничиваем перетаскивание границами изображения
+                const constrainedOffset = constrainImagePosition(image, newOffsetX, newOffsetY);
+                
+                image.dataset.offsetX = constrainedOffset.x.toString();
+                image.dataset.offsetY = constrainedOffset.y.toString();
+                
+                updateImageTransform();
+            });
+            
+            document.addEventListener('mouseup', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    image.style.cursor = 'move';
+                    // Не возвращаем transition, оставляем без сглаживания
+                }
+            });
+            
+            // Touch события для мобильных устройств
+            image.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                isDragging = true;
+                startX = touch.clientX;
+                startY = touch.clientY;
+                startOffsetX = parseFloat(image.dataset.offsetX || 0);
+                startOffsetY = parseFloat(image.dataset.offsetY || 0);
+                image.style.transition = 'none';
+            });
+            
+            document.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+                
+                const touch = e.touches[0];
+                const deltaX = touch.clientX - startX;
+                const deltaY = touch.clientY - startY;
+                
+                const newOffsetX = startOffsetX + deltaX;
+                const newOffsetY = startOffsetY + deltaY;
+                
+                const constrainedOffset = constrainImagePosition(image, newOffsetX, newOffsetY);
+                
+                image.dataset.offsetX = constrainedOffset.x.toString();
+                image.dataset.offsetY = constrainedOffset.y.toString();
+                
+                updateImageTransform();
+            });
+            
+            document.addEventListener('touchend', () => {
+                isDragging = false;
+            });
+        }
+
+        // Функция для ограничения позиции изображения
+        function constrainImagePosition(image, offsetX, offsetY) {
+            const scale = parseFloat(image.dataset.scale || 1);
+            const containerSize = 400;
+            const cropSize = 256; // размер круга кропа
+            
+            // Размеры масштабированного изображения
+            const scaledWidth = image.naturalWidth * scale;
+            const scaledHeight = image.naturalHeight * scale;
+            
+            // Вычисляем максимальные смещения чтобы изображение не выходило за границы круга
+            const maxOffsetX = Math.max(0, (scaledWidth - cropSize) / 2);
+            const maxOffsetY = Math.max(0, (scaledHeight - cropSize) / 2);
+            
+            // Ограничиваем смещения
+            const constrainedX = Math.max(-maxOffsetX, Math.min(maxOffsetX, offsetX));
+            const constrainedY = Math.max(-maxOffsetY, Math.min(maxOffsetY, offsetY));
+            
+            return { x: constrainedX, y: constrainedY };
+        }
+
+        function zoomImage(value) {
+            const image = document.getElementById('cropper-image');
+            if (image) {
+                const minScale = parseFloat(image.dataset.minScale || 0.1);
+                const clampedValue = Math.max(minScale, parseFloat(value));
+                image.dataset.scale = clampedValue.toString();
+                
+                // После изменения масштаба нужно проверить и ограничить позицию
+                const currentOffsetX = parseFloat(image.dataset.offsetX || 0);
+                const currentOffsetY = parseFloat(image.dataset.offsetY || 0);
+                const constrainedOffset = constrainImagePosition(image, currentOffsetX, currentOffsetY);
+                
+                image.dataset.offsetX = constrainedOffset.x.toString();
+                image.dataset.offsetY = constrainedOffset.y.toString();
+                
+                updateImageTransform();
+            }
+        }
+
+        function rotateLeft() {
+            const image = document.getElementById('cropper-image');
+            if (image) {
+                const currentRotation = parseFloat(image.dataset.rotation || 0);
+                image.dataset.rotation = (currentRotation - 90).toString();
+                updateImageTransform();
+            }
+        }
+
+        function rotateRight() {
+            const image = document.getElementById('cropper-image');
+            if (image) {
+                const currentRotation = parseFloat(image.dataset.rotation || 0);
+                image.dataset.rotation = (currentRotation + 90).toString();
+                updateImageTransform();
+            }
+        }
+
+        function flipHorizontal() {
+            const image = document.getElementById('cropper-image');
+            if (image) {
+                const currentFlip = parseFloat(image.dataset.flipX || 1);
+                image.dataset.flipX = (-currentFlip).toString();
+                updateImageTransform();
+            }
+        }
+
+        function resetCropper() {
+            const image = document.getElementById('cropper-image');
+            const zoomSlider = document.getElementById('zoom-slider');
+            if (image) {
+                const minScale = parseFloat(image.dataset.minScale || 1);
+                image.dataset.scale = minScale.toString();
+                image.dataset.rotation = '0';
+                image.dataset.flipX = '1';
+                image.dataset.offsetX = '0';
+                image.dataset.offsetY = '0';
+                updateImageTransform();
+            }
+            if (zoomSlider) {
+                const minScale = parseFloat(image.dataset.minScale || 1);
+                zoomSlider.value = minScale;
+            }
+        }
+
+        function updateImageTransform() {
+            const image = document.getElementById('cropper-image');
+            if (image) {
+                const scale = parseFloat(image.dataset.scale || 1);
+                const rotation = parseFloat(image.dataset.rotation || 0);
+                const flipX = parseFloat(image.dataset.flipX || 1);
+                const offsetX = parseFloat(image.dataset.offsetX || 0);
+                const offsetY = parseFloat(image.dataset.offsetY || 0);
+                
+                // Центрируем изображение в контейнере (400x400) и добавляем смещение
+                const containerSize = 400;
+                const centerX = containerSize / 2;
+                const centerY = containerSize / 2;
+                
+                image.style.transform = `
+                    translate(${centerX + offsetX}px, ${centerY + offsetY}px) 
+                    translate(-50%, -50%) 
+                    scale(${scale * flipX}, ${scale}) 
+                    rotate(${rotation}deg)
+                `;
+                // Убираем анимацию для более отзывчивого управления
+                image.style.transition = 'none';
+            }
+        }
+
+        async function saveAvatar() {
+            if (!currentImageFile) return;
 
             try {
-                const token = localStorage.getItem('auth_token');
-                const response = await fetch('/api/profile/avatar', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: formData
-                });
+                // Собираем данные о кропе
+                const image = document.getElementById('cropper-image');
+                const cropData = {
+                    scale: parseFloat(image.dataset.scale || 1),
+                    rotation: parseFloat(image.dataset.rotation || 0),
+                    flipX: parseFloat(image.dataset.flipX || 1),
+                    offsetX: parseFloat(image.dataset.offsetX || 0),
+                    offsetY: parseFloat(image.dataset.offsetY || 0),
+                    cropSize: 256, // размер области кропа
+                    containerSize: 400 // размер контейнера
+                };
 
-                if (response.ok) {
-                    const data = await response.json();
-                    showMessage('settings-message', 'Аватар успешно загружен!', 'success');
-                    selectedAvatarFile = null;
-                    await loadProfileData(); // Перезагружаем профиль
-                } else {
-                    const error = await response.json();
-                    showMessage('settings-message', error.error || 'Ошибка загрузки аватара', 'error');
+                // Создаем FormData и добавляем данные о кропе
+                const formData = new FormData();
+                formData.append('avatar', currentImageFile);
+                formData.append('cropData', JSON.stringify(cropData));
+
+                const loadingIndicator = document.getElementById('loading-indicator');
+                if (loadingIndicator) loadingIndicator.style.display = 'block';
+
+                try {
+                    const response = await fetch('/api/profile/avatar', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+                        },
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        // Обновляем аватар в интерфейсе
+                        const avatarUrl = result.avatar_url + '?t=' + Date.now();
+                        
+                        // Обновляем аватары во всех местах
+                        const avatarElements = document.querySelectorAll('img[id*="avatar"], img[class*="avatar"]');
+                        avatarElements.forEach(element => {
+                            element.src = avatarUrl;
+                        });
+
+                        // Обновляем конкретные элементы
+                        const currentAvatar = document.getElementById('current-avatar');
+                        if (currentAvatar) currentAvatar.src = avatarUrl;
+
+                        const navAvatar = document.querySelector('.navbar-avatar');
+                        if (navAvatar) navAvatar.src = avatarUrl;
+
+                        // Обновляем аватар в заголовке профиля
+                        const headerAvatar = document.getElementById('header-avatar');
+                        if (headerAvatar) headerAvatar.src = avatarUrl;
+
+                        // Обновляем аватар в навбаре
+                        const navbarAvatar = document.getElementById('navbar-avatar');
+                        if (navbarAvatar) navbarAvatar.src = avatarUrl;
+
+                        closeAvatarEditor();
+                        showMessage('settings-message', 'Аватар успешно обновлён!', 'success');
+                    } else {
+                        showMessage('settings-message', result.message || 'Ошибка при загрузке аватара', 'error');
+                    }
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    showMessage('settings-message', 'Ошибка при загрузке файла', 'error');
+                } finally {
+                    if (loadingIndicator) loadingIndicator.style.display = 'none';
                 }
+
             } catch (error) {
-                console.error('Ошибка загрузки аватара:', error);
-                showMessage('settings-message', 'Ошибка соединения с сервером', 'error');
+                console.error('Error processing image:', error);
+                showMessage('settings-message', 'Ошибка при обработке изображения', 'error');
             }
         }
 
@@ -2890,5 +3215,81 @@
             }
         }
     </script>
+
+    <!-- Модальное окно редактора аватарки -->
+    <div id="avatar-editor-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-minecraft-gray rounded-xl shadow-xl border border-minecraft-gold/30 w-full max-w-2xl">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-6 border-b border-minecraft-light-gray">
+                <h3 class="text-xl font-bold text-minecraft-gold">
+                    <i class="fas fa-edit mr-2"></i>Редактор аватарки
+                </h3>
+                <button id="close-avatar-editor" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Editor content -->
+            <div class="p-6">
+                <div class="space-y-4">
+                    <!-- Image preview container -->
+                    <div class="text-center">
+                        <div class="relative inline-block border-2 border-minecraft-gold/30 rounded-lg overflow-hidden bg-minecraft-dark/50" style="width: 400px; height: 400px;">
+                            <img id="cropper-image" src="" alt="Preview" class="absolute cursor-move select-none" style="user-select: none;">
+                            <!-- Круглая маска для предпросмотра аватара -->
+                            <div class="absolute inset-0 pointer-events-none">
+                                <div class="w-full h-full bg-black bg-opacity-20"></div>
+                                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full border-4 border-minecraft-gold shadow-lg" style="box-shadow: 0 0 0 999px rgba(0,0,0,0.2);"></div>
+                            </div>
+                            <!-- Центральная точка для выравнивания -->
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1 h-1 bg-minecraft-gold rounded-full opacity-50"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Controls -->
+                    <div class="flex flex-wrap gap-4 justify-center">
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm text-gray-300">Масштаб:</label>
+                            <input type="range" id="zoom-slider" min="0.1" max="3" step="0.1" value="1" 
+                                   class="w-32 h-2 bg-minecraft-dark rounded-lg appearance-none cursor-pointer">
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button id="rotate-left" class="px-3 py-2 bg-minecraft-gold/20 hover:bg-minecraft-gold/30 text-minecraft-gold rounded-lg transition-colors">
+                                <i class="fas fa-undo mr-1"></i>↶ 90°
+                            </button>
+                            <button id="rotate-right" class="px-3 py-2 bg-minecraft-gold/20 hover:bg-minecraft-gold/30 text-minecraft-gold rounded-lg transition-colors">
+                                <i class="fas fa-redo mr-1"></i>↷ 90°
+                            </button>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button id="flip-horizontal" class="px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg transition-colors">
+                                <i class="fas fa-arrows-alt-h mr-1"></i>Отразить
+                            </button>
+                            <button id="reset-crop" class="px-3 py-2 bg-gray-500/20 hover:bg-gray-500/30 text-gray-400 rounded-lg transition-colors">
+                                <i class="fas fa-refresh mr-1"></i>Сброс
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Info -->
+                    <div class="text-center text-sm text-gray-400 bg-minecraft-dark/30 rounded-lg p-3">
+                        <i class="fas fa-info-circle mr-1 text-minecraft-gold"></i>
+                        Перетащите изображение для позиционирования. Используйте слайдер для масштабирования. 
+                        Итоговый аватар будет круглым 512x512px
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="flex items-center justify-end space-x-3 p-6 border-t border-minecraft-light-gray">
+                <button id="cancel-avatar-edit" class="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors">
+                    <i class="fas fa-times mr-1"></i>Отмена
+                </button>
+                <button id="save-avatar-edit" class="px-6 py-2 bg-minecraft-gold hover:bg-minecraft-yellow text-minecraft-dark font-bold rounded-lg transition-colors">
+                    <i class="fas fa-check mr-1"></i>Сохранить
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
