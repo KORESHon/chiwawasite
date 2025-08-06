@@ -73,13 +73,16 @@ function calculateTimeRemaining(banUntil) {
     };
 }
 
-// GET /api/profile/detailed-stats - Получение детальной статистики игрока
+// GET /api/profile/detailed-stats - Получение упрощенной статистики игрока
 router.get('/detailed-stats', authenticateToken, async (req, res) => {
     try {
-        // Получаем детальную статистику
+        // Получаем базовую статистику
         const statsResult = await db.query(`
             SELECT 
-                ps.*,
+                ps.time_played_minutes,
+                ps.last_seen,
+                ps.deaths_count,
+                ps.mobs_killed,
                 u.nickname,
                 u.registered_at,
                 u.last_login
@@ -94,101 +97,35 @@ router.get('/detailed-stats', authenticateToken, async (req, res) => {
 
         const stats = statsResult.rows[0];
 
-        // Получаем последние 30 дней активности
-        const activityResult = await db.query(`
-            SELECT 
-                stat_date,
-                playtime_minutes,
-                logins_count,
-                blocks_broken,
-                blocks_placed
-            FROM daily_stats 
-            WHERE user_id = $1 
-                AND stat_date >= CURRENT_DATE - INTERVAL '30 days'
-            ORDER BY stat_date DESC
-        `, [req.user.id]);
-
-        // Получаем последние игровые активности из daily_stats
-        const sessionsResult = await db.query(`
-            SELECT 
-                stat_date as session_date,
-                playtime_minutes as duration_minutes,
-                blocks_broken,
-                blocks_placed,
-                logins_count
-            FROM daily_stats 
-            WHERE user_id = $1 
-            ORDER BY stat_date DESC 
-            LIMIT 10
-        `, [req.user.id]);
-
         // Вычисляем статистику
         const totalPlaytime = stats.time_played_minutes || 0;
         const playtimeHours = Math.floor(totalPlaytime / 60);
         const playtimeMinutes = totalPlaytime % 60;
-        
-        const avgSessionDuration = stats.average_session_duration || 0;
-        const longestSession = stats.longest_session_duration || 0;
-        
-        const registrationDate = new Date(stats.registered_at);
-        const daysSinceRegistration = Math.floor((Date.now() - registrationDate.getTime()) / (1000 * 60 * 60 * 24));
 
         res.json({
             success: true,
             stats: {
-                // Основная статистика
+                // Основная статистика - только то что нужно
                 total_playtime_minutes: totalPlaytime,
                 total_playtime_hours: playtimeHours,
                 total_playtime_formatted: `${playtimeHours}ч ${playtimeMinutes}м`,
                 
-                // Сессии
-                total_sessions: stats.session_count || 0,
-                average_session_duration: avgSessionDuration,
-                longest_session_duration: longestSession,
-                average_session_formatted: formatMinutesToTime(avgSessionDuration),
-                longest_session_formatted: formatMinutesToTime(longestSession),
-                
-                // Активность
-                total_logins: stats.total_logins || 0,
-                active_days: stats.active_days_count || 0,
-                days_since_registration: daysSinceRegistration,
+                // Последний вход
                 last_seen: stats.last_seen,
                 
-                // Игровая статистика
-                blocks_broken: stats.blocks_broken || 0,
-                blocks_placed: stats.blocks_placed || 0,
-                distance_walked: stats.distance_walked || 0,
+                // Игровая статистика - только убийства и смерти
                 deaths_count: stats.deaths_count || 0,
-                mobs_killed: stats.mobs_killed || 0,
-                items_crafted: stats.items_crafted || 0,
-                damage_dealt: stats.damage_dealt || 0,
-                damage_taken: stats.damage_taken || 0,
-                food_eaten: stats.food_eaten || 0,
-                jumps_count: stats.jumps_count || 0,
-                
-                // Временная статистика
-                online_time_today: stats.online_time_today || 0,
-                online_time_week: stats.online_time_week || 0,
-                online_time_month: stats.online_time_month || 0,
-                
-                // Репутация и достижения
-                reputation: stats.reputation || 0,
-                achievements_count: stats.achievements_count || 0,
-                
-                // Дополнительная информация
-                last_ip_address: stats.last_ip_address,
-                stats_last_updated: stats.stats_last_updated,
-                minecraft_stats: stats.minecraft_stats || {}
-            },
-            activity_chart: activityResult.rows,
-            recent_sessions: sessionsResult.rows
+                mobs_killed: stats.mobs_killed || 0
+            }
         });
 
     } catch (error) {
-        console.error('Ошибка получения детальной статистики:', error);
+        console.error('Ошибка получения статистики:', error);
         res.status(500).json({ error: 'Ошибка сервера' });
     }
 });
+
+
 
 // POST /api/profile/update-stats - Обновление статистики с сервера Minecraft (только для плагина)
 router.post('/update-stats', authenticateLongTermApiToken, async (req, res) => {
@@ -215,29 +152,45 @@ router.post('/update-stats', authenticateLongTermApiToken, async (req, res) => {
 
         const user = userResult.rows[0];
 
-        // Обновляем статистику игрока
+        // Специальная обработка инкремента входов
+        if (stats.increment_login) {
+            // Увеличиваем счетчик входов на 1
+            await db.query(`
+                UPDATE player_stats 
+                SET 
+                    total_logins = COALESCE(total_logins, 0) + 1,
+                    last_seen = COALESCE($2::timestamp, last_seen),
+                    stats_last_updated = NOW(),
+                    updated_at = NOW()
+                WHERE user_id = $1
+            `, [user.id, stats.last_seen]);
+            
+            // Если записи не существует, создаем её
+            const checkExists = await db.query(`SELECT id FROM player_stats WHERE user_id = $1`, [user.id]);
+            if (checkExists.rows.length === 0) {
+                await db.query(`
+                    INSERT INTO player_stats (
+                        user_id, total_logins, last_seen, stats_last_updated, created_at, updated_at
+                    ) VALUES ($1, 1, $2::timestamp, NOW(), NOW(), NOW())
+                `, [user.id, stats.last_seen]);
+            }
+            
+            res.json({
+                success: true,
+                message: `Счетчик входов увеличен для игрока ${minecraft_nick}`,
+                user_id: user.id
+            });
+            return;
+        }
+
+        // Обычное обновление статистики игрока - только основные поля
         const updateResult = await db.query(`
             UPDATE player_stats 
             SET 
                 time_played_minutes = COALESCE($2, time_played_minutes),
-                total_logins = COALESCE($3, total_logins),
-                session_count = COALESCE($4, session_count),
-                average_session_duration = COALESCE($5, average_session_duration),
-                longest_session_duration = COALESCE($6, longest_session_duration),
-                last_seen = COALESCE($7::timestamp, last_seen),
-                blocks_broken = COALESCE($8, blocks_broken),
-                blocks_placed = COALESCE($9, blocks_placed),
-                distance_walked = COALESCE($10, distance_walked),
-                deaths_count = COALESCE($11, deaths_count),
-                mobs_killed = COALESCE($12, mobs_killed),
-                items_crafted = COALESCE($13, items_crafted),
-                damage_dealt = COALESCE($14, damage_dealt),
-                damage_taken = COALESCE($15, damage_taken),
-                food_eaten = COALESCE($16, food_eaten),
-                jumps_count = COALESCE($17, jumps_count),
-                current_level = COALESCE($18, current_level),
-                minecraft_stats = COALESCE($19::jsonb, minecraft_stats),
-                last_ip_address = COALESCE($20::inet, last_ip_address),
+                last_seen = COALESCE($3::timestamp, last_seen),
+                deaths_count = COALESCE($4, deaths_count),
+                mobs_killed = COALESCE($5, mobs_killed),
                 stats_last_updated = NOW(),
                 updated_at = NOW()
             WHERE user_id = $1
@@ -245,92 +198,30 @@ router.post('/update-stats', authenticateLongTermApiToken, async (req, res) => {
         `, [
             user.id,
             stats.time_played_minutes,
-            stats.total_logins, 
-            stats.session_count,
-            stats.average_session_duration,
-            stats.longest_session_duration,
             stats.last_seen,
-            stats.blocks_broken,
-            stats.blocks_placed,
-            stats.distance_walked,
-            stats.deaths_count || stats.deaths, // поддерживаем оба варианта
-            stats.mobs_killed || stats.mob_kills, // поддерживаем оба варианта
-            stats.items_crafted,
-            stats.damage_dealt,
-            stats.damage_taken,
-            stats.food_eaten,
-            stats.jumps_count,
-            stats.player_level || stats.current_level, // поддерживаем оба варианта
-            JSON.stringify(stats.minecraft_stats || {}),
-            stats.last_ip_address
+            stats.deaths_count || stats.deaths,
+            stats.mobs_killed || stats.mob_kills
         ]);
 
-        // Если статистика не существует, создаем новую запись
+        // Если статистика не существует, создаем новую запись - только основные поля
         if (updateResult.rows.length === 0) {
             await db.query(`
                 INSERT INTO player_stats (
-                    user_id, time_played_minutes, total_logins, session_count,
-                    average_session_duration, longest_session_duration, last_seen,
-                    blocks_broken, blocks_placed, distance_walked, deaths_count,
-                    mobs_killed, items_crafted, damage_dealt, damage_taken,
-                    food_eaten, jumps_count, current_level, minecraft_stats, last_ip_address,
+                    user_id, time_played_minutes, last_seen, deaths_count, mobs_killed,
                     stats_last_updated, created_at, updated_at
                 ) VALUES (
-                    $1, $2, $3, $4, $5, $6, $7::timestamp, $8, $9, $10, $11, $12, 
-                    $13, $14, $15, $16, $17, $18, $19::jsonb, $20::inet, NOW(), NOW(), NOW()
+                    $1, $2, $3::timestamp, $4, $5, NOW(), NOW(), NOW()
                 )
             `, [
                 user.id,
                 stats.time_played_minutes || 0,
-                stats.total_logins || 0,
-                stats.session_count || 0,
-                stats.average_session_duration || 0,
-                stats.longest_session_duration || 0,
                 stats.last_seen,
-                stats.blocks_broken || 0,
-                stats.blocks_placed || 0,
-                stats.distance_walked || 0,
                 stats.deaths_count || stats.deaths || 0,
-                stats.mobs_killed || stats.mob_kills || 0,
-                stats.items_crafted || 0,
-                stats.damage_dealt || 0,
-                stats.damage_taken || 0,
-                stats.food_eaten || 0,
-                stats.jumps_count || 0,
-                stats.player_level || stats.current_level || 1,
-                JSON.stringify(stats.minecraft_stats || {}),
-                stats.last_ip_address
+                stats.mobs_killed || stats.mob_kills || 0
             ]);
         }
 
-        // Обновляем ежедневную статистику
-        if (stats.daily_stats) {
-            await db.query(`
-                INSERT INTO daily_stats (
-                    user_id, stat_date, playtime_minutes, logins_count,
-                    blocks_broken, blocks_placed, distance_walked, deaths_count, mobs_killed
-                ) VALUES ($1, CURRENT_DATE, $2, $3, $4, $5, $6, $7, $8)
-                ON CONFLICT (user_id, stat_date) 
-                DO UPDATE SET 
-                    playtime_minutes = daily_stats.playtime_minutes + EXCLUDED.playtime_minutes,
-                    logins_count = EXCLUDED.logins_count,
-                    blocks_broken = daily_stats.blocks_broken + EXCLUDED.blocks_broken,
-                    blocks_placed = daily_stats.blocks_placed + EXCLUDED.blocks_placed,
-                    distance_walked = daily_stats.distance_walked + EXCLUDED.distance_walked,
-                    deaths_count = daily_stats.deaths_count + EXCLUDED.deaths_count,
-                    mobs_killed = daily_stats.mobs_killed + EXCLUDED.mobs_killed,
-                    updated_at = NOW()
-            `, [
-                user.id,
-                stats.daily_stats.playtime_minutes || 0,
-                stats.daily_stats.logins_count || 0,
-                stats.daily_stats.blocks_broken || 0,
-                stats.daily_stats.blocks_placed || 0,
-                stats.daily_stats.distance_walked || 0,
-                stats.daily_stats.deaths_count || 0,
-                stats.daily_stats.mobs_killed || 0
-            ]);
-        }
+
 
         res.json({
             success: true,
@@ -359,16 +250,17 @@ function formatMinutesToTime(minutes) {
 // GET /api/profile - Получение данных профиля
 router.get('/', authenticateToken, async (req, res) => {
     try {
-        // Получаем основные данные пользователя
+        // Получаем основные данные пользователя - упрощенно
         const userResult = await db.query(`
             SELECT u.id, u.nickname, u.first_name, u.email, u.role, 
                    u.discord_username, u.trust_level, u.bio, u.avatar_url,
                    u.age, u.is_email_verified, u.is_banned, u.status,
                    u.ban_reason, u.ban_until, u.last_login, u.registered_at,
-                   ps.time_played_minutes, ps.is_time_limited,
-                   ps.reputation, ps.achievements_count, ps.total_logins
+                   ps.time_played_minutes, ps.last_seen, ps.deaths_count, ps.mobs_killed, ps.total_logins,
+                   ur.reputation_score
             FROM users u
             LEFT JOIN player_stats ps ON u.id = ps.user_id
+            LEFT JOIN user_reputation ur ON u.id = ur.user_id
             WHERE u.id = $1 AND u.is_active = true
         `, [req.user.id]);
 
@@ -406,33 +298,29 @@ router.get('/', authenticateToken, async (req, res) => {
             activityResult.rows = newActivityResult.rows;
         }
 
-        // Получаем достижения пользователя (пока заглушка, так как таблица удалена)
-        const achievementsResult = { rows: [] };
+        // Достижения убраны - слишком сложно реализовать корректно
+        // const achievementsResult = { rows: [] };
 
-        // Получаем репутацию пользователя
-        const reputationResult = await db.query(`
-            SELECT reputation_score, positive_votes, negative_votes
-            FROM user_reputation 
-            WHERE user_id = $1
-        `, [req.user.id]);
-        
-        const reputation = reputationResult.rows[0] || { reputation_score: 0, positive_votes: 0, negative_votes: 0 };
+        // Получаем репутацию убрана - упрощаем
+        // const reputationResult = { rows: [] };
+        // const reputation = { reputation_score: 0, positive_votes: 0, negative_votes: 0 };
 
-        // Формируем статистику
+        // Формируем упрощенную статистику - только основное
         const stats = {
             playtime: user.time_played_minutes || 0,
             days_registered: Math.floor((new Date() - new Date(user.registered_at)) / (1000 * 60 * 60 * 24)),
-            reputation: reputation.reputation_score || 0,
-            friends: 0, // Пока заглушка
-            achievements_count: user.achievements_count || 0,
-            total_logins: 0 // Можно добавить подсчет из login_logs
+            last_seen: user.last_seen,
+            deaths_count: user.deaths_count || 0,
+            mobs_killed: user.mobs_killed || 0,
+            total_logins: user.total_logins || 0
         };
 
         // Формируем прогресс Trust Level
         const trustProgress = {
             current: user.trust_level || 0,
             required: getTrustLevelRequirements(user.trust_level || 0),
-            type: 'минут игры'
+            type: 'минут игры',
+            reputation: user.reputation_score || 0
         };
 
         // Проверяем статус заявки
@@ -458,11 +346,6 @@ router.get('/', authenticateToken, async (req, res) => {
             role: user.role || 'user',
             trust_level: user.trust_level || 0,
             trust_level_name: getTrustLevelName(user.trust_level || 0),
-            reputation: reputation.reputation_score || 0,
-            reputation_votes: {
-                positive: reputation.positive_votes || 0,
-                negative: reputation.negative_votes || 0
-            },
             is_email_verified: user.is_email_verified,
             is_banned: user.is_banned || false,
             ban_info: user.is_banned ? {
@@ -478,11 +361,13 @@ router.get('/', authenticateToken, async (req, res) => {
             stats,
             trust_progress: trustProgress,
             activity: activityResult.rows,
-            achievements: achievementsResult.rows,
+            // achievements убраны - слишком сложно реализовать корректно
             application,
             player_stats: {
                 time_played_minutes: user.time_played_minutes || 0,
-                is_time_limited: user.is_time_limited !== false,
+                last_seen: user.last_seen,
+                deaths_count: user.deaths_count || 0,
+                mobs_killed: user.mobs_killed || 0,
                 total_logins: user.total_logins || 0
             }
         });
@@ -972,5 +857,95 @@ router.get('/ban-status', authenticateToken, async (req, res) => {
     } catch (error) {
         console.error('Ошибка проверки статуса бана:', error);
         res.status(500).json({ error: 'Ошибка проверки статуса бана' });
+    }
+});
+
+// POST /api/profile/update-stats - Обновление статистики игрока (для плагина)
+router.post('/update-stats', authenticateLongTermApiToken, async (req, res) => {
+    try {
+        const { minecraft_nick, stats, increment_login } = req.body;
+
+        if (!minecraft_nick) {
+            return res.status(400).json({ error: 'Требуется minecraft_nick' });
+        }
+
+        // Находим пользователя по никнейму
+        const userResult = await db.query(
+            'SELECT id FROM users WHERE LOWER(nickname) = LOWER($1) AND is_active = true',
+            [minecraft_nick]
+        );
+
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Пользователь не найден' });
+        }
+
+        const userId = userResult.rows[0].id;
+
+        // Если нужно увеличить счётчик входов
+        if (increment_login) {
+            await db.query(`
+                INSERT INTO player_stats (user_id, total_logins, last_seen, created_at, updated_at)
+                VALUES ($1, 1, NOW(), NOW(), NOW())
+                ON CONFLICT (user_id)
+                DO UPDATE SET 
+                    total_logins = COALESCE(player_stats.total_logins, 0) + 1,
+                    last_seen = NOW(),
+                    updated_at = NOW()
+            `, [userId]);
+            
+            console.log(`✅ Увеличен счётчик входов для ${minecraft_nick} (ID: ${userId})`);
+        }
+
+        // Обновляем остальную статистику если передана
+        if (stats && typeof stats === 'object') {
+            const updateFields = [];
+            const updateValues = [];
+            let paramIndex = 1;
+
+            // Обрабатываем поля статистики
+            if (stats.time_played_minutes !== undefined) {
+                updateFields.push(`time_played_minutes = $${paramIndex++}`);
+                updateValues.push(stats.time_played_minutes);
+            }
+            if (stats.last_seen !== undefined) {
+                updateFields.push(`last_seen = $${paramIndex++}`);
+                updateValues.push(stats.last_seen);
+            }
+            if (stats.deaths_count !== undefined) {
+                updateFields.push(`deaths_count = $${paramIndex++}`);
+                updateValues.push(stats.deaths_count);
+            }
+            if (stats.mobs_killed !== undefined) {
+                updateFields.push(`mobs_killed = $${paramIndex++}`);
+                updateValues.push(stats.mobs_killed);
+            }
+
+            // Если есть поля для обновления
+            if (updateFields.length > 0) {
+                updateFields.push(`updated_at = NOW()`);
+                updateValues.push(userId);
+
+                const updateQuery = `
+                    INSERT INTO player_stats (user_id, ${updateFields.map(f => f.split(' = ')[0]).join(', ')}, created_at, updated_at)
+                    VALUES ($${paramIndex}, ${updateFields.map((_, i) => `$${i + 1}`).join(', ')}, NOW(), NOW())
+                    ON CONFLICT (user_id)
+                    DO UPDATE SET ${updateFields.join(', ')}
+                `;
+
+                await db.query(updateQuery, updateValues);
+                
+                console.log(`✅ Обновлена статистика для ${minecraft_nick} (ID: ${userId}):`, Object.keys(stats));
+            }
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Статистика обновлена',
+            user_id: userId
+        });
+
+    } catch (error) {
+        console.error('Ошибка обновления статистики:', error);
+        res.status(500).json({ error: 'Ошибка обновления статистики' });
     }
 });

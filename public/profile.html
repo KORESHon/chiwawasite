@@ -145,6 +145,40 @@
             animation: fadeIn 0.5s ease-in;
         }
         
+        /* Стили для tooltip'ов */
+        [title] {
+            position: relative;
+        }
+        
+        [title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            white-space: nowrap;
+            z-index: 1000;
+            margin-bottom: 5px;
+            border: 1px solid #FFAA00;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        [title]:hover::before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: #FFAA00;
+            z-index: 1001;
+        }
+        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -403,9 +437,6 @@
                         <button class="profile-tab py-4 px-2 border-b-2 border-transparent text-gray-400 hover:text-minecraft-gold transition-all duration-300" data-tab="settings">
                             <i class="fas fa-cog mr-2"></i>Настройки
                         </button>
-                        <button class="profile-tab py-4 px-2 border-b-2 border-transparent text-gray-400 hover:text-minecraft-gold transition-all duration-300" data-tab="stats">
-                            <i class="fas fa-chart-bar mr-2"></i>Статистика
-                        </button>
                     </nav>
                 </div>
 
@@ -455,11 +486,36 @@
                                         </span>
                                         <span id="profile-role" class="font-medium text-white">Loading...</span>
                                     </div>
-                                    <div class="flex justify-between items-center py-3">
+                                    <div class="flex justify-between items-center py-3 border-b border-minecraft-light-gray">
                                         <span class="text-gray-300 flex items-center">
                                             <i class="fas fa-calendar mr-3 text-minecraft-gold"></i>Дата регистрации:
                                         </span>
                                         <span id="profile-created" class="font-medium text-white">Loading...</span>
+                                    </div>
+                                    
+                                    <!-- Игровая статистика в блоке информации -->
+                                    <div class="mt-6 pt-6 border-t border-minecraft-gold">
+                                        <h4 class="text-lg font-bold text-minecraft-gold mb-4 flex items-center">
+                                            <i class="fas fa-chart-bar mr-3"></i>Игровая статистика
+                                        </h4>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div class="bg-minecraft-dark/30 rounded-lg p-3 text-center">
+                                                <div class="text-lg font-bold text-white" id="profile-playtime">0ч</div>
+                                                <div class="text-xs text-gray-400">Общее время игры</div>
+                                            </div>
+                                            <div class="bg-minecraft-dark/30 rounded-lg p-3 text-center">
+                                                <div class="text-lg font-bold text-white" id="profile-last-seen">Неизвестно</div>
+                                                <div class="text-xs text-gray-400">Последний вход</div>
+                                            </div>
+                                            <div class="bg-minecraft-dark/30 rounded-lg p-3 text-center">
+                                                <div class="text-lg font-bold text-white" id="profile-mobs-killed">0</div>
+                                                <div class="text-xs text-gray-400">Убийства мобов</div>
+                                            </div>
+                                            <div class="bg-minecraft-dark/30 rounded-lg p-3 text-center">
+                                                <div class="text-lg font-bold text-white" id="profile-deaths">0</div>
+                                                <div class="text-xs text-gray-400">Смерти</div>
+                                            </div>
+                                        </div>
                                     </div>
                                     
                                     <!-- Биография -->
@@ -1019,90 +1075,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Вкладка статистики -->
-                    <div id="tab-stats" class="tab-content hidden">
-                        <div class="space-y-8">
-                            <!-- Общая статистика -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                <div class="glass-effect rounded-xl p-6 text-center stat-card">
-                                    <i class="fas fa-clock text-minecraft-gold text-3xl mb-3"></i>
-                                    <div class="text-3xl font-bold text-white mb-2" id="stat-total-playtime">0ч</div>
-                                    <div class="text-gray-400">Общее время игры</div>
-                                </div>
-                                <div class="glass-effect rounded-xl p-6 text-center stat-card">
-                                    <i class="fas fa-sign-in-alt text-green-400 text-3xl mb-3"></i>
-                                    <div class="text-3xl font-bold text-white mb-2" id="stat-total-logins">0</div>
-                                    <div class="text-gray-400">Всего входов</div>
-                                </div>
-                                <div class="glass-effect rounded-xl p-6 text-center stat-card">
-                                    <i class="fas fa-calendar-day text-blue-400 text-3xl mb-3"></i>
-                                    <div class="text-3xl font-bold text-white mb-2" id="stat-last-seen">Никогда</div>
-                                    <div class="text-gray-400">Последний вход</div>
-                                </div>
-                                <div class="glass-effect rounded-xl p-6 text-center stat-card">
-                                    <i class="fas fa-trophy text-yellow-400 text-3xl mb-3"></i>
-                                    <div class="text-3xl font-bold text-white mb-2" id="stat-achievements">0</div>
-                                    <div class="text-gray-400">Достижений</div>
-                                </div>
-                            </div>
-                            
-                            <!-- Детальная статистика -->
-                            <div class="grid lg:grid-cols-2 gap-8">
-                                <!-- Игровая статистика -->
-                                <div class="glass-effect rounded-xl p-6">
-                                    <h4 class="text-lg font-bold text-minecraft-gold mb-4 flex items-center">
-                                        <i class="fas fa-gamepad mr-3"></i>Игровая активность
-                                    </h4>
-                                    <div class="space-y-4">
-                                        <div class="flex justify-between items-center py-2 border-b border-minecraft-light-gray">
-                                            <span class="text-gray-300">Среднее время за сессию:</span>
-                                            <span id="stat-avg-session" class="text-white font-medium">-</span>
-                                        </div>
-                                        <div class="flex justify-between items-center py-2 border-b border-minecraft-light-gray">
-                                            <span class="text-gray-300">Самая длинная сессия:</span>
-                                            <span id="stat-longest-session" class="text-white font-medium">-</span>
-                                        </div>
-                                        <div class="flex justify-between items-center py-2 border-b border-minecraft-light-gray">
-                                            <span class="text-gray-300">Активных дней:</span>
-                                            <span id="stat-active-days" class="text-white font-medium">-</span>
-                                        </div>
-                                        <div class="flex justify-between items-center py-2">
-                                            <span class="text-gray-300">Любимое время игры:</span>
-                                            <span id="stat-favorite-time" class="text-white font-medium">-</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Прогресс и достижения -->
-                                <div class="glass-effect rounded-xl p-6">
-                                    <h4 class="text-lg font-bold text-minecraft-gold mb-4 flex items-center">
-                                        <i class="fas fa-medal mr-3"></i>Прогресс и достижения
-                                    </h4>
-                                    <div id="achievements-list" class="space-y-3 max-h-64 overflow-y-auto">
-                                        <div class="text-center text-gray-400 py-8">
-                                            <i class="fas fa-trophy text-2xl mb-2"></i>
-                                            <p>Загрузка достижений...</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- График активности -->
-                            <div class="glass-effect rounded-xl p-6">
-                                <h4 class="text-lg font-bold text-minecraft-gold mb-4 flex items-center">
-                                    <i class="fas fa-chart-line mr-3"></i>График активности за последние 30 дней
-                                </h4>
-                                <div id="activity-chart" class="h-64 flex items-center justify-center text-gray-400">
-                                    <div class="text-center">
-                                        <i class="fas fa-chart-bar text-4xl mb-4"></i>
-                                        <p>График активности будет отображаться здесь</p>
-                                        <p class="text-sm mt-2">Пока недостаточно данных для построения графика</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -1124,8 +1096,18 @@
                     if (response.ok) {
                         const userData = await response.json();
                         currentUser = userData.user;
-                        showProfile();
-                        await loadProfileData();
+                        
+                        // Пробуем загрузить профиль для проверки сессии
+                        try {
+                            await loadProfileData();
+                            showProfile();
+                        } catch (profileError) {
+                            console.error('Ошибка загрузки профиля, возможно сессия неактивна:', profileError);
+                            // Если ошибка профиля - очищаем токен и показываем страницу авторизации
+                            localStorage.removeItem('auth_token');
+                            showNotAuthorized();
+                            return;
+                        }
                         
                         // Обрабатываем Discord callback
                         const urlParams = new URLSearchParams(window.location.search);
@@ -1507,9 +1489,6 @@
                 case 'game-token':
                     loadTokenHistory();
                     break;
-                case 'stats':
-                    loadStatistics();
-                    break;
             }
         }
 
@@ -1539,14 +1518,19 @@
                 if (response.ok) {
                     const data = await response.json();
                     updateProfileUI(data);
+                } else if (response.status === 401) {
+                    // Сессия недействительна
+                    throw new Error('Недействительная сессия');
                 } else {
-                    console.error('Ошибка загрузки профиля');
+                    console.error('Ошибка загрузки профиля, статус:', response.status);
+                    throw new Error('Ошибка загрузки профиля');
                 }
 
                 // Загружаем настройки сервера
                 await loadServerSettings();
             } catch (error) {
                 console.error('Ошибка загрузки данных профиля:', error);
+                throw error; // Перебрасываем ошибку для обработки выше
             }
         }
 
@@ -1773,38 +1757,52 @@
 
         function updateStatistics(data) {
             const stats = data.stats || {};
-            const playtimeHours = Math.floor((stats.playtime || 0) / 60);
+            const userStats = data.player_stats || {};
+            const trustProgress = data.trust_progress || {};
+            
+            // Упрощенная статистика в блоке информации
+            const playtimeMinutes = userStats.time_played_minutes || 0;
+            const playtimeHours = Math.floor(playtimeMinutes / 60);
+            const playtimeRemainder = playtimeMinutes % 60;
+            
+            // Обновляем миниблоки статистики в блоке информации
+            document.getElementById('profile-playtime').textContent = `${playtimeHours}ч ${playtimeRemainder}м`;
+            
+            // Последний вход
+            const lastSeenEl = document.getElementById('profile-last-seen');
+            if (userStats.last_seen) {
+                const lastSeen = new Date(userStats.last_seen);
+                const options = { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                };
+                lastSeenEl.textContent = lastSeen.toLocaleDateString('ru-RU', options);
+            } else {
+                lastSeenEl.textContent = 'Неизвестно';
+            }
+            
+            // Всего входов
+            document.getElementById('stat-logins').textContent = (userStats.total_logins || stats.total_logins || 0).toLocaleString();
+            
+            // Репутация
+            document.getElementById('stat-reputation').textContent = (trustProgress.reputation || 0).toLocaleString();
+
+            // Убийства мобов и смерти
+            document.getElementById('profile-mobs-killed').textContent = (userStats.mobs_killed || 0).toLocaleString();
+            document.getElementById('profile-deaths').textContent = (userStats.deaths_count || 0).toLocaleString();
+            
+            // Header stats (если они остались)
             const registrationDate = new Date(data.registered_at);
             const daysSinceRegistration = Math.floor((Date.now() - registrationDate.getTime()) / (1000 * 60 * 60 * 24));
             
-            // Header stats
-            document.getElementById('stat-playtime').textContent = playtimeHours + 'ч';
-            document.getElementById('stat-reputation').textContent = data.reputation || 0;
-            document.getElementById('stat-logins').textContent = stats.total_logins || 0;
-            document.getElementById('stat-days').textContent = daysSinceRegistration;
-            
-            // Detailed stats
-            document.getElementById('stat-total-playtime').textContent = playtimeHours + 'ч';
-            document.getElementById('stat-total-logins').textContent = stats.total_logins || 0;
-            document.getElementById('stat-achievements').textContent = stats.achievements_count || 0;
-            
-            // Last seen
-            const lastSeenEl = document.getElementById('stat-last-seen');
-            if (data.last_login) {
-                const lastSeen = new Date(data.last_login);
-                const now = new Date();
-                const diffTime = Math.abs(now - lastSeen);
-                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                
-                if (diffDays === 0) {
-                    lastSeenEl.textContent = 'Сегодня';
-                } else if (diffDays === 1) {
-                    lastSeenEl.textContent = 'Вчера';
-                } else {
-                    lastSeenEl.textContent = `${diffDays} дн. назад`;
-                }
-            } else {
-                lastSeenEl.textContent = 'Никогда';
+            if (document.getElementById('stat-playtime')) {
+                document.getElementById('stat-playtime').textContent = playtimeHours + 'ч';
+            }
+            if (document.getElementById('stat-days')) {
+                document.getElementById('stat-days').textContent = daysSinceRegistration;
             }
         }
 
@@ -2966,180 +2964,7 @@
             `).join('');
         }
 
-        async function loadStatistics() {
-            const token = localStorage.getItem('auth_token');
-            
-            try {
-                // Загружаем детальную статистику
-                const response = await fetch('/api/profile/detailed-stats', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    updateDetailedStatistics(data);
-                } else {
-                    console.error('Ошибка загрузки статистики:', response.status);
-                }
-            } catch (error) {
-                console.error('Ошибка загрузки статистики:', error);
-            }
-            
-            await loadAchievements();
-        }
-
-        function updateDetailedStatistics(data) {
-            const stats = data.stats;
-            
-            // Обновляем основную статистику
-            document.getElementById('stat-total-playtime').textContent = stats.total_playtime_formatted || '0ч 0м';
-            document.getElementById('stat-total-logins').textContent = stats.total_logins || 0;
-            document.getElementById('stat-achievements').textContent = stats.achievements_count || 0;
-            
-            // Последний вход
-            const lastSeenEl = document.getElementById('stat-last-seen');
-            if (stats.last_seen) {
-                const lastSeen = new Date(stats.last_seen);
-                const now = new Date();
-                const diffTime = Math.abs(now - lastSeen);
-                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                
-                if (diffDays === 0) {
-                    lastSeenEl.textContent = 'Сегодня';
-                } else if (diffDays === 1) {
-                    lastSeenEl.textContent = 'Вчера';
-                } else {
-                    lastSeenEl.textContent = `${diffDays} дн. назад`;
-                }
-            } else {
-                lastSeenEl.textContent = 'Никогда';
-            }
-            
-            // Детальная игровая статистика
-            document.getElementById('stat-avg-session').textContent = stats.average_session_formatted || '-';
-            document.getElementById('stat-longest-session').textContent = stats.longest_session_formatted || '-';
-            document.getElementById('stat-active-days').textContent = stats.active_days || 0;
-            
-            // Любимое время игры
-            const favoriteHour = stats.favorite_play_hour || 12;
-            document.getElementById('stat-favorite-time').textContent = `${favoriteHour}:00`;
-            
-            // Обновляем дополнительную статистику, если есть соответствующие элементы
-            updateGameplayStats(stats);
-            
-            // Обновляем график активности
-            if (data.activity_chart) {
-                updateActivityChart(data.activity_chart);
-            }
-        }
-
-        function updateGameplayStats(stats) {
-            // Создаем дополнительную статистику если элементы существуют
-            const gameplayStats = [
-                { id: 'blocks-broken', value: stats.blocks_broken || 0, label: 'Блоков сломано' },
-                { id: 'blocks-placed', value: stats.blocks_placed || 0, label: 'Блоков поставлено' },
-                { id: 'distance-walked', value: formatDistance(stats.distance_walked || 0), label: 'Пройдено' },
-                { id: 'mobs-killed', value: stats.mobs_killed || 0, label: 'Мобов убито' },
-                { id: 'deaths-count', value: stats.deaths_count || 0, label: 'Смертей' },
-                { id: 'damage-dealt', value: stats.damage_dealt || 0, label: 'Урона нанесено' }
-            ];
-            
-            // Добавляем детальную игровую статистику к существующей
-            const gameplayContainer = document.querySelector('#tab-stats .space-y-4');
-            if (gameplayContainer && !document.getElementById('gameplay-stats-section')) {
-                const gameplaySection = document.createElement('div');
-                gameplaySection.id = 'gameplay-stats-section';
-                gameplaySection.innerHTML = `
-                    <div class="glass-effect rounded-xl p-6">
-                        <h4 class="text-lg font-bold text-minecraft-gold mb-4 flex items-center">
-                            <i class="fas fa-cubes mr-3"></i>Игровая статистика
-                        </h4>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                            ${gameplayStats.map(stat => `
-                                <div class="text-center">
-                                    <div class="text-2xl font-bold text-white">${stat.value}</div>
-                                    <div class="text-sm text-gray-400">${stat.label}</div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-                
-                gameplayContainer.parentNode.insertBefore(gameplaySection, gameplayContainer.nextSibling);
-            }
-        }
-
-        function formatDistance(blocks) {
-            if (blocks < 1000) return blocks + ' бл.';
-            if (blocks < 1000000) return Math.round(blocks / 1000) + ' км';
-            return Math.round(blocks / 1000000) + ' Мкм';
-        }
-
-        function updateActivityChart(activityData) {
-            const chartContainer = document.getElementById('activity-chart');
-            if (!chartContainer || !activityData.length) {
-                chartContainer.innerHTML = `
-                    <div class="text-center">
-                        <i class="fas fa-chart-bar text-4xl mb-4 text-gray-500"></i>
-                        <p class="text-gray-400">Недостаточно данных для графика</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Простой график активности
-            const maxPlaytime = Math.max(...activityData.map(d => d.playtime_minutes || 0));
-            const chartHTML = `
-                <div class="relative h-full">
-                    <div class="flex items-end justify-between h-48 px-2">
-                        ${activityData.slice(-14).map(day => {
-                            const height = maxPlaytime > 0 ? (day.playtime_minutes || 0) / maxPlaytime * 100 : 0;
-                            const date = new Date(day.stat_date);
-                            return `
-                                <div class="flex flex-col items-center group cursor-pointer">
-                                    <div class="bg-minecraft-gold rounded-t transition-all group-hover:bg-minecraft-yellow" 
-                                         style="height: ${height}%; width: 20px; min-height: 2px;"></div>
-                                    <div class="text-xs text-gray-400 mt-2 transform rotate-45 origin-bottom-left">
-                                        ${date.getDate()}/${date.getMonth() + 1}
-                                    </div>
-                                    <div class="absolute bottom-full mb-2 hidden group-hover:block bg-minecraft-dark p-2 rounded shadow-lg text-sm whitespace-nowrap">
-                                        ${Math.floor((day.playtime_minutes || 0) / 60)}ч ${(day.playtime_minutes || 0) % 60}м
-                                    </div>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-                    <div class="text-center text-gray-400 text-sm mt-4">
-                        Последние 14 дней (время игры в часах)
-                    </div>
-                </div>
-            `;
-            
-            chartContainer.innerHTML = chartHTML;
-        }
-
-        async function loadAchievements() {
-            const achievementsContainer = document.getElementById('achievements-list');
-            
-            try {
-                // Пока система достижений не реализована, показываем заглушку
-                achievementsContainer.innerHTML = `
-                    <div class="text-center text-gray-400 py-8">
-                        <i class="fas fa-trophy text-2xl mb-2"></i>
-                        <p>Система достижений в разработке</p>
-                        <p class="text-sm mt-1">Играйте на сервере, система достижений будет добавлена в будущих обновлениях!</p>
-                    </div>
-                `;
-            } catch (error) {
-                console.error('Ошибка загрузки достижений:', error);
-                achievementsContainer.innerHTML = `
-                    <div class="text-center text-gray-400 py-8">
-                        <i class="fas fa-trophy text-2xl mb-2"></i>
-                        <p>Система достижений в разработке</p>
-                    </div>
-                `;
-            }
-        }
+        // Удалены функции статистики - больше не нужны
 
         function showMessage(elementId, text, type) {
             const element = document.getElementById(elementId);

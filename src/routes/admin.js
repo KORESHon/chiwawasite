@@ -88,6 +88,48 @@ const safeDeleteUser = async (userId, adminId, reason) => {
     }
 };
 
+// GET /api/admin/users/by-nick/:nickname - Поиск пользователя по нику (для плагина)
+router.get('/users/by-nick/:nickname', authenticateLongTermApiToken, requireRole(['admin']), async (req, res) => {
+    try {
+        const { nickname } = req.params;
+
+        console.log(`🔍 Поиск пользователя по нику: ${nickname}`);
+
+        const userResult = await db.query(`
+            SELECT 
+                u.id, u.nickname, u.email, u.discord_username, u.trust_level,
+                u.is_banned, u.ban_reason, u.ban_until, u.registered_at, u.last_login,
+                u.is_email_verified, u.first_name, u.role, u.status,
+                ps.time_played_minutes, ps.is_time_limited,
+                ur.reputation_score, ps.total_logins
+            FROM users u
+            LEFT JOIN player_stats ps ON u.id = ps.user_id
+            LEFT JOIN user_reputation ur ON u.id = ur.user_id
+            WHERE LOWER(u.nickname) = LOWER($1)
+            LIMIT 1
+        `, [nickname]);
+
+        if (userResult.rows.length === 0) {
+            console.log(`❌ Пользователь с ником ${nickname} не найден`);
+            return res.status(404).json({ error: `Пользователь с ником ${nickname} не найден` });
+        }
+
+        const user = userResult.rows[0];
+        console.log(`✅ Найден пользователь ${user.nickname} (ID: ${user.id}), статус бана: ${user.is_banned}`);
+
+        res.json({
+            success: true,
+            user: user
+        });
+
+    } catch (error) {
+        console.error('Ошибка поиска пользователя по нику:', error);
+        res.status(500).json({
+            error: 'Внутренняя ошибка сервера'
+        });
+    }
+});
+
 // GET /api/admin/users - Управление пользователями
 router.get('/users', authenticateLongTermApiToken, requireRole(['admin']), async (req, res) => {
     try {
@@ -180,12 +222,13 @@ router.get('/users', authenticateLongTermApiToken, requireRole(['admin']), async
 
 // PUT /api/admin/users/:id/ban - Блокировка пользователя
 router.put('/users/:id/ban', [
-    authenticateToken,
+    authenticateLongTermApiToken,
     requireRole(['admin', 'moderator']),
     body('reason').isLength({ min: 1, max: 500 }).withMessage('Причина должна содержать от 1 до 500 символов'),
     body('type').optional().isIn(['temporary', 'permanent']).withMessage('Тип должен быть temporary или permanent'),
     body('duration').optional().isInt({ min: 1 }).withMessage('Длительность должна быть положительным числом'),
-    body('unit').optional().isIn(['hours', 'days', 'weeks', 'months']).withMessage('Единица времени должна быть hours, days, weeks или months')
+    body('unit').optional().isIn(['hours', 'days', 'weeks', 'months']).withMessage('Единица времени должна быть hours, days, weeks или months'),
+    body('minecraft_nick').optional().isLength({ min: 1, max: 50 }).withMessage('Minecraft ник должен содержать от 1 до 50 символов')
 ], async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -199,17 +242,30 @@ router.put('/users/:id/ban', [
         }
 
         const { id } = req.params;
-        const { reason, type, duration, unit } = req.body;
+        const { reason, type, duration, unit, minecraft_nick } = req.body;
 
-        console.log(`📝 Запрос на бан пользователя ID:${id}, тип:${type}, причина:${reason}`);
+        console.log(`📝 Запрос на бан пользователя ID:${id}, тип:${type}, причина:${reason}, ник:${minecraft_nick}`);
 
-        // Проверяем, что пользователь существует
-        const userResult = await db.query('SELECT nickname FROM users WHERE id = $1', [id]);
-        if (userResult.rows.length === 0) {
-            return res.status(404).json({ error: 'Пользователь не найден' });
+        let userId = id;
+        let userNickname = null;
+
+        // Если передан minecraft_nick, ищем пользователя по нику (поддержка оффлайн игроков)
+        if (minecraft_nick) {
+            const userResult = await db.query('SELECT id, nickname FROM users WHERE LOWER(nickname) = LOWER($1)', [minecraft_nick]);
+            if (userResult.rows.length === 0) {
+                return res.status(404).json({ error: `Пользователь с ником ${minecraft_nick} не найден` });
+            }
+            userId = userResult.rows[0].id;
+            userNickname = userResult.rows[0].nickname;
+            console.log(`🎯 Найден пользователь по нику ${minecraft_nick}: ID ${userId}`);
+        } else {
+            // Проверяем, что пользователь существует по ID
+            const userResult = await db.query('SELECT nickname FROM users WHERE id = $1', [userId]);
+            if (userResult.rows.length === 0) {
+                return res.status(404).json({ error: 'Пользователь не найден' });
+            }
+            userNickname = userResult.rows[0].nickname;
         }
-
-        const user = userResult.rows[0];
 
         // Вычисляем дату окончания бана для временной блокировки
         let bannedUntil = null;
@@ -236,21 +292,21 @@ router.put('/users/:id/ban', [
         // Обновляем статус бана
         await db.query(`
             UPDATE users 
-            SET is_banned = true, ban_reason = $1
-            WHERE id = $2
-        `, [reason, id]);
+            SET is_banned = true, ban_reason = $1, ban_until = $2
+            WHERE id = $3
+        `, [reason, bannedUntil, userId]);
 
         // Деактивируем все активные сессии пользователя
         await db.query(`
             UPDATE user_sessions 
             SET is_active = false 
             WHERE user_id = $1 AND is_active = true
-        `, [id]);
+        `, [userId]);
 
         // Логируем действие
         const logDetails = type === 'temporary' 
-            ? `Пользователь ${user.nickname} заблокирован на ${duration} ${unit}: ${reason}`
-            : `Пользователь ${user.nickname} заблокирован навсегда: ${reason}`;
+            ? `Пользователь ${userNickname} заблокирован на ${duration} ${unit}: ${reason}${bannedUntil ? ` (до ${bannedUntil.toLocaleString('ru-RU')})` : ''}`
+            : `Пользователь ${userNickname} заблокирован навсегда: ${reason}`;
 
         await db.query(`
             INSERT INTO admin_logs (admin_id, action, details, target_user_id)
@@ -259,14 +315,18 @@ router.put('/users/:id/ban', [
             req.user.id,
             'user_banned',
             logDetails,
-            id
+            userId
         ]);
+
+        console.log(`✅ Пользователь ${userNickname} (ID: ${userId}) успешно забанен`);
 
         res.json({
             success: true,
             message: type === 'temporary' 
-                ? `Пользователь ${user.nickname} заблокирован на ${duration} ${unit}`
-                : `Пользователь ${user.nickname} заблокирован навсегда`
+                ? `Пользователь ${userNickname} заблокирован на ${duration} ${unit}`
+                : `Пользователь ${userNickname} заблокирован навсегда`,
+            user_id: userId,
+            ban_until: bannedUntil
         });
 
     } catch (error) {
@@ -278,22 +338,53 @@ router.put('/users/:id/ban', [
 });
 
 // PUT /api/admin/users/:id/unban - Разблокировка пользователя
-router.put('/users/:id/unban', authenticateToken, requireRole(['admin']), async (req, res) => {
+router.put('/users/:id/unban', [
+    authenticateLongTermApiToken, 
+    requireRole(['admin', 'moderator']),
+    body('minecraft_nick').optional().isLength({ min: 1, max: 50 }).withMessage('Minecraft ник должен содержать от 1 до 50 символов')
+], async (req, res) => {
     try {
         const { id } = req.params;
+        const { minecraft_nick } = req.body;
 
-        const userResult = await db.query('SELECT nickname FROM users WHERE id = $1', [id]);
-        if (userResult.rows.length === 0) {
-            return res.status(404).json({ error: 'Пользователь не найден' });
+        let userId = id;
+        let userNickname = null;
+
+        console.log(`📝 Запрос на разбан пользователя ID:${id}, ник:${minecraft_nick}`);
+
+        // Если передан minecraft_nick, ищем пользователя по нику (поддержка оффлайн игроков)
+        if (minecraft_nick) {
+            const userResult = await db.query('SELECT id, nickname, is_banned FROM users WHERE LOWER(nickname) = LOWER($1)', [minecraft_nick]);
+            if (userResult.rows.length === 0) {
+                return res.status(404).json({ error: `Пользователь с ником ${minecraft_nick} не найден` });
+            }
+            userId = userResult.rows[0].id;
+            userNickname = userResult.rows[0].nickname;
+            
+            if (!userResult.rows[0].is_banned) {
+                return res.status(400).json({ error: `Пользователь ${userNickname} не забанен` });
+            }
+            
+            console.log(`🎯 Найден забаненный пользователь по нику ${minecraft_nick}: ID ${userId}`);
+        } else {
+            // Проверяем, что пользователь существует по ID
+            const userResult = await db.query('SELECT nickname, is_banned FROM users WHERE id = $1', [userId]);
+            if (userResult.rows.length === 0) {
+                return res.status(404).json({ error: 'Пользователь не найден' });
+            }
+            userNickname = userResult.rows[0].nickname;
+            
+            if (!userResult.rows[0].is_banned) {
+                return res.status(400).json({ error: `Пользователь ${userNickname} не забанен` });
+            }
         }
 
-        const user = userResult.rows[0];
-
+        // Снимаем бан
         await db.query(`
             UPDATE users 
-            SET is_banned = false, ban_reason = NULL
+            SET is_banned = false, ban_reason = NULL, ban_until = NULL
             WHERE id = $1
-        `, [id]);
+        `, [userId]);
 
         // Логируем действие
         await db.query(`
@@ -302,13 +393,16 @@ router.put('/users/:id/unban', authenticateToken, requireRole(['admin']), async 
         `, [
             req.user.id,
             'user_unbanned',
-            `Пользователь ${user.nickname} разблокирован`,
-            id
+            `Пользователь ${userNickname} разблокирован`,
+            userId
         ]);
+
+        console.log(`✅ Пользователь ${userNickname} (ID: ${userId}) успешно разбанен`);
 
         res.json({
             success: true,
-            message: `Пользователь ${user.nickname} разблокирован`
+            message: `Пользователь ${userNickname} разблокирован`,
+            user_id: userId
         });
 
     } catch (error) {
@@ -373,10 +467,11 @@ router.delete('/users/:id/delete', [
 
 // PUT /api/admin/users/:id/trust-level - Изменение уровня доверия
 router.put('/users/:id/trust-level', [
-    authenticateToken,
+    authenticateLongTermApiToken,
     requireRole(['admin']),
     body('level').isInt({ min: 0, max: 3 }),
-    body('reason').optional().isLength({ max: 200 })
+    body('reason').optional().isLength({ max: 200 }),
+    body('minecraft_nick').optional().isLength({ min: 1, max: 50 }).withMessage('Minecraft ник должен содержать от 1 до 50 символов')
 ], async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -388,18 +483,36 @@ router.put('/users/:id/trust-level', [
         }
 
         const { id } = req.params;
-        const { level, reason } = req.body;
+        const { level, reason, minecraft_nick } = req.body;
 
-        const userResult = await db.query('SELECT nickname, trust_level FROM users WHERE id = $1', [id]);
-        if (userResult.rows.length === 0) {
-            return res.status(404).json({ error: 'Пользователь не найден' });
+        let userId = id;
+        let userNickname = null;
+        let oldLevel = null;
+
+        console.log(`📝 Запрос на изменение траст левела пользователя ID:${id}, ник:${minecraft_nick}, новый уровень:${level}`);
+
+        // Если передан minecraft_nick, ищем пользователя по нику (поддержка оффлайн игроков)
+        if (minecraft_nick) {
+            const userResult = await db.query('SELECT id, nickname, trust_level FROM users WHERE LOWER(nickname) = LOWER($1)', [minecraft_nick]);
+            if (userResult.rows.length === 0) {
+                return res.status(404).json({ error: `Пользователь с ником ${minecraft_nick} не найден` });
+            }
+            userId = userResult.rows[0].id;
+            userNickname = userResult.rows[0].nickname;
+            oldLevel = userResult.rows[0].trust_level;
+            console.log(`🎯 Найден пользователь по нику ${minecraft_nick}: ID ${userId}, текущий уровень ${oldLevel}`);
+        } else {
+            // Проверяем, что пользователь существует по ID
+            const userResult = await db.query('SELECT nickname, trust_level FROM users WHERE id = $1', [userId]);
+            if (userResult.rows.length === 0) {
+                return res.status(404).json({ error: 'Пользователь не найден' });
+            }
+            userNickname = userResult.rows[0].nickname;
+            oldLevel = userResult.rows[0].trust_level;
         }
 
-        const user = userResult.rows[0];
-        const oldLevel = user.trust_level;
-
         // Обновляем уровень доверия
-        await db.query('UPDATE users SET trust_level = $1 WHERE id = $2', [level, id]);
+        await db.query('UPDATE users SET trust_level = $1 WHERE id = $2', [level, userId]);
 
         // Логируем действие
         await db.query(`
@@ -408,13 +521,18 @@ router.put('/users/:id/trust-level', [
         `, [
             req.user.id,
             'trust_level_changed',
-            `Уровень доверия ${user.nickname} изменен с ${oldLevel} на ${level}${reason ? ': ' + reason : ''}`,
-            id
+            `Уровень доверия ${userNickname} изменен с ${oldLevel} на ${level}${reason ? ': ' + reason : ''}`,
+            userId
         ]);
+
+        console.log(`✅ Уровень доверия пользователя ${userNickname} (ID: ${userId}) изменен с ${oldLevel} на ${level}`);
 
         res.json({
             success: true,
-            message: `Уровень доверия пользователя ${user.nickname} изменен на ${level}`
+            message: `Уровень доверия пользователя ${userNickname} изменен на ${level}`,
+            user_id: userId,
+            old_level: oldLevel,
+            new_level: level
         });
 
     } catch (error) {
@@ -648,34 +766,152 @@ router.put('/users/:id/playtime', authenticateLongTermApiToken, requireRole(['ad
     }
 });
 
-// GET /api/admin/users/:id/stats - Получить статистику игрока (для плагина)
-router.get('/users/:id/stats', authenticateLongTermApiToken, requireRole(['admin']), async (req, res) => {
+// PUT /api/admin/users/:id/reputation - Изменить репутацию (для плагина)
+router.put('/users/:id/reputation', [
+    authenticateLongTermApiToken, 
+    requireRole(['admin']),
+    body('reputation').optional().isInt({ min: 0 }).withMessage('reputation должно быть неотрицательным числом'),
+    body('reason').optional().isLength({ max: 200 }),
+    body('minecraft_nick').optional().isLength({ min: 1, max: 50 }).withMessage('Minecraft ник должен содержать от 1 до 50 символов')
+], async (req, res) => {
     try {
-        const userId = parseInt(req.params.id);
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                error: 'Ошибка валидации',
+                details: errors.array()
+            });
+        }
 
-        const statsResult = await db.query(
-            'SELECT * FROM player_stats WHERE user_id = $1',
+        const { id } = req.params;
+        const { reputation, reason, minecraft_nick } = req.body;
+
+        let userId = id;
+        let userNickname = null;
+
+        console.log(`📝 Запрос на установку репутации пользователя ID:${id}, ник:${minecraft_nick}, новая репутация:${reputation}`);
+
+        // Если передан minecraft_nick, ищем пользователя по нику (поддержка оффлайн игроков)
+        if (minecraft_nick) {
+            const userResult = await db.query('SELECT id, nickname FROM users WHERE LOWER(nickname) = LOWER($1)', [minecraft_nick]);
+            if (userResult.rows.length === 0) {
+                return res.status(404).json({ error: `Пользователь с ником ${minecraft_nick} не найден` });
+            }
+            userId = userResult.rows[0].id;
+            userNickname = userResult.rows[0].nickname;
+            console.log(`🎯 Найден пользователь по нику ${minecraft_nick}: ID ${userId}`);
+        } else {
+            // Проверяем, что пользователь существует по ID
+            const userResult = await db.query('SELECT id, nickname FROM users WHERE id = $1', [userId]);
+            if (userResult.rows.length === 0) {
+                return res.status(404).json({ error: 'Пользователь не найден' });
+            }
+            userNickname = userResult.rows[0].nickname;
+        }
+
+        // Проверяем, что репутация указана
+        if (reputation === undefined) {
+            return res.status(400).json({ error: 'Требуется параметр reputation' });
+        }
+
+        // Получаем текущую репутацию для логирования
+        const currentRepResult = await db.query(
+            'SELECT reputation_score FROM user_reputation WHERE user_id = $1', 
             [userId]
         );
+        const currentReputation = currentRepResult.rows.length > 0 ? currentRepResult.rows[0].reputation_score : 0;
+
+        // УСТАНАВЛИВАЕМ (а не суммируем) абсолютное значение репутации
+        const result = await db.query(`
+            INSERT INTO user_reputation (user_id, reputation_score, updated_at) 
+            VALUES ($1, $2, NOW())
+            ON CONFLICT (user_id) 
+            DO UPDATE SET 
+                reputation_score = $2,
+                updated_at = NOW()
+            RETURNING *
+        `, [userId, reputation]);
+
+        console.log(`✅ Репутация пользователя ${userNickname} (ID: ${userId}) установлена в ${reputation} (было: ${currentReputation}). Причина: ${reason || 'Не указана'}`);
+
+        res.json({ 
+            success: true, 
+            message: 'Репутация установлена',
+            user_id: userId,
+            user_nickname: userNickname,
+            reputation_score: reputation,
+            previous_reputation: currentReputation,
+            action: 'set'
+        });
+
+    } catch (error) {
+        console.error('Ошибка установки репутации:', error);
+        res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    }
+});
+
+// GET /api/admin/users/:id/stats - Получить статистику игрока (для плагина)
+router.get('/users/:id/stats', [
+    authenticateLongTermApiToken, 
+    requireRole(['admin']),
+    // Поддерживаем query параметр minecraft_nick для поиска по нику
+], async (req, res) => {
+    try {
+        const idParam = req.params.id;
+        const { minecraft_nick } = req.query;
+
+        let userId = parseInt(idParam);
+        let userNickname = null;
+
+        console.log(`📝 Запрос статистики пользователя ID:${idParam}, ник:${minecraft_nick}`);
+
+        // Если передан minecraft_nick, ищем пользователя по нику (поддержка оффлайн игроков)
+        if (minecraft_nick) {
+            const userResult = await db.query('SELECT id, nickname FROM users WHERE LOWER(nickname) = LOWER($1)', [minecraft_nick]);
+            if (userResult.rows.length === 0) {
+                return res.status(404).json({ error: `Пользователь с ником ${minecraft_nick} не найден` });
+            }
+            userId = userResult.rows[0].id;
+            userNickname = userResult.rows[0].nickname;
+            console.log(`🎯 Найден пользователь по нику ${minecraft_nick}: ID ${userId}`);
+        } else {
+            // Проверяем, что пользователь существует по ID
+            const userResult = await db.query('SELECT id, nickname FROM users WHERE id = $1', [userId]);
+            if (userResult.rows.length === 0) {
+                return res.status(404).json({ error: 'Пользователь не найден' });
+            }
+            userNickname = userResult.rows[0].nickname;
+        }
+
+        const statsResult = await db.query(`
+            SELECT ps.*, COALESCE(ur.reputation_score, 0) as reputation
+            FROM player_stats ps
+            LEFT JOIN user_reputation ur ON ps.user_id = ur.user_id
+            WHERE ps.user_id = $1
+        `, [userId]);
 
         if (statsResult.rows.length === 0) {
             // Создаем базовую статистику если её нет
             await db.query(
-                'INSERT INTO player_stats (user_id, time_played_minutes, is_time_limited, created_at, updated_at) VALUES ($1, 0, false, NULL, NOW(), NOW())',
+                'INSERT INTO player_stats (user_id, time_played_minutes, is_time_limited, created_at, updated_at) VALUES ($1, 0, false, NOW(), NOW())',
                 [userId]
             );
             
-            const newStatsResult = await db.query(
-                'SELECT * FROM player_stats WHERE user_id = $1',
-                [userId]
-            );
+            const newStatsResult = await db.query(`
+                SELECT ps.*, COALESCE(ur.reputation_score, 0) as reputation
+                FROM player_stats ps
+                LEFT JOIN user_reputation ur ON ps.user_id = ur.user_id
+                WHERE ps.user_id = $1
+            `, [userId]);
             
             const stats = newStatsResult.rows[0];
             // Добавляем поля для совместимости с админ панелью
             stats.player_level = stats.current_level || 1;
             stats.deaths = stats.deaths_count || 0;
             stats.mob_kills = stats.mobs_killed || 0;
+            stats.user_nickname = userNickname;
             
+            console.log(`✅ Создана и возвращена базовая статистика для ${userNickname} (ID: ${userId})`);
             return res.json(stats);
         }
 
@@ -684,6 +920,9 @@ router.get('/users/:id/stats', authenticateLongTermApiToken, requireRole(['admin
         stats.player_level = stats.current_level || 1;
         stats.deaths = stats.deaths_count || 0; 
         stats.mob_kills = stats.mobs_killed || 0;
+        stats.user_nickname = userNickname;
+        
+        console.log(`✅ Возвращена статистика для ${userNickname} (ID: ${userId}): игровое время ${stats.time_played_minutes || 0} мин, репутация ${stats.reputation}`);
         
         res.json(stats);
 
